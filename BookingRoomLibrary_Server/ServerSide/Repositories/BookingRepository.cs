@@ -13,9 +13,13 @@ namespace ServerSide.Repositories
             this.context = context;
         }
 
+        IEnumerable<Booking> IBookingRepository.GetBookingByDateAndStatus(DateOnly date, byte status)
+        {
+            return context.Bookings.Where(x=>x.BookingDate == date&&x.Status==status).ToList();
+        }
     }
     public interface IBookingRepository
     {
-        
+        IEnumerable<Booking> GetBookingByDateAndStatus(DateOnly date,byte status);
     }
 }

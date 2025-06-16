@@ -1,0 +1,23 @@
+# Node (React)
+library-room-booking-client/node_modules/
+library-room-booking-client/build/
+library-room-booking-client/.env
+library-room-booking-client/.next/
+library-room-booking-client/.parcel-cache/
+
+# VS/ASP.NET
+BookingRoomLibrary_Server/bin/
+BookingRoomLibrary_Server/obj/
+BookingRoomLibrary_Server/.vs/
+BookingRoomLibrary_Server/*.user
+BookingRoomLibrary_Server/*.suo
+BookingRoomLibrary_Server/*.csproj.user
+
+# General
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+.env
+.env.*

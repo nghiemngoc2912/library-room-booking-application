@@ -284,3 +284,4 @@ D:\SU25\PRN232\LibraryRoomBooking\BookingRoomLibrary_Server\ServerSide\obj\Debug
 D:\SU25\PRN232\LibraryRoomBooking\BookingRoomLibrary_Server\ServerSide\obj\Debug\net8.0\ServerSide.pdb
 D:\SU25\PRN232\LibraryRoomBooking\BookingRoomLibrary_Server\ServerSide\obj\Debug\net8.0\ServerSide.genruntimeconfig.cache
 D:\SU25\PRN232\LibraryRoomBooking\BookingRoomLibrary_Server\ServerSide\obj\Debug\net8.0\ref\ServerSide.dll
+D:\SU25\PRN232\LibraryRoomBooking\BookingRoomLibrary_Server\ServerSide\obj\Debug\net8.0\ServerSide.sourcelink.json

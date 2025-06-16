@@ -13,14 +13,15 @@ namespace ServerSide.Services
             this.repository = repository;
         }
 
-        public IEnumerable<HomeBookingDTO> GetBookingByDate(DateOnly date)
+        public IEnumerable<HomeBookingDTO> GetBookingByDateAndStatus(DateOnly date, byte status)
         {
-
-            throw new NotImplementedException();
+            var listRaw = repository.GetBookingByDateAndStatus(date,status);
+            var list = listRaw.Select(x=>new HomeBookingDTO(x)).ToList();
+            return list;
         }
     }
     public interface IBookingService
     {
-        IEnumerable<HomeBookingDTO> GetBookingByDate(DateOnly date);
+        IEnumerable<HomeBookingDTO> GetBookingByDateAndStatus(DateOnly date,byte status);
     }
 }

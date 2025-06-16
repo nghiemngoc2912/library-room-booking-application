@@ -17,17 +17,17 @@ namespace ServerSide.Controllers
             this.service = service;
         }
 
-        //get booking status
+        //get booking 
         //= 0 - booked
         //=-1 - canceled
         //= 1 - checked in
         //= 2 checked out
-        //by date
+        //by date and status
         //for home - just check the date after, before -> check by fe because cannot be booked
-        [HttpGet("date/{date}")]
-        public IEnumerable<HomeBookingDTO> GetBookingByDate(DateOnly date)
+        [HttpGet("date/{date}/status/{status}")]
+        public IEnumerable<HomeBookingDTO> GetBookingByDateAndStatus(DateOnly date,byte status)
         {
-            return null;
+            return service.GetBookingByDateAndStatus(date,status);
         }
 
         //create booking
