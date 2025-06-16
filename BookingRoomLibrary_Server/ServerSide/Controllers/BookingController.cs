@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ServerSide.DTOs.Booking;
+using ServerSide.Services;
 
 namespace ServerSide.Controllers
 {
@@ -7,9 +9,26 @@ namespace ServerSide.Controllers
     [ApiController]
     public class BookingController : ControllerBase
     {
-        //get book by date
-        //for home - just check the date after, before -> check by fe because cannot be booked
+        //call iservice
+        private readonly IBookingService service;
 
+        public BookingController(IBookingService service)
+        {
+            this.service = service;
+        }
+
+        //get booking status
+        //= 0 - booked
+        //=-1 - canceled
+        //= 1 - checked in
+        //= 2 checked out
+        //by date
+        //for home - just check the date after, before -> check by fe because cannot be booked
+        [HttpGet("date/{date}")]
+        public IEnumerable<HomeBookingDTO> GetBookingByDate(DateOnly date)
+        {
+            return null;
+        }
 
         //create booking
         //check date

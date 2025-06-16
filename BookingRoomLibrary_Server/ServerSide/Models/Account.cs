@@ -11,7 +11,7 @@ public partial class Account
 
     public string PasswordHash { get; set; } = null!;
 
-    public string Role { get; set; } = null!;
+    public byte Role { get; set; }
 
     public byte Status { get; set; }
 

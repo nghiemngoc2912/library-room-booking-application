@@ -1,13 +1,17 @@
-﻿using ServerSide.Services;
+﻿
+using ServerSide.Models;
 
 namespace ServerSide.Repositories
 {
     public class BookingRepository:IBookingRepository
     {
         //remember DI in Program.cs
-        //call the interface
-        IBookingService service;
+        private readonly LibraryRoomBookingContext context;
 
+        public BookingRepository(LibraryRoomBookingContext context)
+        {
+            this.context = context;
+        }
 
     }
     public interface IBookingRepository
