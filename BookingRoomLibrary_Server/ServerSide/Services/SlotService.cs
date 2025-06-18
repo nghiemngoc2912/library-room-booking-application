@@ -16,9 +16,15 @@ namespace ServerSide.Services
         {
             return slotRepository.GetAll();
         }
+
+        Slot ISlotService.GetById(int id)
+        {
+            return slotRepository.GetById(id);
+        }
     }
     public interface ISlotService
     {
         IEnumerable<Slot> GetAll();
+        Slot GetById(int id);
     }
 }
