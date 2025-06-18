@@ -23,6 +23,11 @@ namespace ServerSide.Controllers
         {
             return slotService.GetAll();
         }
+        [HttpGet("{id}")]
+        public Slot GetById(int id)
+        {
+            return slotService.GetById(id);
+        }
 
 
     }

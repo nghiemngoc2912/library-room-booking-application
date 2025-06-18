@@ -23,5 +23,10 @@ namespace ServerSide.Controllers
         {
             return roomService.GetAll();
         }
+        [HttpGet("{id}")]
+        public CreateBookingRoom GetById(int id)
+        {
+            return roomService.GetById(id);
+        }
     }
 }

@@ -11,7 +11,7 @@ export default function BookingDatePicker({ value, onChange }) {
   const maxDate = maxDateObj.toISOString().split('T')[0];
   return (
     <TextField
-      label="Chọn ngày"
+      label="Select date"
       type="date"
       value={value}
       onChange={onChange}

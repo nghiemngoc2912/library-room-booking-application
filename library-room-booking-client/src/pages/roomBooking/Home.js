@@ -10,7 +10,7 @@ export default function Home() {
 
   return (
     <div style={{ padding: 20 }}>
-      <h2>Quản lý đặt phòng</h2>
+      <h2>Room Booking</h2>
 
       <div style={{ marginBottom: 20 }}>
         <DatePicker

@@ -15,9 +15,15 @@ namespace ServerSide.Repositories
         {
             return context.Rooms.ToList();
         }
+
+        Room IRoomRepository.GetById(int id)
+        {
+            return context.Rooms.Find(id);
+        }
     }
     public interface IRoomRepository
     {
         IEnumerable<Room> GetAll();
+        Room GetById(int id);
     }
 }

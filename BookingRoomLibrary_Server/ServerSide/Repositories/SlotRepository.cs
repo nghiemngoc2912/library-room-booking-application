@@ -15,9 +15,15 @@ namespace ServerSide.Repositories
         {
             return context.Slots.ToList();
         }
+
+        Slot ISlotRepository.GetById(int id)
+        {
+            return context.Slots.Find(id);
+        }
     }
     public interface ISlotRepository
     {
         IEnumerable<Slot> GetAll();
+        Slot GetById(int id);
     }
 }

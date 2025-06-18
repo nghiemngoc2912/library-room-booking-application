@@ -14,6 +14,7 @@ public partial class Booking
     public int RoomId { get; set; }
 
     public int SlotId { get; set; }
+    public string Reason { get; set; }
     public byte Status { get; set; }
 
     public DateTime? CreatedDate { get; set; }
