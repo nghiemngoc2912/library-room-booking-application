@@ -25,9 +25,12 @@ builder.Services.AddDbContext<LibraryRoomBookingContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MyCnn")));
 //DI repo
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+builder.Services.AddScoped<IRoomRepository, RoomRepository>();
+builder.Services.AddScoped<ISlotRepository, SlotRepository>();
 //DI service
 builder.Services.AddScoped<IBookingService,BookingService>();
-
+builder.Services.AddScoped<IRoomService, RoomService>();
+builder.Services.AddScoped<ISlotService, SlotService>();
 
 var app = builder.Build();
 
