@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ServerSide.Models;
+using ServerSide.Services;
 
 namespace ServerSide.Controllers
 {
@@ -7,8 +9,20 @@ namespace ServerSide.Controllers
     [ApiController]
     public class SlotController : ControllerBase
     {
+        private readonly ISlotService slotService;
+
+        public SlotController(ISlotService slotService)
+        {
+            this.slotService = slotService;
+        }
+
         //get all
         //for home
+        [HttpGet]
+        public IEnumerable<Slot> GetAll()
+        {
+            return slotService.GetAll();
+        }
 
 
     }

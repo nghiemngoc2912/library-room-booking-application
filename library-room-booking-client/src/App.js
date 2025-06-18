@@ -1,10 +1,16 @@
-import './App.css';
-import Header from './Components/Header';
+// src/App.jsx
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import DefaultLayout from './layouts/DefaultLayout';
+import RoomBooking from './pages/roomBooking/RoomBooking';
 
-function App() {
+
+const App = () => {
   return (
-    <Header/>
+    <Routes>
+      <Route path="/" element={<DefaultLayout><RoomBooking /></DefaultLayout>} />
+    </Routes>
   );
-}
+};
 
 export default App;
