@@ -35,7 +35,11 @@ namespace ServerSide.Controllers
         //check student reputation
         //check booking time in a day
         //check booking time in 7 days
+        [HttpPost()]
+        public void CreateBooking([FromForm] CreateBookingDTO createBookingDTO)
+        {
 
+        }
 
 
         //change status

@@ -8,6 +8,7 @@ public partial class User
     public int Id { get; set; }
 
     public string FullName { get; set; } = null!;
+    public string Code { get; set; }
 
     public DateOnly? Dob { get; set; }
 
