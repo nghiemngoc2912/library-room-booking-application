@@ -1,6 +1,6 @@
 import React from 'react';
-import DatePicker from '../../components/date/BookingDatePicker';
-import BookingTable from '../../components/table/BookingTable';
+import DatePicker from '../../Components/date/BookingDatePicker';
+import BookingTable from '../../Components/table/BookingTable';
 import { useState } from 'react';
 export default function Home() {
   const [selectedDate, setSelectedDate] = useState(() => {
