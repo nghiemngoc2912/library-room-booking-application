@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ServerSide.DTOs.Booking;
+using ServerSide.Exceptions;
 using ServerSide.Services;
 
 namespace ServerSide.Controllers
@@ -33,7 +34,7 @@ namespace ServerSide.Controllers
         
 
         [HttpPost]
-        public IActionResult CreateBooking([FromForm]CreateBookingDTO createBookingDTO)
+        public IActionResult CreateBooking([FromBody]CreateBookingDTO createBookingDTO)
         {
 
             try
@@ -41,7 +42,7 @@ namespace ServerSide.Controllers
                 service.CreateBooking(createBookingDTO);
                 return Ok("Booking created successfully");
             }
-            catch (InvalidOperationException ex)
+            catch (BookingPolicyViolationException ex)
             {
                 return BadRequest(ex.Message);
             }

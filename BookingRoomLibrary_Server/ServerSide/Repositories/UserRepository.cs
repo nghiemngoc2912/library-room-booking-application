@@ -12,6 +12,11 @@ namespace ServerSide.Repositories
             this.context = context;
         }
 
+        public IEnumerable<User> SearchUserByCode(string code)
+        {
+            return context.Users.Where(x => x.Code.Contains(code));
+        }
+
         User IUserRepository.GetUserByCode(string code)
         {
             return context.Users
@@ -22,5 +27,6 @@ namespace ServerSide.Repositories
     public interface IUserRepository
     {
         User GetUserByCode(string s);
+        IEnumerable<User> SearchUserByCode(string code);
     }
 }
