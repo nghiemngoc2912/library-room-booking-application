@@ -1,4 +1,5 @@
 ﻿using ServerSide.DTOs.Room;
+using ServerSide.Models;
 using ServerSide.Repositories;
 
 namespace ServerSide.Services
@@ -12,19 +13,19 @@ namespace ServerSide.Services
             this.roomRepository = roomRepository;
         }
 
-        public IEnumerable<HomeRoomDTO> GetAll()
+        public IEnumerable<HomeRoomDTO> GetAllRoomsForHome()
         {
             return roomRepository.GetAll().Select(r => new HomeRoomDTO(r)).ToList();
         }
 
-        CreateBookingRoom IRoomService.GetById(int id)
+        CreateBookingRoomDTO IRoomService.GetRoomByIdForBooking(int id)
         {
-            return new CreateBookingRoom(roomRepository.GetById(id));
+            return new CreateBookingRoomDTO(roomRepository.GetById(id));
         }
     }
     public interface IRoomService
     {
-        IEnumerable<HomeRoomDTO> GetAll();
-        CreateBookingRoom GetById(int id);
+        IEnumerable<HomeRoomDTO> GetAllRoomsForHome();
+        CreateBookingRoomDTO GetRoomByIdForBooking(int id);
     }
 }
