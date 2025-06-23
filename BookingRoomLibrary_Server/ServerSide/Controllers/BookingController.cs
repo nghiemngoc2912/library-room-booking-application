@@ -30,15 +30,25 @@ namespace ServerSide.Controllers
             return service.GetBookingByDateAndStatus(date,status);
         }
 
-        //create booking
-        //check date
-        //check student reputation
-        //check booking time in a day
-        //check booking time in 7 days
-        [HttpPost()]
-        public void CreateBooking([FromForm] CreateBookingDTO createBookingDTO)
+        
+
+        [HttpPost]
+        public IActionResult CreateBooking([FromForm]CreateBookingDTO createBookingDTO)
         {
 
+            try
+            {
+                service.CreateBooking(createBookingDTO);
+                return Ok("Booking created successfully");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
         }
 
 
