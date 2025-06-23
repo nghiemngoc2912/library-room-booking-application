@@ -3,6 +3,38 @@
   "WorkspaceRootPath": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|t:\\learning\\ky8\\prn232\\finalproject\\library-room-booking-application\\bookingroomlibrary_server\\serverside\\controllers\\roomcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|solutionrelative:serverside\\controllers\\roomcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|t:\\learning\\ky8\\prn232\\finalproject\\library-room-booking-application\\bookingroomlibrary_server\\serverside\\controllers\\bookingcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|solutionrelative:serverside\\controllers\\bookingcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|t:\\learning\\ky8\\prn232\\finalproject\\library-room-booking-application\\bookingroomlibrary_server\\serverside\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|solutionrelative:serverside\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|t:\\learning\\ky8\\prn232\\finalproject\\library-room-booking-application\\bookingroomlibrary_server\\serverside\\services\\bookingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|solutionrelative:serverside\\services\\bookingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|t:\\learning\\ky8\\prn232\\finalproject\\library-room-booking-application\\bookingroomlibrary_server\\serverside\\services\\slotservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|solutionrelative:serverside\\services\\slotservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|t:\\learning\\ky8\\prn232\\finalproject\\library-room-booking-application\\bookingroomlibrary_server\\serverside\\repositories\\slotrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|solutionrelative:serverside\\repositories\\slotrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|t:\\learning\\ky8\\prn232\\finalproject\\library-room-booking-application\\bookingroomlibrary_server\\serverside\\repositories\\bookingrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|solutionrelative:serverside\\repositories\\bookingrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|t:\\learning\\ky8\\prn232\\finalproject\\library-room-booking-application\\bookingroomlibrary_server\\serverside\\repositories\\roomrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|solutionrelative:serverside\\repositories\\roomrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|t:\\learning\\ky8\\prn232\\finalproject\\library-room-booking-application\\bookingroomlibrary_server\\serverside\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|solutionrelative:serverside\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
@@ -11,60 +43,12 @@
       "RelativeMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|solutionrelative:serverside\\serverside.http||{5703B403-55E7-4C63-8C88-A8F52C7A45C5}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|t:\\learning\\ky8\\prn232\\finalproject\\library-room-booking-application\\bookingroomlibrary_server\\serverside\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|solutionrelative:serverside\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|t:\\learning\\ky8\\prn232\\finalproject\\library-room-booking-application\\bookingroomlibrary_server\\serverside\\repositories\\slotrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|solutionrelative:serverside\\repositories\\slotrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|t:\\learning\\ky8\\prn232\\finalproject\\library-room-booking-application\\bookingroomlibrary_server\\serverside\\services\\slotservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|solutionrelative:serverside\\services\\slotservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|t:\\learning\\ky8\\prn232\\finalproject\\library-room-booking-application\\bookingroomlibrary_server\\serverside\\controllers\\slotcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|solutionrelative:serverside\\controllers\\slotcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|t:\\learning\\ky8\\prn232\\finalproject\\library-room-booking-application\\bookingroomlibrary_server\\serverside\\controllers\\roomcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|solutionrelative:serverside\\controllers\\roomcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|t:\\learning\\ky8\\prn232\\finalproject\\library-room-booking-application\\bookingroomlibrary_server\\serverside\\services\\roomservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|solutionrelative:serverside\\services\\roomservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|t:\\learning\\ky8\\prn232\\finalproject\\library-room-booking-application\\bookingroomlibrary_server\\serverside\\dtos\\room\\createbookingroom.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|solutionrelative:serverside\\dtos\\room\\createbookingroom.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|t:\\learning\\ky8\\prn232\\finalproject\\library-room-booking-application\\bookingroomlibrary_server\\serverside\\dtos\\room\\homeroomdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|solutionrelative:serverside\\dtos\\room\\homeroomdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|t:\\learning\\ky8\\prn232\\finalproject\\library-room-booking-application\\bookingroomlibrary_server\\serverside\\repositories\\roomrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|solutionrelative:serverside\\repositories\\roomrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|t:\\learning\\ky8\\prn232\\finalproject\\library-room-booking-application\\bookingroomlibrary_server\\serverside\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|solutionrelative:serverside\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|t:\\learning\\ky8\\prn232\\finalproject\\library-room-booking-application\\bookingroomlibrary_server\\serverside\\controllers\\bookingcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|solutionrelative:serverside\\controllers\\bookingcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|t:\\learning\\ky8\\prn232\\finalproject\\library-room-booking-application\\bookingroomlibrary_server\\serverside\\repositories\\bookingrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|solutionrelative:serverside\\repositories\\bookingrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|t:\\learning\\ky8\\prn232\\finalproject\\library-room-booking-application\\bookingroomlibrary_server\\serverside\\dtos\\booking\\homebookingdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|solutionrelative:serverside\\dtos\\booking\\homebookingdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|t:\\learning\\ky8\\prn232\\finalproject\\library-room-booking-application\\bookingroomlibrary_server\\serverside\\services\\bookingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BACABAAC-A280-456E-BE13-919754509D0B}|ServerSide\\ServerSide.csproj|solutionrelative:serverside\\services\\bookingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -87,52 +71,27 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\appsettings.json",
-              "RelativeDocumentMoniker": "ServerSide\\appsettings.json",
-              "ToolTip": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\appsettings.json",
-              "RelativeToolTip": "ServerSide\\appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-06-20T04:29:26.084Z",
+              "Title": "RoomController.cs",
+              "DocumentMoniker": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Controllers\\RoomController.cs",
+              "RelativeDocumentMoniker": "ServerSide\\Controllers\\RoomController.cs",
+              "ToolTip": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Controllers\\RoomController.cs*",
+              "RelativeToolTip": "ServerSide\\Controllers\\RoomController.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-22T18:17:39.269Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "ServerSide.http",
-              "DocumentMoniker": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\ServerSide.http",
-              "RelativeDocumentMoniker": "ServerSide\\ServerSide.http",
-              "ToolTip": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\ServerSide.http",
-              "RelativeToolTip": "ServerSide\\ServerSide.http",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003502|",
-              "WhenOpened": "2025-06-20T04:29:24.546Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "SlotService.cs",
-              "DocumentMoniker": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Services\\SlotService.cs",
-              "RelativeDocumentMoniker": "ServerSide\\Services\\SlotService.cs",
-              "ToolTip": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Services\\SlotService.cs",
-              "RelativeToolTip": "ServerSide\\Services\\SlotService.cs",
-              "ViewState": "AQIAABMAAAAAAAAAAAApwBUAAAApAAAA",
+              "Title": "BookingController.cs",
+              "DocumentMoniker": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Controllers\\BookingController.cs",
+              "RelativeDocumentMoniker": "ServerSide\\Controllers\\BookingController.cs",
+              "ToolTip": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Controllers\\BookingController.cs",
+              "RelativeToolTip": "ServerSide\\Controllers\\BookingController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABsAAAAaAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-16T14:20:55.847Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "SlotRepository.cs",
-              "DocumentMoniker": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Repositories\\SlotRepository.cs",
-              "RelativeDocumentMoniker": "ServerSide\\Repositories\\SlotRepository.cs",
-              "ToolTip": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Repositories\\SlotRepository.cs",
-              "RelativeToolTip": "ServerSide\\Repositories\\SlotRepository.cs",
-              "ViewState": "AgIAABMAAAAAAAAAAAAlwBQAAAAoAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-16T14:20:04.858Z",
+              "WhenOpened": "2025-06-22T18:17:19.016Z",
               "EditorCaption": ""
             },
             {
@@ -143,14 +102,79 @@
               "RelativeDocumentMoniker": "ServerSide\\Program.cs",
               "ToolTip": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Program.cs",
               "RelativeToolTip": "ServerSide\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACAAAAA0AAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACMAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-06-16T14:06:33.922Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "BookingRepository.cs",
+              "DocumentMoniker": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Repositories\\BookingRepository.cs",
+              "RelativeDocumentMoniker": "ServerSide\\Repositories\\BookingRepository.cs",
+              "ToolTip": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Repositories\\BookingRepository.cs",
+              "RelativeToolTip": "ServerSide\\Repositories\\BookingRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-16T10:52:49.126Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "BookingService.cs",
+              "DocumentMoniker": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Services\\BookingService.cs",
+              "RelativeDocumentMoniker": "ServerSide\\Services\\BookingService.cs",
+              "ToolTip": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Services\\BookingService.cs",
+              "RelativeToolTip": "ServerSide\\Services\\BookingService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAABEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-16T03:30:25.874Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "RoomRepository.cs",
+              "DocumentMoniker": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Repositories\\RoomRepository.cs",
+              "RelativeDocumentMoniker": "ServerSide\\Repositories\\RoomRepository.cs",
+              "ToolTip": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Repositories\\RoomRepository.cs",
+              "RelativeToolTip": "ServerSide\\Repositories\\RoomRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-16T14:04:51.572Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 5,
+              "Title": "SlotRepository.cs",
+              "DocumentMoniker": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Repositories\\SlotRepository.cs",
+              "RelativeDocumentMoniker": "ServerSide\\Repositories\\SlotRepository.cs",
+              "ToolTip": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Repositories\\SlotRepository.cs",
+              "RelativeToolTip": "ServerSide\\Repositories\\SlotRepository.cs",
+              "ViewState": "AgIAAAQAAAAAAAAAAIAzwBQAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-16T14:20:04.858Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "SlotService.cs",
+              "DocumentMoniker": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Services\\SlotService.cs",
+              "RelativeDocumentMoniker": "ServerSide\\Services\\SlotService.cs",
+              "ToolTip": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Services\\SlotService.cs",
+              "RelativeToolTip": "ServerSide\\Services\\SlotService.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAASwBUAAAApAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-16T14:20:55.847Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
               "Title": "SlotController.cs",
               "DocumentMoniker": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Controllers\\SlotController.cs",
               "RelativeDocumentMoniker": "ServerSide\\Controllers\\SlotController.cs",
@@ -174,118 +198,27 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "RoomService.cs",
-              "DocumentMoniker": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Services\\RoomService.cs",
-              "RelativeDocumentMoniker": "ServerSide\\Services\\RoomService.cs",
-              "ToolTip": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Services\\RoomService.cs",
-              "RelativeToolTip": "ServerSide\\Services\\RoomService.cs",
-              "ViewState": "AQIAAAoAAAAAAAAAAAAlwBYAAAAJAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-16T14:05:21.73Z"
+              "DocumentIndex": 9,
+              "Title": "ServerSide.http",
+              "DocumentMoniker": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\ServerSide.http",
+              "RelativeDocumentMoniker": "ServerSide\\ServerSide.http",
+              "ToolTip": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\ServerSide.http",
+              "RelativeToolTip": "ServerSide\\ServerSide.http",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003502|",
+              "WhenOpened": "2025-06-20T04:29:24.546Z"
             },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "RoomRepository.cs",
-              "DocumentMoniker": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Repositories\\RoomRepository.cs",
-              "RelativeDocumentMoniker": "ServerSide\\Repositories\\RoomRepository.cs",
-              "ToolTip": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Repositories\\RoomRepository.cs",
-              "RelativeToolTip": "ServerSide\\Repositories\\RoomRepository.cs",
-              "ViewState": "AQIAAA0AAAAAAAAAAAAlwBQAAAAqAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-16T14:04:51.572Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "BookingRepository.cs",
-              "DocumentMoniker": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Repositories\\BookingRepository.cs",
-              "RelativeDocumentMoniker": "ServerSide\\Repositories\\BookingRepository.cs",
-              "ToolTip": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Repositories\\BookingRepository.cs",
-              "RelativeToolTip": "ServerSide\\Repositories\\BookingRepository.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAABUAAAAFAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-16T10:52:49.126Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 15,
-              "Title": "BookingService.cs",
-              "DocumentMoniker": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Services\\BookingService.cs",
-              "RelativeDocumentMoniker": "ServerSide\\Services\\BookingService.cs",
-              "ToolTip": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Services\\BookingService.cs",
-              "RelativeToolTip": "ServerSide\\Services\\BookingService.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAA8AAABEAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-16T03:30:25.874Z"
-            }
-          ]
-        },
-        {
-          "DockedWidth": 199,
-          "SelectedChildIndex": 2,
-          "Children": [
             {
               "$type": "Document",
               "DocumentIndex": 8,
-              "Title": "CreateBookingRoom.cs",
-              "DocumentMoniker": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\DTOs\\Room\\CreateBookingRoom.cs",
-              "RelativeDocumentMoniker": "ServerSide\\DTOs\\Room\\CreateBookingRoom.cs",
-              "ToolTip": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\DTOs\\Room\\CreateBookingRoom.cs",
-              "RelativeToolTip": "ServerSide\\DTOs\\Room\\CreateBookingRoom.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAoAAAAJAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-18T07:21:26.638Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "HomeRoomDTO.cs",
-              "DocumentMoniker": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\DTOs\\Room\\HomeRoomDTO.cs",
-              "RelativeDocumentMoniker": "ServerSide\\DTOs\\Room\\HomeRoomDTO.cs",
-              "ToolTip": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\DTOs\\Room\\HomeRoomDTO.cs",
-              "RelativeToolTip": "ServerSide\\DTOs\\Room\\HomeRoomDTO.cs",
-              "ViewState": "AQIAAAUAAAAAAAAAAAAAwBAAAAAJAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-16T14:09:04.8Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "RoomController.cs",
-              "DocumentMoniker": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Controllers\\RoomController.cs",
-              "RelativeDocumentMoniker": "ServerSide\\Controllers\\RoomController.cs",
-              "ToolTip": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Controllers\\RoomController.cs",
-              "RelativeToolTip": "ServerSide\\Controllers\\RoomController.cs",
-              "ViewState": "AgIAAAsAAAAAAAAAAAAAwBcAAAAfAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-16T14:07:31.934Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "BookingController.cs",
-              "DocumentMoniker": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Controllers\\BookingController.cs",
-              "RelativeDocumentMoniker": "ServerSide\\Controllers\\BookingController.cs",
-              "ToolTip": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\Controllers\\BookingController.cs",
-              "RelativeToolTip": "ServerSide\\Controllers\\BookingController.cs",
-              "ViewState": "AQIAABMAAAAAAAAAAAAiwBwAAAAJAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-16T03:27:59.559Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 14,
-              "Title": "HomeBookingDTO.cs",
-              "DocumentMoniker": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\DTOs\\Booking\\HomeBookingDTO.cs",
-              "RelativeDocumentMoniker": "ServerSide\\DTOs\\Booking\\HomeBookingDTO.cs",
-              "ToolTip": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\DTOs\\Booking\\HomeBookingDTO.cs",
-              "RelativeToolTip": "ServerSide\\DTOs\\Booking\\HomeBookingDTO.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAwAAAAbAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-16T02:41:45.871Z"
+              "Title": "appsettings.json",
+              "DocumentMoniker": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\appsettings.json",
+              "RelativeDocumentMoniker": "ServerSide\\appsettings.json",
+              "ToolTip": "T:\\Learning\\Ky8\\PRN232\\FinalProject\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\appsettings.json",
+              "RelativeToolTip": "ServerSide\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-06-20T04:29:26.084Z"
             }
           ]
         }

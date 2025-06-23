@@ -1,0 +1,103 @@
+/* Set full-screen background with a soft gradient and center the form */
+body, html, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif; /* Cleaner, modern font */
+  background: linear-gradient(to bottom right, #f3f4f6, #e5e7eb); /* Soft gray gradient */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Login form container */
+.login-container {
+  max-width: 400px;
+  width: 100%;
+  padding: 32px;
+  border-radius: 12px;
+  background: #ffffff; /* Clean white background */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+/* Website title */
+.login-container h1 {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937; /* Dark gray */
+  margin-bottom: 8px;
+}
+
+/* Login form subtitle */
+.login-container h2 {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 500;
+  color: #6b7280; /* Light gray */
+  margin-bottom: 24px;
+}
+
+/* Input fields */
+.login-container input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 16px;
+  border: 1px solid #d1d5db; /* Light border */
+  border-radius: 8px;
+  outline: none;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+}
+
+.login-container input:focus {
+  border-color: #3b82f6; /* Soft blue on focus */
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); /* Subtle glow */
+}
+
+/* Buttons */
+.login-container button {
+  width: 100%;
+  padding: 12px;
+  background-color: #3b82f6; /* Soft blue */
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.login-container button:hover {
+  background-color: #2563eb; /* Darker blue on hover */
+}
+
+/* Forgot password button */
+.login-container .forgot-password {
+  background: none;
+  color: #3b82f6; /* Blue link color */
+  font-weight: 500;
+  margin-top: 8px;
+  text-align: center;
+}
+
+.login-container .forgot-password:hover {
+  color: #2563eb; /* Darker blue on hover */
+  background: none;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
