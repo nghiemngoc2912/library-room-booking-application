@@ -10,6 +10,13 @@ body, html, #root {
   align-items: center;
 }
 
+.error-text {
+  color: red;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+
 /* Login form container */
 .login-container {
   max-width: 400px;

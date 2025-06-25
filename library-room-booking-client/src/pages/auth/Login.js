@@ -6,30 +6,33 @@ import './Login.css';
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMsg(''); // Reset lỗi
+
     try {
-      const res = await login(email, password);
-      localStorage.setItem('token', res.data.token);
-      alert('Login successful!');
+      await login(email, password);
       navigate('/home');
     } catch (err) {
-      alert('Login failed. Please check your credentials.');
+      setErrorMsg('Incorrect account or password.');
     }
   };
 
   const handleForgotPassword = () => {
-    alert('Redirecting to password reset page...');
-    navigate('/forgot-password'); // Adjust the route as needed
+    navigate('/forgot-password');
   };
 
   return (
     <div className="login-container">
       <h1>Booking Room Library</h1>
       <h2>Login to Your Account</h2>
+
       <form onSubmit={handleSubmit}>
+        {errorMsg && <p className="error-text">{errorMsg}</p>}
+
         <input
           type="email"
           placeholder="Email"
