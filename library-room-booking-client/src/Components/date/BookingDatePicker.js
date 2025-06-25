@@ -1,6 +1,7 @@
 import React from 'react';
 import TextField from '@mui/material/TextField';
-
+import DatePicker from '../../Components/date/BookingDatePicker';
+import BookingTable from '../../Components/table/BookingTable';
 export default function BookingDatePicker({ value, onChange }) {
   const today = new Date();
   const minDate = today.toISOString().split('T')[0];

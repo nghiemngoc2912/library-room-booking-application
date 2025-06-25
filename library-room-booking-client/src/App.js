@@ -4,12 +4,15 @@ import { Routes, Route } from 'react-router-dom';
 import DefaultLayout from './layouts/DefaultLayout';
 import RoomBooking from './pages/roomBooking/RoomBooking';
 import Home from './pages/roomBooking/Home';
+import NewsPage from './pages/roomBooking/NewsPage';
+
 
 const App = () => {
   return (
     <Routes>
       <Route path="/" element={<DefaultLayout><Home /></DefaultLayout>} />
       <Route path="/booking" element={<DefaultLayout><RoomBooking /></DefaultLayout>} />
+      <Route path="/news" element={<DefaultLayout><NewsPage /></DefaultLayout>} />
     </Routes>
   );
 };
