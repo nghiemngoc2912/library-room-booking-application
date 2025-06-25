@@ -21,12 +21,12 @@ namespace ServerSide.Controllers
         [HttpGet]
         public IEnumerable<HomeRoomDTO> GetAll()
         {
-            return roomService.GetAll();
+            return roomService.GetAllRoomsForHome();
         }
         [HttpGet("{id}")]
-        public CreateBookingRoom GetById(int id)
+        public CreateBookingRoomDTO GetById(int id)
         {
-            return roomService.GetById(id);
+            return roomService.GetRoomByIdForBooking(id);
         }
     }
 }

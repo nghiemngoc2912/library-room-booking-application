@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ServerSide.DTOs.Booking;
+using ServerSide.Exceptions;
 using ServerSide.Services;
 
 namespace ServerSide.Controllers
@@ -30,12 +31,26 @@ namespace ServerSide.Controllers
             return service.GetBookingByDateAndStatus(date,status);
         }
 
-        //create booking
-        //check date
-        //check student reputation
-        //check booking time in a day
-        //check booking time in 7 days
+        
 
+        [HttpPost]
+        public IActionResult CreateBooking([FromBody]CreateBookingDTO createBookingDTO)
+        {
+
+            try
+            {
+                service.CreateBooking(createBookingDTO);
+                return Ok("Booking created successfully");
+            }
+            catch (BookingPolicyViolationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
 
 
         //change status

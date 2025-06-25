@@ -8,6 +8,7 @@ namespace ServerSide.DTOs.Booking
         public int RoomId { get; set; }
         public int SlotId { get; set; }
         public string Reason { get; set; }
-        public IEnumerable<string> StudentList { get; set; }
+        public IEnumerable<string> StudentListCode { get; set; }
+
     }
 }
