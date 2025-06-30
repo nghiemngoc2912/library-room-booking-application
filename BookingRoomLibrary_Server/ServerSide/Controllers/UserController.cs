@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using ServerSide.DTOs.Booking;
+using Microsoft.EntityFrameworkCore;
 using ServerSide.Models;
-using ServerSide.Services;
-using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
 namespace ServerSide.Controllers
 {
@@ -11,17 +9,19 @@ namespace ServerSide.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUserService userService;
+        private readonly IUserService service;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService service)
         {
-            this.userService = userService;
+            this.service = service;
         }
 
-        [HttpGet("Search")]
-        public IEnumerable<UserBookingDTO> SearchUserByCode([FromQuery] string code)
+        [HttpGet("{userId}/reputation")]
+        public async Task<IActionResult> GetReputation(int userId)
         {
-            return userService.SearchUserByCode(code);
+            var result = await service.GetUserReputationAsync(userId);
+            if (result == null) return NotFound();
+            return Ok(result);
         }
     }
 }
