@@ -45,7 +45,6 @@ namespace ServerSide.Controllers
         public async Task<IActionResult> Create([FromBody] CreateNewsDTO dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-
             var created = await _service.CreateAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }

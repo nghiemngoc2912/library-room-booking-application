@@ -43,6 +43,27 @@
   },
   {
     "ContainingType": "ServerSide.Controllers.BookingController",
+    "Method": "RateRoom",
+    "RelativePath": "api/Booking/{bookingId}/rate",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "bookingId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "ServerSide.DTOs.Booking.CreateRatingDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ServerSide.Controllers.BookingController",
     "Method": "GetBookingByDateAndStatus",
     "RelativePath": "api/Booking/date/{date}/status/{status}",
     "HttpMethod": "GET",
@@ -71,6 +92,42 @@
         "StatusCode": 200
       }
     ]
+  },
+  {
+    "ContainingType": "ServerSide.Controllers.BookingController",
+    "Method": "GetBookingHistory",
+    "RelativePath": "api/Booking/user/{userId}/history",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "from",
+        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "to",
+        "Type": "System.Nullable\u00601[[System.DateTime, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
   },
   {
     "ContainingType": "ServerSide.Controllers.NewsController",
@@ -273,5 +330,21 @@
         "StatusCode": 200
       }
     ]
+  },
+  {
+    "ContainingType": "ServerSide.Controllers.UserController",
+    "Method": "GetReputation",
+    "RelativePath": "api/User/{userId}/reputation",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   }
 ]

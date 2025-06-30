@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ServerSide.DTOs.News;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ServerSide.Models;
 
 namespace ServerSide.Repositories
@@ -13,93 +13,78 @@ namespace ServerSide.Repositories
             _context = context;
         }
 
-        public async Task<List<NewsDTO>> GetAllAsync()
+        public async Task<List<News>> GetAllAsync()
         {
-            return await _context.News
+            var list = await _context.News
                 .Include(n => n.CreatedByNavigation)
-                .Select(n => new NewsDTO
-                {
-                    Id = n.Id,
-                    Title = n.Title,
-                    Description = n.Description,
-                    CreatedDate = n.CreatedDate,
-                    CreatedBy = n.CreatedBy,
-                    CreatedByName = n.CreatedByNavigation.FullName
-                })
                 .ToListAsync();
+
+            return list;
         }
 
-        public async Task<NewsDTO?> GetByIdAsync(int id)
+        public async Task<News?> GetByIdAsync(int id)
         {
             return await _context.News
-                .Where(n => n.Id == id)
                 .Include(n => n.CreatedByNavigation)
-                .Select(n => new NewsDTO
-                {
-                    Id = n.Id,
-                    Title = n.Title,
-                    Description = n.Description,
-                    CreatedDate = n.CreatedDate,
-                    CreatedBy = n.CreatedBy,
-                    CreatedByName = n.CreatedByNavigation.FullName
-                }).FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(n => n.Id == id);
         }
 
-        public async Task<List<NewsDTO>> FilterAsync(NewsFilterDTO filter)
+        public async Task<List<News>> FilterAsync(DateTime? fromDate, DateTime? toDate, string? keyword, string? sortBy, bool isAsc, int pageIndex, int pageSize)
         {
             var query = _context.News.Include(n => n.CreatedByNavigation).AsQueryable();
 
-            if (!string.IsNullOrEmpty(filter.Keyword))
+            if (!string.IsNullOrEmpty(keyword))
             {
-                query = query.Where(n =>
-                    n.Title.Contains(filter.Keyword) ||
-                    n.Description.Contains(filter.Keyword));
+                query = query.Where(n => n.Title.Contains(keyword) || n.Description.Contains(keyword));
             }
 
-            if (filter.FromDate.HasValue)
-                query = query.Where(n => n.CreatedDate >= filter.FromDate);
+            if (fromDate.HasValue)
+                query = query.Where(n => n.CreatedDate >= fromDate);
 
-            if (filter.ToDate.HasValue)
-                query = query.Where(n => n.CreatedDate <= filter.ToDate);
+            if (toDate.HasValue)
+                query = query.Where(n => n.CreatedDate <= toDate);
 
-            if (!string.IsNullOrEmpty(filter.SortBy))
+            if (!string.IsNullOrEmpty(sortBy))
             {
-                if (filter.SortBy.ToLower() == "title")
-                    query = filter.IsAsc ? query.OrderBy(n => n.Title) : query.OrderByDescending(n => n.Title);
-                else
-                    query = filter.IsAsc ? query.OrderBy(n => n.CreatedDate) : query.OrderByDescending(n => n.CreatedDate);
+                switch (sortBy.ToLower())
+                {
+                    case "title":
+                        query = isAsc ? query.OrderBy(n => n.Title) : query.OrderByDescending(n => n.Title);
+                        break;
+                    case "createddate":
+                        query = isAsc
+                            ? query.OrderBy(n => n.CreatedDate ?? DateTime.MinValue)
+                            : query.OrderByDescending(n => n.CreatedDate ?? DateTime.MinValue);
+                        break;
+                    default:
+                        query = query.OrderByDescending(n => n.CreatedDate); // fallback tránh crash
+                        break;
+                }
+            }
+            else
+            {
+                query = query.OrderByDescending(n => n.CreatedDate); // default nếu sortBy null
             }
 
             return await query
-                .Skip((filter.PageIndex - 1) * filter.PageSize)
-                .Take(filter.PageSize)
-                .Select(n => new NewsDTO
-                {
-                    Id = n.Id,
-                    Title = n.Title,
-                    Description = n.Description,
-                    CreatedDate = n.CreatedDate,
-                    CreatedBy = n.CreatedBy,
-                    CreatedByName = n.CreatedByNavigation.FullName
-                }).ToListAsync();
+                .Skip((pageIndex - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
         }
 
-        public async Task<int> CountAsync(NewsFilterDTO filter)
+        public async Task<int> CountAsync(DateTime? fromDate, DateTime? toDate, string? keyword)
         {
             var query = _context.News.AsQueryable();
 
-            if (!string.IsNullOrEmpty(filter.Keyword))
-            {
-                query = query.Where(n =>
-                    n.Title.Contains(filter.Keyword) ||
-                    n.Description.Contains(filter.Keyword));
-            }
+            if (!string.IsNullOrEmpty(keyword))
+                query = query.Where(n => n.Title.Contains(keyword) || n.Description.Contains(keyword));
 
-            if (filter.FromDate.HasValue)
-                query = query.Where(n => n.CreatedDate >= filter.FromDate);
+            if (fromDate.HasValue)
+                query = query.Where(n => n.CreatedDate >= fromDate.Value);
 
-            if (filter.ToDate.HasValue)
-                query = query.Where(n => n.CreatedDate <= filter.ToDate);
+            if (toDate.HasValue)
+                query = query.Where(n => n.CreatedDate <= toDate.Value);
+
 
             return await query.CountAsync();
         }

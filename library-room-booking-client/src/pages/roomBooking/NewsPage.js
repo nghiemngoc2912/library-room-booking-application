@@ -57,6 +57,16 @@ const NewsPage = () => {
     }
   };
 
+  const handleCreateClick = () => {
+    setForm(defaultForm);  // Reset form về mặc định
+    setOpen(true);         // Mở modal
+  };
+
+  const handleCloseModal = () => {
+    setOpen(false);
+    setForm(defaultForm);  // Reset lại form khi đóng modal
+  };
+
   return (
     <Box p={3}>
       <Typography variant="h4" gutterBottom>News Management</Typography>
@@ -69,19 +79,11 @@ const NewsPage = () => {
           fullWidth
         />
         <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <DatePicker
-            label="From Date"
-            value={fromDate}
-            onChange={setFromDate}
-          />
-          <DatePicker
-            label="To Date"
-            value={toDate}
-            onChange={setToDate}
-          />
+          <DatePicker label="From Date" value={fromDate} onChange={setFromDate} />
+          <DatePicker label="To Date" value={toDate} onChange={setToDate} />
         </LocalizationProvider>
         <Button variant="contained" onClick={loadNews}>Search</Button>
-        <Button variant="contained" color="primary" onClick={() => setOpen(true)} startIcon={<Add />}>
+        <Button variant="contained" color="primary" onClick={handleCreateClick} startIcon={<Add />}>
           Create News
         </Button>
       </Box>
@@ -103,7 +105,7 @@ const NewsPage = () => {
         }
       />
 
-      <Dialog open={open} onClose={() => setOpen(false)} fullWidth>
+      <Dialog open={open} onClose={handleCloseModal} fullWidth>
         <DialogTitle>{form.id === 0 ? 'Create News' : 'Update News'}</DialogTitle>
         <DialogContent>
           <TextField
@@ -124,7 +126,7 @@ const NewsPage = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancel</Button>
+          <Button onClick={handleCloseModal}>Cancel</Button>
           <Button onClick={handleSubmit} variant="contained">Save</Button>
         </DialogActions>
       </Dialog>
