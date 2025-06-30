@@ -116,6 +116,10 @@ namespace ServerSide.Services
             if (bookings.Any(b => b.RoomId == booking.RoomId && b.SlotId == booking.SlotId)) return false;
             return true;
         }
+        public Booking GetDetailBookingById(int id)
+        {
+            return repository.GetBookingById(id);
+        }
     }
     public interface IBookingService
     {
@@ -123,6 +127,6 @@ namespace ServerSide.Services
         IEnumerable<HomeBookingDTO> GetBookingByDateAndStatus(DateOnly date,byte status);
         int GetBookingCountByDateAndUser(User user,DateOnly fromDate,DateOnly toDate);
         Boolean CheckBookingAvailable(Booking booking);
-        
+        Booking GetDetailBookingById(int id);
     }
 }

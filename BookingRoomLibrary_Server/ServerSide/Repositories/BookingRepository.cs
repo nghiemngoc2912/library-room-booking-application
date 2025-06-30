@@ -31,12 +31,17 @@ namespace ServerSide.Repositories
                 .Where(b => b.BookingDate >=fromDate &&b.BookingDate<=toDate && b.Students.Any(s => s.Id == user.Id))
                 .Count();
         }
-
+        public Booking GetBookingById(int id)
+        {
+            return context.Bookings
+                .Find(id);
+        }
     }
     public interface IBookingRepository
     {
         IEnumerable<Booking> GetBookingByDateAndStatus(DateOnly date,byte status);
         void Add(Booking booking);
         int GetBookingCountByDateAndUser(User user, DateOnly fromDate, DateOnly toDate);
+        Booking GetBookingById(int id);
     }
 }

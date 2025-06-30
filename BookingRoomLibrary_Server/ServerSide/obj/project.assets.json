@@ -4424,11 +4424,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\SU25\\PRN232\\LibraryRoomBooking\\BookingRoomLibrary_Server\\ServerSide\\ServerSide.csproj",
+      "projectUniqueName": "D:\\SU25\\PRN232\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\ServerSide.csproj",
       "projectName": "ServerSide",
-      "projectPath": "D:\\SU25\\PRN232\\LibraryRoomBooking\\BookingRoomLibrary_Server\\ServerSide\\ServerSide.csproj",
+      "projectPath": "D:\\SU25\\PRN232\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\ServerSide.csproj",
       "packagesPath": "C:\\Users\\nghie\\.nuget\\packages\\",
-      "outputPath": "D:\\SU25\\PRN232\\LibraryRoomBooking\\BookingRoomLibrary_Server\\ServerSide\\obj\\",
+      "outputPath": "D:\\SU25\\PRN232\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\nghie\\AppData\\Roaming\\NuGet\\NuGet.Config",

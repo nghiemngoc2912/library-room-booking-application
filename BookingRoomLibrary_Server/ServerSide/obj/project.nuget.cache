@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "7A3bgQh5OWqohLaJGohHSLIA9l1PfK2DpNdzZR8pKgxtugNj8+L/9PnOU8sj+F/zJhAamtrzfyyvtDAx7QHGsg==",
+  "dgSpecHash": "etGbExoD2NnKVV68oKIOgEAusQYPW+laQqhn13FV13NwafV0wkuuxUJbVXlb0JEa1gEqDPGaIRjvRIrjoE9btw==",
   "success": true,
-  "projectFilePath": "D:\\SU25\\PRN232\\LibraryRoomBooking\\BookingRoomLibrary_Server\\ServerSide\\ServerSide.csproj",
+  "projectFilePath": "D:\\SU25\\PRN232\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\ServerSide.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\nghie\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\nghie\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",
