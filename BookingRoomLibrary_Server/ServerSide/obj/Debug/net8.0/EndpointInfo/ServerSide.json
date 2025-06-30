@@ -5,7 +5,6 @@
     "version": "1.0"
   },
   "paths": {
-<<<<<<< HEAD
     "/api/Auth/login": {
       "post": {
         "tags": [
@@ -102,11 +101,6 @@
     "/api/Booking/date/{date}/status/{status}": {
       "get": {
         "tags": [
-=======
-    "/api/Booking/date/{date}/status/{status}": {
-      "get": {
-        "tags": [
->>>>>>> cuong
           "Booking"
         ],
         "parameters": [
@@ -162,8 +156,6 @@
         }
       }
     },
-<<<<<<< HEAD
-=======
     "/api/Booking": {
       "post": {
         "tags": [
@@ -171,49 +163,19 @@
         ],
         "requestBody": {
           "content": {
-            "multipart/form-data": {
+            "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "BookingDate": {
-                    "type": "string",
-                    "format": "date"
-                  },
-                  "RoomId": {
-                    "type": "integer",
-                    "format": "int32"
-                  },
-                  "SlotId": {
-                    "type": "integer",
-                    "format": "int32"
-                  },
-                  "Reason": {
-                    "type": "string"
-                  },
-                  "StudentList": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  }
-                }
-              },
-              "encoding": {
-                "BookingDate": {
-                  "style": "form"
-                },
-                "RoomId": {
-                  "style": "form"
-                },
-                "SlotId": {
-                  "style": "form"
-                },
-                "Reason": {
-                  "style": "form"
-                },
-                "StudentList": {
-                  "style": "form"
-                }
+                "$ref": "#/components/schemas/CreateBookingDTO"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBookingDTO"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBookingDTO"
               }
             }
           }
@@ -495,7 +457,6 @@
         }
       }
     },
->>>>>>> cuong
     "/api/Room": {
       "get": {
         "tags": [
@@ -556,17 +517,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateBookingRoom"
+                  "$ref": "#/components/schemas/CreateBookingRoomDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateBookingRoom"
+                  "$ref": "#/components/schemas/CreateBookingRoomDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateBookingRoom"
+                  "$ref": "#/components/schemas/CreateBookingRoomDTO"
                 }
               }
             }
@@ -651,8 +612,53 @@
           }
         }
       }
-<<<<<<< HEAD
-=======
+    },
+    "/api/User/Search": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserBookingDTO"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserBookingDTO"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserBookingDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     },
     "/api/User/{userId}/reputation": {
       "get": {
@@ -676,7 +682,6 @@
           }
         }
       }
->>>>>>> cuong
     }
   },
   "components": {
@@ -786,7 +791,36 @@
         },
         "additionalProperties": false
       },
-      "CreateBookingRoom": {
+      "CreateBookingDTO": {
+        "type": "object",
+        "properties": {
+          "bookingDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "roomId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "slotId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "reason": {
+            "type": "string",
+            "nullable": true
+          },
+          "studentListCode": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateBookingRoomDTO": {
         "type": "object",
         "properties": {
           "id": {
@@ -796,12 +830,14 @@
           "roomName": {
             "type": "string",
             "nullable": true
+          },
+          "capacity": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
       },
-<<<<<<< HEAD
-=======
       "CreateNewsDTO": {
         "type": "object",
         "properties": {
@@ -840,7 +876,6 @@
         },
         "additionalProperties": false
       },
->>>>>>> cuong
       "HomeBookingDTO": {
         "type": "object",
         "properties": {
@@ -877,7 +912,6 @@
         },
         "additionalProperties": false
       },
-<<<<<<< HEAD
       "LoginDTO": {
         "type": "object",
         "properties": {
@@ -892,8 +926,6 @@
         },
         "additionalProperties": false
       },
-=======
->>>>>>> cuong
       "News": {
         "type": "object",
         "properties": {
@@ -974,11 +1006,8 @@
             "format": "int32"
           },
           "ratingValue": {
-<<<<<<< HEAD
-=======
             "maximum": 5,
             "minimum": 1,
->>>>>>> cuong
             "type": "integer",
             "format": "int32"
           },
@@ -1169,8 +1198,6 @@
         },
         "additionalProperties": false
       },
-<<<<<<< HEAD
-=======
       "UpdateNewsDTO": {
         "type": "object",
         "properties": {
@@ -1189,7 +1216,6 @@
         },
         "additionalProperties": false
       },
->>>>>>> cuong
       "User": {
         "type": "object",
         "properties": {
@@ -1201,13 +1227,10 @@
             "type": "string",
             "nullable": true
           },
-<<<<<<< HEAD
-=======
           "code": {
             "type": "string",
             "nullable": true
           },
->>>>>>> cuong
           "dob": {
             "type": "string",
             "format": "date",
@@ -1283,6 +1306,20 @@
             "items": {
               "$ref": "#/components/schemas/Booking"
             },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserBookingDTO": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "nullable": true
+          },
+          "code": {
+            "type": "string",
             "nullable": true
           }
         },

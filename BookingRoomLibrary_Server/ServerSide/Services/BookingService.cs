@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.EntityFrameworkCore;
 using ServerSide.Constants;
 using ServerSide.DTOs.Booking;
+using ServerSide.DTOs.Room;
+using ServerSide.Exceptions;
 using ServerSide.Models;
 using ServerSide.Repositories;
 using ServerSide.Validations;
@@ -14,11 +14,17 @@ namespace ServerSide.Services
     {
         private readonly IBookingRepository repository;
         private readonly LibraryRoomBookingContext context;
+        private readonly IRoomService roomService;
+        private readonly ISlotService slotService;
+        private readonly IUserService userService;
 
-        public BookingService(IBookingRepository repository, LibraryRoomBookingContext context)
+        public BookingService(IBookingRepository repository, LibraryRoomBookingContext context, IRoomService roomService, ISlotService slotService, IUserService userService)
         {
             this.repository = repository;
             this.context = context;
+            this.roomService = roomService;
+            this.slotService = slotService;
+            this.userService = userService;
         }
 
         public IEnumerable<HomeBookingDTO> GetBookingByDateAndStatus(DateOnly date, byte status)
@@ -83,5 +89,87 @@ namespace ServerSide.Services
             context.Ratings.Add(rating);
             await context.SaveChangesAsync();
         }
+
+        public void CreateBooking(CreateBookingDTO createBookingDTO)
+        {
+            //check date
+            var slot = slotService.GetById(createBookingDTO.SlotId);
+            CreateBookingValidation.ValidateBookingDate(createBookingDTO, slot);
+            //check capacity
+            CreateBookingRoomDTO room = roomService.GetRoomByIdForBooking(createBookingDTO.RoomId);
+            CreateBookingValidation.ValidateCapacity(createBookingDTO, room);
+
+            List<User> users = new List<User>();
+            foreach (var s in createBookingDTO.StudentListCode)
+            {
+                User user = userService.GetUserByCode(s);
+
+                if (user == null || user.Account.Role != Roles.Student)
+                {
+                    throw new BookingPolicyViolationException($"User with code {s} is not a valid student.");
+                }
+                //check reputation
+                if (user.Reputation < BookingRules.MinReputationToBook)
+                {
+                    throw new BookingPolicyViolationException($"User with code {s} has reputation under 50");
+                }
+                //check times booking in the booking day
+                //booking in day -> studentbooking 
+                DateOnly bookingDate = createBookingDTO.BookingDate;
+                DateOnly dayBeforeAWeek = bookingDate.AddDays(-7);
+                int bookingTimesInDay = GetBookingCountByDateAndUser(user, bookingDate, bookingDate);
+                if (bookingTimesInDay >= BookingRules.MaxDailyBookingsPerStudent)
+                {
+                    throw new BookingPolicyViolationException($"User with code {s} has booking times in a day exceeds {BookingRules.MaxDailyBookingsPerStudent}");
+                }
+                int bookingTimesInWeek = GetBookingCountByDateAndUser(user, dayBeforeAWeek, bookingDate);
+                if (bookingTimesInWeek >= BookingRules.MaxWeeklyBookingDays)
+                {
+                    throw new BookingPolicyViolationException($"User with code {s} has booking times in a week exceeds {BookingRules.MaxWeeklyBookingDays}");
+                }
+                if (users.Contains(user))
+                {
+                    throw new BookingPolicyViolationException($"User with code {s} is duplicate in booking");
+                }
+                users.Add(user);
+            }
+            var booking = new Booking
+            {
+                BookingDate = createBookingDTO.BookingDate,
+                RoomId = createBookingDTO.RoomId,
+                SlotId = createBookingDTO.SlotId,
+                Reason = createBookingDTO.Reason,
+                Students = users,
+                CreatedBy = users.ElementAt(0).Id
+            };
+            //check available
+            if (CheckBookingAvailable(booking))
+                repository.Add(booking);
+            else
+                throw new BookingPolicyViolationException($"Room {room.RoomName} is unavailble in slot {slot.Order} date {createBookingDTO.BookingDate}");
+        }
+
+        public int GetBookingCountByDateAndUser(User user, DateOnly fromDate, DateOnly toDate)
+        {
+            return repository.GetBookingCountByDateAndUser(user, fromDate, toDate);
+        }
+
+        public bool CheckBookingAvailable(Booking booking)
+        {
+            //check booking at date, slot status
+            var bookings = GetBookingByDateAndStatus(booking.BookingDate, 0);
+            //if bookings contain room and slot available return false
+            if (bookings.Any(b => b.RoomId == booking.RoomId && b.SlotId == booking.SlotId)) return false;
+            return true;
+        }
+    }
+    public interface IBookingService
+    {
+        IEnumerable<HomeBookingDTO> GetBookingByDateAndStatus(DateOnly date, byte status);
+        void CreateBooking(CreateBookingDTO createBookingDTO);
+
+        Task<(int total, List<BookingHistoryDTO> data)> GetBookingHistoryAsync(
+            int userId, DateTime? from, DateTime? to, int page, int pageSize);
+        Task AddRatingAsync(int bookingId, CreateRatingDTO dto);
     }
 }

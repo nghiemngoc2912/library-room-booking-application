@@ -30,7 +30,7 @@ namespace ServerSide.Controllers
 
             try
             {
-                service.CreateBooking(createBookingDTO);
+                _bookingService.CreateBooking(createBookingDTO);
                 return Ok("Booking created successfully");
             }
             catch (BookingPolicyViolationException ex)
