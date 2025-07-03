@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ServerSide.DTOs.Booking;
 using ServerSide.Exceptions;
+using ServerSide.Models;
 using ServerSide.Services;
 
 namespace ServerSide.Controllers
@@ -53,6 +54,11 @@ namespace ServerSide.Controllers
         }
 
 
-        //change status
-    }
+        //detail booking
+        [HttpGet("{id}")]
+        public BookingDetailDTO GetDetailBookingById(int id)
+        {
+            return service.GetDetailBookingById(id);
+        }
+    } 
 }

@@ -38,9 +38,9 @@ export default function BookingTable({ date = '2025-06-17', status = 0}) {
     }
   }, [date, status, isPastDate]);
 
-  const isBooked = (roomId, slotId) => {
-    return bookings.some(b => b.roomId === roomId && b.slotId === slotId);
-  };
+  const getBooking = (roomId, slotId) => {
+  return bookings.find(b => b.roomId === roomId && b.slotId === slotId);
+};
 return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="booking table">
@@ -63,28 +63,36 @@ return (
 
               {slots.map((slot) => {
                 const isRoomInactive = room.status === 0;
-                const booked = isBooked(room.id, slot.id);
-
+                              
+                const booking = getBooking(room.id, slot.id);
                 const cellText = isRoomInactive
                   ? '-'
-                  : booked
-                  ? '-'
-                  : <Link
-                    to={`/booking?roomId=${room.id}&slotId=${slot.id}&date=${date}`}
-                    style={{fontWeight: 'bold', textDecoration: 'underline' }}
-                  >
-                    +
-                  </Link>;
-
+                  : booking
+                  ? (
+                      <Link
+                        to={`/booking/detail/${booking.id}`}
+                        style={{ fontWeight: 'bold', textDecoration: 'underline', color: 'red' }}
+                      >
+                        Đã đặt
+                      </Link>
+                    )
+                  : (
+                      <Link
+                        to={`/booking?roomId=${room.id}&slotId=${slot.id}&date=${date}`}
+                        style={{ fontWeight: 'bold', textDecoration: 'underline' }}
+                      >
+                        +
+                      </Link>
+                    );
                 const bgColor = isRoomInactive
                   ? '#e0e0e0' // xám
-                  : booked
+                  : booking
                   ? '#f8d7da' // đỏ nhạt
                   : '#d4edda'; // xanh nhạt
 
                 const textColor = isRoomInactive
                   ? '#6c757d'
-                  : booked
+                  : booking
                   ? '#721c24'
                   : '#155724';
 

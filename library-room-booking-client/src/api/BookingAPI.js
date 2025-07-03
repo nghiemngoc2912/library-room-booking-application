@@ -3,3 +3,20 @@ export async function fetchBookingsByDateAndStatus(date,status) {
   if (!res.ok) throw new Error('Failed to fetch bookings');
   return res.json();
 }
+export async function fetchBookingDetail(id) {
+  const res = await fetch(`https://localhost:7238/api/Booking/${id}`);
+  return res.json();
+}
+export async function updateBooking(id, data) {
+  const res = await fetch(`https://localhost:7238/api/Booking/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  return res.json();
+}
+
+export async function deleteBooking(id) {
+  const res = await fetch(`https://localhost:7238/api/Booking/bookings/${id}`, { method: 'DELETE' });
+  return res.json();
+}
