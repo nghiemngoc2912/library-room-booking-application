@@ -23,10 +23,16 @@ namespace ServerSide.Repositories
                 .Include(u => u.Account)
                 .FirstOrDefault(s => s.Code == code);
         }
+
+        User IUserRepository.GetUserById(int id)
+        {
+            return context.Users.Find(id);
+        }
     }
     public interface IUserRepository
     {
         User GetUserByCode(string s);
+        User GetUserById(int id);
         IEnumerable<User> SearchUserByCode(string code);
     }
 }

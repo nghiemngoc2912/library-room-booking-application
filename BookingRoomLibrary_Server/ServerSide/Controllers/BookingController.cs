@@ -56,7 +56,7 @@ namespace ServerSide.Controllers
 
         //detail booking
         [HttpGet("{id}")]
-        public Booking GetDetailBookingById(int id)
+        public BookingDetailDTO GetDetailBookingById(int id)
         {
             return service.GetDetailBookingById(id);
         }

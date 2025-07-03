@@ -34,7 +34,8 @@ namespace ServerSide.Repositories
         public Booking GetBookingById(int id)
         {
             return context.Bookings
-                .Find(id);
+                .Include(b => b.Students)
+                .FirstOrDefault(b=>b.Id==id);
         }
     }
     public interface IBookingRepository

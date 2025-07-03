@@ -22,10 +22,16 @@ namespace ServerSide.Services
         {
             return repository.GetUserByCode(s);
         }
+
+        User IUserService.GetUserById(int id)
+        {
+            return repository.GetUserById(id);
+        }
     }
     public interface IUserService
     {
         User GetUserByCode(string s);
         IEnumerable<UserBookingDTO> SearchUserByCode(string code);
+        User GetUserById(int id);
     }
 }

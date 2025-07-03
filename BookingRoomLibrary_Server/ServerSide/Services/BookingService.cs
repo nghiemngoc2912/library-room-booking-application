@@ -116,17 +116,35 @@ namespace ServerSide.Services
             if (bookings.Any(b => b.RoomId == booking.RoomId && b.SlotId == booking.SlotId)) return false;
             return true;
         }
-        public Booking GetDetailBookingById(int id)
+        public BookingDetailDTO GetDetailBookingById(int id)
         {
-            return repository.GetBookingById(id);
+            var booking = repository.GetBookingById(id);
+            if (booking == null) return null;
+            var createdBy = userService.GetUserById(booking.CreatedBy);
+            return new BookingDetailDTO
+            {
+                Id = booking.Id,
+                BookingDate = booking.BookingDate,
+                Reason = booking.Reason,
+                SlotId=booking.SlotId,
+                RoomId=booking.RoomId,
+                CreatedDate=booking.CreatedDate,
+                CreatedBy=new UserBookingDTO(createdBy),
+                Status=booking.Status,
+                CheckInAt=booking.CheckInAt,
+                CheckOutAt=booking.CheckOutAt,
+                Students = booking.Students?.Select(s => new UserBookingDTO(s)).ToList()
+            };
         }
     }
+    
     public interface IBookingService
     {
         void CreateBooking(CreateBookingDTO createBookingDTO);
         IEnumerable<HomeBookingDTO> GetBookingByDateAndStatus(DateOnly date,byte status);
         int GetBookingCountByDateAndUser(User user,DateOnly fromDate,DateOnly toDate);
         Boolean CheckBookingAvailable(Booking booking);
-        Booking GetDetailBookingById(int id);
+        BookingDetailDTO GetDetailBookingById(int id);
     }
 }
+
