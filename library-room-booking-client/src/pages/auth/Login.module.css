@@ -1,24 +1,25 @@
 /* Set full-screen background with a soft gradient and center the form */
-body, html, #root {
-  height: 100%;
+.root {
+  min-height: 100vh; /* Ensure full viewport height */
   margin: 0;
   padding: 0;
   font-family: 'Inter', sans-serif; /* Cleaner, modern font */
   background: linear-gradient(to bottom right, #f3f4f6, #e5e7eb); /* Soft gray gradient */
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  width: 100vw; /* Ensure full viewport width */
+  box-sizing: border-box; /* Prevent padding/margin issues */
 }
 
-.error-text {
+.errorText {
   color: red;
   margin-bottom: 10px;
   font-size: 14px;
 }
 
-
 /* Login form container */
-.login-container {
+.loginContainer {
   max-width: 400px;
   width: 100%;
   padding: 32px;
@@ -26,10 +27,11 @@ body, html, #root {
   background: #ffffff; /* Clean white background */
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Subtle shadow */
   animation: fadeIn 0.6s ease-in-out;
+  box-sizing: border-box; /* Ensure padding doesn't affect width */
 }
 
 /* Website title */
-.login-container h1 {
+.loginContainer h1 {
   text-align: center;
   font-size: 24px;
   font-weight: 700;
@@ -38,7 +40,7 @@ body, html, #root {
 }
 
 /* Login form subtitle */
-.login-container h2 {
+.loginContainer h2 {
   text-align: center;
   font-size: 18px;
   font-weight: 500;
@@ -47,7 +49,7 @@ body, html, #root {
 }
 
 /* Input fields */
-.login-container input {
+.loginContainer input {
   width: 100%;
   padding: 12px;
   margin-bottom: 16px;
@@ -58,13 +60,13 @@ body, html, #root {
   transition: border-color 0.3s ease;
 }
 
-.login-container input:focus {
+.loginContainer input:focus {
   border-color: #3b82f6; /* Soft blue on focus */
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); /* Subtle glow */
 }
 
 /* Buttons */
-.login-container button {
+.loginContainer button {
   width: 100%;
   padding: 12px;
   background-color: #3b82f6; /* Soft blue */
@@ -77,12 +79,12 @@ body, html, #root {
   transition: background-color 0.3s ease;
 }
 
-.login-container button:hover {
+.loginContainer button:hover {
   background-color: #2563eb; /* Darker blue on hover */
 }
 
 /* Forgot password button */
-.login-container .forgot-password {
+.loginContainer .forgotPassword {
   background: none;
   color: #3b82f6; /* Blue link color */
   font-weight: 500;
@@ -90,7 +92,7 @@ body, html, #root {
   text-align: center;
 }
 
-.login-container .forgot-password:hover {
+.loginContainer .forgotPassword:hover {
   color: #2563eb; /* Darker blue on hover */
   background: none;
 }
