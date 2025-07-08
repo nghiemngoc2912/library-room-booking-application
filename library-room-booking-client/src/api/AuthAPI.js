@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://localhost:7238/api'; // Thay bằng địa chỉ backend thực tế
+const API_BASE_URL = 'https://localhost:7238/api'; 
 
 /**
  * Gửi thông tin đăng nhập đến backend sử dụng session/cookie.
