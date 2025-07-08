@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ServerSide.DTOs.Booking;
 using ServerSide.Exceptions;
 using ServerSide.Models;
@@ -11,36 +10,25 @@ namespace ServerSide.Controllers
     [ApiController]
     public class BookingController : ControllerBase
     {
-        //call iservice
-        private readonly IBookingService service;
+        private readonly IBookingService _bookingService;
 
-        public BookingController(IBookingService service)
+        public BookingController(IBookingService bookingService)
         {
-            this.service = service;
+            _bookingService = bookingService;
         }
 
-        //get booking 
-        //= 0 - booked
-        //=-1 - canceled
-        //= 1 - checked in
-        //= 2 checked out
-        //by date and status
-        //for home - just check the date after, before -> check by fe because cannot be booked
         [HttpGet("date/{date}/status/{status}")]
-        public IEnumerable<HomeBookingDTO> GetBookingByDateAndStatus(DateOnly date,byte status)
+        public IEnumerable<HomeBookingDTO> GetBookingByDateAndStatus(DateOnly date, byte status)
         {
-            return service.GetBookingByDateAndStatus(date,status);
+            return _bookingService.GetBookingByDateAndStatus(date, status);
         }
-
-        
 
         [HttpPost]
-        public IActionResult CreateBooking([FromBody]CreateBookingDTO createBookingDTO)
+        public IActionResult CreateBooking([FromBody] CreateBookingDTO createBookingDTO)
         {
-
             try
             {
-                service.CreateBooking(createBookingDTO);
+                _bookingService.CreateBooking(createBookingDTO);
                 return Ok("Booking created successfully");
             }
             catch (BookingPolicyViolationException ex)
@@ -53,17 +41,16 @@ namespace ServerSide.Controllers
             }
         }
 
-
-        //detail booking
         [HttpGet("{id}")]
         public BookingDetailDTO GetDetailBookingById(int id)
         {
-            return service.GetDetailBookingById(id);
+            return _bookingService.GetDetailBookingById(id);
         }
+
         [HttpPatch("{id}/checkin")]
         public IActionResult CheckinBooking(int id)
         {
-            var (success, message, booking) = service.CheckIn(id);
+            var (success, message, booking) = _bookingService.CheckIn(id);
 
             if (!success)
                 return BadRequest(new { message });
@@ -74,12 +61,12 @@ namespace ServerSide.Controllers
                 bookingId = booking!.Id,
                 checkinTime = booking.CheckInAt
             });
-
         }
+
         [HttpPatch("{id}/checkout")]
         public IActionResult CheckoutBooking(int id)
         {
-            var (success, message, booking) = service.CheckIn(id);
+            var (success, message, booking) = _bookingService.CheckOut(id); 
 
             if (!success)
                 return BadRequest(new { message });
@@ -88,9 +75,34 @@ namespace ServerSide.Controllers
             {
                 message,
                 bookingId = booking!.Id,
-                checkinTime = booking.CheckInAt
+                checkoutTime = booking.CheckOutAt // Changed to checkoutTime
             });
-
         }
-    } 
+
+        [HttpGet("user/{userId}/history")]
+        public async Task<IActionResult> GetBookingHistory(
+            int userId, DateTime? from = null, DateTime? to = null,
+            int page = 1, int pageSize = 5)
+        {
+            var (total, data) = await _bookingService.GetBookingHistoryAsync(userId, from, to, page, pageSize);
+            return Ok(new { total, data });
+        }
+
+        [HttpPost("{bookingId}/rate")]
+        public async Task<IActionResult> RateRoom(int bookingId, [FromBody] CreateRatingDTO dto)
+        {
+            try
+            {
+                await _bookingService.AddRatingAsync(bookingId, dto);
+                return Ok(new { message = "Rating submitted." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    error = ex.InnerException?.Message ?? ex.Message
+                });
+            }
+        }
+    }
 }

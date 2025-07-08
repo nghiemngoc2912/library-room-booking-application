@@ -1,4 +1,4 @@
-﻿using ServerSide.Constants;
+using ServerSide.Constants;
 using ServerSide.DTOs;
 using ServerSide.DTOs.Booking;
 using ServerSide.DTOs.User;
@@ -20,10 +20,10 @@ namespace ServerSide.Services
 
         public IEnumerable<UserBookingDTO> SearchUserByCode(string code)
         {
-            return repository.SearchUserByCode(code).Select(s=>new UserBookingDTO(s));
+            return repository.SearchUserByCode(code).Select(s => new UserBookingDTO(s));
         }
 
-        User IUserService.GetUserByCode(string s)
+        public User GetUserByCode(string s)
         {
             return repository.GetUserByCode(s);
         }
@@ -61,9 +61,38 @@ namespace ServerSide.Services
                 PageSize = pageSize
             };
         }
+    
+
+        public async Task<UserReputationDTO?> GetUserReputationAsync(int userId)
+        {
+            var user = await repository.GetUserWithReports(userId);
+            if (user == null) return null;
+
+            var violations = user.ReportUsers
+                .GroupBy(r => r.ReportType)
+                .Select(g => new UserReputationDTO.ViolationStat
+                {
+                    Type = g.Key ?? "Unknown",
+                    Count = g.Count(),
+                    Score = g.Count() * -5
+                }).ToList();
+
+            var totalPenalty = violations.Sum(v => v.Score);
+            var reputation = 100 + totalPenalty;
+            reputation = Math.Clamp(reputation, 0, 100);
+
+            return new UserReputationDTO
+            {
+                FullName = user.FullName,
+                Reputation = reputation,
+                Violations = violations
+            };
+        }
     }
+
     public interface IUserService
     {
+        Task<UserReputationDTO?> GetUserReputationAsync(int userId);
         User GetUserByCode(string s);
         IEnumerable<UserBookingDTO> SearchUserByCode(string code);
         User GetUserById(int id);

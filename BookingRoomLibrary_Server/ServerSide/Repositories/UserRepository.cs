@@ -17,11 +17,18 @@ namespace ServerSide.Repositories
             return context.Users.Where(x => x.Code.Contains(code));
         }
 
-        User IUserRepository.GetUserByCode(string code)
+        public User GetUserByCode(string code)
         {
             return context.Users
                 .Include(u => u.Account)
-                .FirstOrDefault(s => s.Code == code);
+                .FirstOrDefault(u => u.Code == code);
+        }
+
+        public async Task<User?> GetUserWithReports(int userId)
+        {
+            return await context.Users
+                .Include(u => u.ReportUsers)
+                .FirstOrDefaultAsync(u => u.Id == userId);
         }
 
         User IUserRepository.GetUserById(int id)
@@ -44,11 +51,13 @@ namespace ServerSide.Repositories
             return query;
         }
     }
+
     public interface IUserRepository
     {
         User GetUserByCode(string s);
         User GetUserById(int id);
-        IQueryable<User> GetUsersByRole(int role, string? keyword);
+        IQueryable<User> GetUsersByRole(int role, string? keyword);      
         IEnumerable<User> SearchUserByCode(string code);
+        Task<User?> GetUserWithReports(int userId);
     }
 }

@@ -1,5 +1,4 @@
 ﻿using ServerSide.Models;
-
 namespace ServerSide.DTOs.Booking
 {
     public class UserBookingDTO
