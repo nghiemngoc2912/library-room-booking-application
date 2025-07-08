@@ -60,5 +60,37 @@ namespace ServerSide.Controllers
         {
             return service.GetDetailBookingById(id);
         }
+        [HttpPatch("{id}/checkin")]
+        public IActionResult CheckinBooking(int id)
+        {
+            var (success, message, booking) = service.CheckIn(id);
+
+            if (!success)
+                return BadRequest(new { message });
+
+            return Ok(new
+            {
+                message,
+                bookingId = booking!.Id,
+                checkinTime = booking.CheckInAt
+            });
+
+        }
+        [HttpPatch("{id}/checkout")]
+        public IActionResult CheckoutBooking(int id)
+        {
+            var (success, message, booking) = service.CheckIn(id);
+
+            if (!success)
+                return BadRequest(new { message });
+
+            return Ok(new
+            {
+                message,
+                bookingId = booking!.Id,
+                checkinTime = booking.CheckInAt
+            });
+
+        }
     } 
 }

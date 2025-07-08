@@ -28,11 +28,27 @@ namespace ServerSide.Repositories
         {
             return context.Users.Find(id);
         }
+        public IQueryable<User> GetUsersByRole(int role, string? keyword)
+        {
+            var query = context.Users
+                .Where(u => u.Account.Role == (byte)role);
+
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                query = query.Where(u =>
+                    u.FullName.Contains(keyword) ||
+                    u.Code.Contains(keyword) ||
+                    u.Email.Contains(keyword));
+            }
+
+            return query;
+        }
     }
     public interface IUserRepository
     {
         User GetUserByCode(string s);
         User GetUserById(int id);
+        IQueryable<User> GetUsersByRole(int role, string? keyword);
         IEnumerable<User> SearchUserByCode(string code);
     }
 }
