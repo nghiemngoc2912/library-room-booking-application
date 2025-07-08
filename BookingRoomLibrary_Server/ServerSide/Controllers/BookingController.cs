@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ServerSide.DTOs.Booking;
 using ServerSide.Exceptions;
+using ServerSide.Models;
 using ServerSide.Services;
 
 namespace ServerSide.Controllers
@@ -44,6 +45,45 @@ namespace ServerSide.Controllers
         }
 
 
+        //detail booking
+        [HttpGet("{id}")]
+        public BookingDetailDTO GetDetailBookingById(int id)
+        {
+            return service.GetDetailBookingById(id);
+        }
+        [HttpPatch("{id}/checkin")]
+        public IActionResult CheckinBooking(int id)
+        {
+            var (success, message, booking) = service.CheckIn(id);
+
+            if (!success)
+                return BadRequest(new { message });
+
+            return Ok(new
+            {
+                message,
+                bookingId = booking!.Id,
+                checkinTime = booking.CheckInAt
+            });
+
+        }
+        [HttpPatch("{id}/checkout")]
+        public IActionResult CheckoutBooking(int id)
+        {
+            var (success, message, booking) = service.CheckIn(id);
+
+            if (!success)
+                return BadRequest(new { message });
+
+            return Ok(new
+            {
+                message,
+                bookingId = booking!.Id,
+                checkinTime = booking.CheckInAt
+            });
+
+        }
+    } 
         [HttpGet("user/{userId}/history")]
         public async Task<IActionResult> GetBookingHistory(
             int userId, DateTime? from = null, DateTime? to = null,

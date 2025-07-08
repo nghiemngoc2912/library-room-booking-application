@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ServerSide.Constants;
 using ServerSide.DTOs.Booking;
+using ServerSide.DTOs.User;
 using ServerSide.Models;
 using ServerSide.Services;
 using System.Collections.Generic;
@@ -32,6 +34,12 @@ namespace ServerSide.Controllers
         {
             var result = await userService.GetUserReputationAsync(userId);
             if (result == null) return NotFound();
+            return Ok(result);
+        }
+        [HttpGet("students")]
+        public IActionResult GetStudentLists([FromQuery] string? keyword,[FromQuery] int page = 1)
+        {
+            var result = userService.GetAllStudents(keyword, page, Pagination.DefaultPageSize);
             return Ok(result);
         }
     }

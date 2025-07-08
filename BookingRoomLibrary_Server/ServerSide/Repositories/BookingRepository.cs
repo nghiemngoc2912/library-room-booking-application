@@ -43,6 +43,20 @@ namespace ServerSide.Repositories
                     b.Students.Any(s => s.Id == user.Id))
                 .Count();
         }
+        public Booking GetBookingById(int id)
+        {
+            return context.Bookings
+                .Include(b => b.Students)
+                .Include(b=>b.Slot)
+                .FirstOrDefault(b=>b.Id==id);
+        }
+
+        void IBookingRepository.UpdateBooking(Booking booking)
+        {
+            context.Bookings.Update(booking);
+            context.SaveChanges();
+        }
+    }
 
         public async Task<List<Booking>> GetBookingsByUser(int userId, DateOnly? from, DateOnly? to, int page, int pageSize)
         {
@@ -91,5 +105,7 @@ namespace ServerSide.Repositories
         IEnumerable<Booking> GetBookingByDateAndStatus(DateOnly date, byte status);
         int GetBookingCountByDateAndUser(User user, DateOnly fromDate, DateOnly toDate);
         Task<int> CountBookingsByUser(int userId, DateOnly? from, DateOnly? to);
+        Booking GetBookingById(int id);
+        void UpdateBooking(Booking booking);
     }
 }

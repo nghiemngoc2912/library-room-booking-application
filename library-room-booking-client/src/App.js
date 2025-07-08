@@ -7,6 +7,8 @@ import Home from './pages/roomBooking/Home';
 import NewsPage from './pages/roomBooking/NewsPage';
 import ProfilePage from './pages/student/ProfilePage';
 
+import BookingDetailPage from './pages/roomBooking/BookingDetail';
+import StudentList from './pages/user/StudentList';
 
 const App = () => {
   return (
@@ -19,6 +21,8 @@ const App = () => {
         element={<DefaultLayout><ProfilePage userId={2} /></DefaultLayout>}
       />
 
+      <Route path="/booking/detail/:id" element={<DefaultLayout><BookingDetailPage /></DefaultLayout>} />
+      <Route path="/user/students" element={<DefaultLayout><StudentList /></DefaultLayout>} />
     </Routes>
   );
 };
