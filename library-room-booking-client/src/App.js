@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import DefaultLayout from './layouts/DefaultLayout';
+import AdminLayout from './layouts/AdminLayout';
 import RoomBooking from './pages/roomBooking/RoomBooking';
 import Home from './pages/roomBooking/Home';
 import Login from './pages/auth/Login';
@@ -34,7 +35,7 @@ const App = () => {
   }, [location]);
 
   const ProtectedRoute = ({ children, allowedRoles }) => {
-    if (loading) return <div>Loading...</div>; // Hiển thị loading trong khi kiểm tra
+    if (loading) return <div>Loading...</div>; 
     if (role === null) return <Navigate to="/login" replace />;
     if (!allowedRoles.includes(role)) {
       return <Navigate to={role === 1 ? '/home' : '/login'} replace />;
@@ -84,7 +85,7 @@ const App = () => {
         path="/admin"
         element={
           <ProtectedRoute allowedRoles={[3]}>
-            <DefaultLayout><AdminDashboard /></DefaultLayout>
+            <AdminLayout><AdminDashboard /></AdminLayout>
           </ProtectedRoute>
         }
       />
