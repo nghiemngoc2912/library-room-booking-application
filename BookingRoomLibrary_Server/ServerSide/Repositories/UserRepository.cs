@@ -12,6 +12,18 @@ namespace ServerSide.Repositories
             this.context = context;
         }
 
+        public IEnumerable<User> SearchUserByCode(string code)
+        {
+            return context.Users.Where(x => x.Code.Contains(code));
+        }
+
+        public User GetUserByCode(string code)
+        {
+            return context.Users
+                .Include(u => u.Account)
+                .FirstOrDefault(u => u.Code == code);
+        }
+
         public async Task<User?> GetUserWithReports(int userId)
         {
             return await context.Users
@@ -20,4 +32,10 @@ namespace ServerSide.Repositories
         }
     }
 
+    public interface IUserRepository
+    {
+        User GetUserByCode(string code);
+        IEnumerable<User> SearchUserByCode(string code);
+        Task<User?> GetUserWithReports(int userId);
+    }
 }

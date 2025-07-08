@@ -70,49 +70,19 @@
         ],
         "requestBody": {
           "content": {
-            "multipart/form-data": {
+            "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "BookingDate": {
-                    "type": "string",
-                    "format": "date"
-                  },
-                  "RoomId": {
-                    "type": "integer",
-                    "format": "int32"
-                  },
-                  "SlotId": {
-                    "type": "integer",
-                    "format": "int32"
-                  },
-                  "Reason": {
-                    "type": "string"
-                  },
-                  "StudentList": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  }
-                }
-              },
-              "encoding": {
-                "BookingDate": {
-                  "style": "form"
-                },
-                "RoomId": {
-                  "style": "form"
-                },
-                "SlotId": {
-                  "style": "form"
-                },
-                "Reason": {
-                  "style": "form"
-                },
-                "StudentList": {
-                  "style": "form"
-                }
+                "$ref": "#/components/schemas/CreateBookingDTO"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBookingDTO"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBookingDTO"
               }
             }
           }
@@ -454,17 +424,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateBookingRoom"
+                  "$ref": "#/components/schemas/CreateBookingRoomDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateBookingRoom"
+                  "$ref": "#/components/schemas/CreateBookingRoomDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateBookingRoom"
+                  "$ref": "#/components/schemas/CreateBookingRoomDTO"
                 }
               }
             }
@@ -543,6 +513,53 @@
               "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Slot"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/User/search": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserBookingDTO"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserBookingDTO"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserBookingDTO"
+                  }
                 }
               }
             }
@@ -681,7 +698,36 @@
         },
         "additionalProperties": false
       },
-      "CreateBookingRoom": {
+      "CreateBookingDTO": {
+        "type": "object",
+        "properties": {
+          "bookingDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "roomId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "slotId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "reason": {
+            "type": "string",
+            "nullable": true
+          },
+          "studentListCode": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateBookingRoomDTO": {
         "type": "object",
         "properties": {
           "id": {
@@ -691,6 +737,10 @@
           "roomName": {
             "type": "string",
             "nullable": true
+          },
+          "capacity": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -1149,6 +1199,20 @@
             "items": {
               "$ref": "#/components/schemas/Booking"
             },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserBookingDTO": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "nullable": true
+          },
+          "code": {
+            "type": "string",
             "nullable": true
           }
         },

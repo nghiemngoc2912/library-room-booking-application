@@ -8,38 +8,12 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "BookingDate",
-        "Type": "System.DateOnly",
-        "IsRequired": false
-      },
-      {
-        "Name": "RoomId",
-        "Type": "System.Int32",
-        "IsRequired": false
-      },
-      {
-        "Name": "SlotId",
-        "Type": "System.Int32",
-        "IsRequired": false
-      },
-      {
-        "Name": "Reason",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "StudentList",
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
-        "IsRequired": false
+        "Name": "createBookingDTO",
+        "Type": "ServerSide.DTOs.Booking.CreateBookingDTO",
+        "IsRequired": true
       }
     ],
-    "ReturnTypes": [
-      {
-        "Type": "System.Void",
-        "MediaTypes": [],
-        "StatusCode": 200
-      }
-    ]
+    "ReturnTypes": []
   },
   {
     "ContainingType": "ServerSide.Controllers.BookingController",
@@ -275,7 +249,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "ServerSide.DTOs.Room.CreateBookingRoom",
+        "Type": "ServerSide.DTOs.Room.CreateBookingRoomDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -346,5 +320,31 @@
       }
     ],
     "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ServerSide.Controllers.UserController",
+    "Method": "SearchUserByCode",
+    "RelativePath": "api/User/search",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "code",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[ServerSide.DTOs.Booking.UserBookingDTO, ServerSide, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   }
 ]

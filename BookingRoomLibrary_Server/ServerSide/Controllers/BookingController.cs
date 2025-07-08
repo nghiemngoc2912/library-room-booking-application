@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ServerSide.DTOs.Booking;
+using ServerSide.Exceptions;
 using ServerSide.Services;
 
 namespace ServerSide.Controllers
@@ -21,11 +22,27 @@ namespace ServerSide.Controllers
             return _bookingService.GetBookingByDateAndStatus(date, status);
         }
 
+        
+
         [HttpPost]
-        public void CreateBooking([FromForm] CreateBookingDTO createBookingDTO)
+        public IActionResult CreateBooking([FromBody]CreateBookingDTO createBookingDTO)
         {
-            // TODO: triển khai sau
+
+            try
+            {
+                _bookingService.CreateBooking(createBookingDTO);
+                return Ok("Booking created successfully");
+            }
+            catch (BookingPolicyViolationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
         }
+
 
         [HttpGet("user/{userId}/history")]
         public async Task<IActionResult> GetBookingHistory(
