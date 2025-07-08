@@ -35,7 +35,14 @@ namespace ServerSide.Repositories
         {
             return context.Bookings
                 .Include(b => b.Students)
+                .Include(b=>b.Slot)
                 .FirstOrDefault(b=>b.Id==id);
+        }
+
+        void IBookingRepository.UpdateBooking(Booking booking)
+        {
+            context.Bookings.Update(booking);
+            context.SaveChanges();
         }
     }
     public interface IBookingRepository
@@ -44,5 +51,6 @@ namespace ServerSide.Repositories
         void Add(Booking booking);
         int GetBookingCountByDateAndUser(User user, DateOnly fromDate, DateOnly toDate);
         Booking GetBookingById(int id);
+        void UpdateBooking(Booking booking);
     }
 }

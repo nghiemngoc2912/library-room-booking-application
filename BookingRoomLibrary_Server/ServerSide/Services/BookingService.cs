@@ -136,6 +136,53 @@ namespace ServerSide.Services
                 Students = booking.Students?.Select(s => new UserBookingDTO(s)).ToList()
             };
         }
+
+        (bool success, string message, Booking booking) IBookingService.CheckIn(int id)
+        {
+            var booking = repository.GetBookingById(id);
+            if (booking == null)
+                return (false, "Booking does not exist", null);
+
+            if (booking.CheckInAt != null)
+                return (false, "Booking was checked in", booking);
+            var now = DateTime.Now;
+            var slotStart = booking.BookingDate.ToDateTime(booking.Slot.FromTime);
+
+            var early = slotStart.AddMinutes(-BookingRules.MaxTimeToCheckin);
+            var late = slotStart.AddMinutes(BookingRules.MaxTimeToCheckin);
+
+            if (now < early || now > late)
+            {
+                return (false, $"You can just checkin within {BookingRules.MaxTimeToCheckin} minutes before and after: {slotStart:HH:mm}", booking);
+            }
+            booking.CheckInAt = now;
+            repository.UpdateBooking(booking);
+
+            return (true, "Check-in successfully", booking);
+        }
+        (bool success, string message, Booking booking) IBookingService.CheckOut(int id)
+        {
+            var booking = repository.GetBookingById(id);
+            if (booking == null)
+                return (false, "Booking does not exist", null);
+
+            if (booking.CheckOutAt != null)
+                return (false, "Booking was checked out", booking);
+            var now = DateTime.Now;
+            var slotStart = booking.BookingDate.ToDateTime(booking.Slot.ToTime);
+
+            var early = slotStart.AddMinutes(-BookingRules.MaxTimeToCheckout);
+            var late = slotStart.AddMinutes(BookingRules.MaxTimeToCheckout);
+
+            if (now < early || now > late)
+            {
+                return (false, $"You can just checkout within {BookingRules.MaxTimeToCheckout} minutes before and after: {slotStart:HH:mm}", booking);
+            }
+            booking.CheckOutAt = now;
+            repository.UpdateBooking(booking);
+
+            return (true, "Check-out successfully", booking);
+        }
     }
     
     public interface IBookingService
@@ -145,6 +192,8 @@ namespace ServerSide.Services
         int GetBookingCountByDateAndUser(User user,DateOnly fromDate,DateOnly toDate);
         Boolean CheckBookingAvailable(Booking booking);
         BookingDetailDTO GetDetailBookingById(int id);
+        (bool success, string message, Booking booking) CheckIn(int id);
+        (bool success, string message, Booking booking) CheckOut(int id);
     }
 }
 

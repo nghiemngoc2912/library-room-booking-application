@@ -6,7 +6,7 @@ namespace ServerSide.DTOs.Booking
     {
         public string FullName { get; set; } = null!;
         public string Code { get; set; }
-        public UserBookingDTO(User user) {
+        public UserBookingDTO(ServerSide.Models.User user) {
             this.FullName = user.FullName;
             this.Code = user.Code;
         }
