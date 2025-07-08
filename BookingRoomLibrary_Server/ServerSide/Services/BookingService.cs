@@ -155,10 +155,86 @@ namespace ServerSide.Services
             context.Ratings.Add(rating);
             await context.SaveChangesAsync();
         }
+        public BookingDetailDTO GetDetailBookingById(int id)
+        {
+            var booking = repository.GetBookingById(id);
+            if (booking == null) return null;
+
+            var createdBy = userService.GetUserById(booking.CreatedBy);
+
+            return new BookingDetailDTO
+            {
+                Id = booking.Id,
+                BookingDate = booking.BookingDate,
+                Reason = booking.Reason,
+                SlotId = booking.SlotId,
+                RoomId = booking.RoomId,
+                CreatedDate = booking.CreatedDate,
+                CreatedBy = new UserBookingDTO(createdBy),
+                Status = booking.Status,
+                CheckInAt = booking.CheckInAt,
+                CheckOutAt = booking.CheckOutAt,
+                Students = booking.Students?.Select(s => new UserBookingDTO(s)).ToList()
+            };
+        }
+        public (bool success, string message, Booking booking) CheckIn(int id)
+        {
+            var booking = repository.GetBookingById(id);
+            if (booking == null)
+                return (false, "Booking does not exist", null);
+
+            if (booking.CheckInAt != null)
+                return (false, "Booking was already checked in", booking);
+
+            var now = DateTime.Now;
+            var slotStart = booking.BookingDate.ToDateTime(booking.Slot.FromTime);
+
+            var early = slotStart.AddMinutes(-BookingRules.MaxTimeToCheckin);
+            var late = slotStart.AddMinutes(BookingRules.MaxTimeToCheckin);
+
+            if (now < early || now > late)
+            {
+                return (false, $"You can check in within {BookingRules.MaxTimeToCheckin} minutes before and after: {slotStart:HH:mm}", booking);
+            }
+
+            booking.CheckInAt = now;
+            repository.UpdateBooking(booking);
+
+            return (true, "Check-in successfully", booking);
+        }
+
+        public (bool success, string message, Booking booking) CheckOut(int id)
+        {
+            var booking = repository.GetBookingById(id);
+            if (booking == null)
+                return (false, "Booking does not exist", null);
+
+            if (booking.CheckOutAt != null)
+                return (false, "Booking was already checked out", booking);
+
+            var now = DateTime.Now;
+            var slotEnd = booking.BookingDate.ToDateTime(booking.Slot.ToTime);
+
+            var early = slotEnd.AddMinutes(-BookingRules.MaxTimeToCheckout);
+            var late = slotEnd.AddMinutes(BookingRules.MaxTimeToCheckout);
+
+            if (now < early || now > late)
+            {
+                return (false, $"You can check out within {BookingRules.MaxTimeToCheckout} minutes before and after: {slotEnd:HH:mm}", booking);
+            }
+
+            booking.CheckOutAt = now;
+            repository.UpdateBooking(booking);
+
+            return (true, "Check-out successfully", booking);
+        }
     }
 
     public interface IBookingService
     {
+        BookingDetailDTO GetDetailBookingById(int id);
+        (bool success, string message, Booking booking) CheckIn(int id);
+        (bool success, string message, Booking booking) CheckOut(int id);
         void CreateBooking(CreateBookingDTO createBookingDTO);
         IEnumerable<HomeBookingDTO> GetBookingByDateAndStatus(DateOnly date, byte status);
         int GetBookingCountByDateAndUser(User user, DateOnly fromDate, DateOnly toDate);
@@ -166,6 +242,6 @@ namespace ServerSide.Services
         Task<(int total, List<BookingHistoryDTO> data)> GetBookingHistoryAsync(int userId, DateTime? from, DateTime? to, int page, int pageSize);
         Task AddRatingAsync(int bookingId, CreateRatingDTO dto);
 
-        
+
     }
 }

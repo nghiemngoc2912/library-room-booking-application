@@ -61,7 +61,7 @@ namespace ServerSide.Services
                 PageSize = pageSize
             };
         }
-    }
+    
 
         public async Task<UserReputationDTO?> GetUserReputationAsync(int userId)
         {
@@ -92,6 +92,7 @@ namespace ServerSide.Services
 
     public interface IUserService
     {
+        Task<UserReputationDTO?> GetUserReputationAsync(int userId);
         User GetUserByCode(string s);
         IEnumerable<UserBookingDTO> SearchUserByCode(string code);
         User GetUserById(int id);

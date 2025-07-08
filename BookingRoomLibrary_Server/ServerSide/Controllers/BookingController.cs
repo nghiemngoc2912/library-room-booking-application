@@ -23,12 +23,9 @@ namespace ServerSide.Controllers
             return _bookingService.GetBookingByDateAndStatus(date, status);
         }
 
-        
-
         [HttpPost]
-        public IActionResult CreateBooking([FromBody]CreateBookingDTO createBookingDTO)
+        public IActionResult CreateBooking([FromBody] CreateBookingDTO createBookingDTO)
         {
-
             try
             {
                 _bookingService.CreateBooking(createBookingDTO);
@@ -44,17 +41,16 @@ namespace ServerSide.Controllers
             }
         }
 
-
-        //detail booking
         [HttpGet("{id}")]
         public BookingDetailDTO GetDetailBookingById(int id)
         {
-            return service.GetDetailBookingById(id);
+            return _bookingService.GetDetailBookingById(id);
         }
+
         [HttpPatch("{id}/checkin")]
         public IActionResult CheckinBooking(int id)
         {
-            var (success, message, booking) = service.CheckIn(id);
+            var (success, message, booking) = _bookingService.CheckIn(id);
 
             if (!success)
                 return BadRequest(new { message });
@@ -65,12 +61,12 @@ namespace ServerSide.Controllers
                 bookingId = booking!.Id,
                 checkinTime = booking.CheckInAt
             });
-
         }
+
         [HttpPatch("{id}/checkout")]
         public IActionResult CheckoutBooking(int id)
         {
-            var (success, message, booking) = service.CheckIn(id);
+            var (success, message, booking) = _bookingService.CheckOut(id); 
 
             if (!success)
                 return BadRequest(new { message });
@@ -79,11 +75,10 @@ namespace ServerSide.Controllers
             {
                 message,
                 bookingId = booking!.Id,
-                checkinTime = booking.CheckInAt
+                checkoutTime = booking.CheckOutAt // Changed to checkoutTime
             });
-
         }
-    } 
+
         [HttpGet("user/{userId}/history")]
         public async Task<IActionResult> GetBookingHistory(
             int userId, DateTime? from = null, DateTime? to = null,

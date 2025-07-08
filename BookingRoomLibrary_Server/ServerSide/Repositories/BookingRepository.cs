@@ -56,7 +56,7 @@ namespace ServerSide.Repositories
             context.Bookings.Update(booking);
             context.SaveChanges();
         }
-    }
+    
 
         public async Task<List<Booking>> GetBookingsByUser(int userId, DateOnly? from, DateOnly? to, int page, int pageSize)
         {

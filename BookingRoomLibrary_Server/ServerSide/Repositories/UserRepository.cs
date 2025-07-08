@@ -56,8 +56,7 @@ namespace ServerSide.Repositories
     {
         User GetUserByCode(string s);
         User GetUserById(int id);
-        IQueryable<User> GetUsersByRole(int role, string? keyword);
-        User GetUserByCode(string code);
+        IQueryable<User> GetUsersByRole(int role, string? keyword);      
         IEnumerable<User> SearchUserByCode(string code);
         Task<User?> GetUserWithReports(int userId);
     }
