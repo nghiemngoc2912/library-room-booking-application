@@ -18,6 +18,11 @@ namespace ServerSide.Services
             return roomRepository.GetAll().Select(r => new HomeRoomDTO(r)).ToList();
         }
 
+        public IEnumerable<RoomLibrarian> GetAllRoomsForStaffManagement()
+        {
+            return roomRepository.GetAll().Select(r => new RoomLibrarian(r)).ToList();
+        }
+
         CreateBookingRoomDTO IRoomService.GetRoomByIdForBooking(int id)
         {
             return new CreateBookingRoomDTO(roomRepository.GetById(id));
@@ -26,6 +31,7 @@ namespace ServerSide.Services
     public interface IRoomService
     {
         IEnumerable<HomeRoomDTO> GetAllRoomsForHome();
+        IEnumerable<RoomLibrarian> GetAllRoomsForStaffManagement();
         CreateBookingRoomDTO GetRoomByIdForBooking(int id);
     }
 }

@@ -8,7 +8,8 @@ import AdminLayout from './layouts/AdminLayout';
 
 // Import các Page Components
 import RoomBooking from './pages/roomBooking/RoomBooking';
-import Home from './pages/roomBooking/Home'; // Import Home trực tiếp ở đây
+import Home from './pages/roomBooking/Home'; 
+import ListRoom from './pages/roomManagement/ListRoom'; 
 import Login from './pages/auth/Login';
 import NewsPage from './pages/roomBooking/NewsPage';
 import ProfilePage from './pages/student/ProfilePage';
@@ -99,6 +100,15 @@ const App = () => {
           element={
             <ProtectedRoute allowedRoles={[1, 2, 3]}>
               {getHomeLayout()} {/* Gọi hàm để render layout phù hợp */}
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/room_management"
+          element={
+            <ProtectedRoute allowedRoles={[2]}>
+              <LibrarianLayout><ListRoom/></LibrarianLayout>
             </ProtectedRoute>
           }
         />

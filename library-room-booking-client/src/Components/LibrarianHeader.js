@@ -16,7 +16,7 @@ import AdbIcon from '@mui/icons-material/Adb';
 import Badge from '@mui/material/Badge';
 import { useNavigate } from 'react-router-dom';
 
-const pages = ['Room', 'Students', 'Report', 'Setting', 'News', 'Rules'];
+const pages = ['Home', 'Room', 'Students', 'Report', 'Setting', 'News', 'Rules'];
 const settings = ['Profile', 'Logout'];
 
 function LibrarianHeader() {
@@ -40,21 +40,32 @@ function LibrarianHeader() {
   };
 
   const handleLogout = async () => {
-  try {
-    await fetch('https://localhost:7238/api/auth/logout', {
-      method: 'POST',
-      credentials: 'include', // Bắt buộc để gửi session cookie
-    });
-  } catch (err) {
-    console.error('Logout failed', err);
-  }
+    try {
+      await fetch('https://localhost:7238/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch (err) {
+      console.error('Logout failed', err);
+    }
 
-  // Xóa local/session storage nếu bạn dùng thêm
-  localStorage.removeItem('authToken');
-  sessionStorage.clear();
+    localStorage.removeItem('authToken');
+    sessionStorage.clear();
 
-  handleCloseUserMenu();
-  navigate('/login');
+    handleCloseUserMenu();
+    navigate('/login');
+  };
+
+  const handlePageNavigation = (page) => {
+    handleCloseNavMenu();
+    if (page === 'Home') {
+      navigate('/home');
+    } else if (page === 'Room') {
+      navigate('/room_management');
+    } else {
+      // Placeholder for other pages
+      navigate(`/${page.toLowerCase()}`);
+    }
   };
 
   return (
@@ -108,7 +119,7 @@ function LibrarianHeader() {
               sx={{ display: { xs: 'block', md: 'none' } }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
+                <MenuItem key={page} onClick={() => handlePageNavigation(page)}>
                   <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
                 </MenuItem>
               ))}
@@ -137,7 +148,7 @@ function LibrarianHeader() {
             {pages.map((page) => (
               <Button
                 key={page}
-                onClick={handleCloseNavMenu}
+                onClick={() => handlePageNavigation(page)}
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
                 {page}
@@ -146,7 +157,7 @@ function LibrarianHeader() {
           </Box>
           <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center', gap: 2 }}>
             <Badge badgeContent={3} color="error" overlap="circular">
-              <NotificationsIcon /> 
+              <NotificationsIcon />
             </Badge>
             <Tooltip title="Account setting">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
@@ -181,4 +192,5 @@ function LibrarianHeader() {
     </AppBar>
   );
 }
+
 export default LibrarianHeader;
