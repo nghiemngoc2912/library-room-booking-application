@@ -16,10 +16,10 @@ import AdbIcon from '@mui/icons-material/Adb';
 import Badge from '@mui/material/Badge';
 import { useNavigate } from 'react-router-dom';
 
-const pages = ['Booking Room', 'News', 'Rules', 'Reports'];
+const pages = ['Room', 'Students', 'Report', 'Setting', 'News', 'Rules'];
 const settings = ['Profile', 'Logout'];
 
-function Header() {
+function LibrarianHeader() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const navigate = useNavigate();
@@ -181,4 +181,4 @@ function Header() {
     </AppBar>
   );
 }
-export default Header;
+export default LibrarianHeader;

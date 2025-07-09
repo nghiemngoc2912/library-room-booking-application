@@ -16,7 +16,7 @@ import AdbIcon from '@mui/icons-material/Adb';
 import Badge from '@mui/material/Badge';
 import { useNavigate } from 'react-router-dom';
 
-const pages = ['News', 'Manage rules', 'Manage staff', 'Dashboard'];
+const pages = ['Manage rules', 'Manage librarians', 'Dashboard'];
 const settings = ['Profile', 'Logout'];
 
 function AdminHeader() {
