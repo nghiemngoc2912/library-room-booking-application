@@ -10,6 +10,7 @@ import AdminLayout from './layouts/AdminLayout';
 import RoomBooking from './pages/roomBooking/RoomBooking';
 import Home from './pages/roomBooking/Home'; 
 import ListRoom from './pages/roomManagement/ListRoom'; 
+import UpdateRoom from './pages/roomManagement/UpdateRoom';
 import Login from './pages/auth/Login';
 import NewsPage from './pages/roomBooking/NewsPage';
 import ProfilePage from './pages/student/ProfilePage';
@@ -109,6 +110,14 @@ const App = () => {
           element={
             <ProtectedRoute allowedRoles={[2]}>
               <LibrarianLayout><ListRoom/></LibrarianLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/room_management/update"
+          element={
+            <ProtectedRoute allowedRoles={[2]}>
+              <LibrarianLayout><UpdateRoom /></LibrarianLayout>
             </ProtectedRoute>
           }
         />

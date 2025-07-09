@@ -20,10 +20,28 @@ namespace ServerSide.Repositories
         {
             return context.Rooms.Find(id);
         }
+
+        public bool Update(Room room)
+        {
+            var existingRoom = context.Rooms.Find(room.Id);
+            if (existingRoom == null)
+            {
+                return false;
+            }
+
+            existingRoom.RoomName = room.RoomName;
+            existingRoom.Capacity = room.Capacity;
+            existingRoom.Status = room.Status;
+
+            context.Rooms.Update(existingRoom);
+            context.SaveChanges();
+            return true;
+        }
     }
     public interface IRoomRepository
     {
         IEnumerable<Room> GetAll();
         Room GetById(int id);
+        bool Update(Room room);
     }
 }

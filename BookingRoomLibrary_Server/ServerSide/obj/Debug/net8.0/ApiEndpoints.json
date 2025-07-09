@@ -395,6 +395,84 @@
     ]
   },
   {
+    "ContainingType": "ServerSide.Controllers.RoomController",
+    "Method": "GetAllForLibrarian",
+    "RelativePath": "api/Room/room_librarian",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[ServerSide.DTOs.Room.RoomLibrarian, ServerSide, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "ServerSide.Controllers.RoomController",
+    "Method": "GetFilteredRoomsForLibrarian",
+    "RelativePath": "api/Room/room_librarian/filter",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "search",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "status",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ServerSide.Controllers.RoomController",
+    "Method": "GetByIdForUpdate",
+    "RelativePath": "api/Room/update_room/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ServerSide.Controllers.RoomController",
+    "Method": "UpdateRoom",
+    "RelativePath": "api/Room/update_room/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "updateRoomDTO",
+        "Type": "ServerSide.DTOs.Room.UpdateRoomDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "ServerSide.Controllers.SlotController",
     "Method": "GetAll",
     "RelativePath": "api/Slot",
@@ -473,26 +551,6 @@
     "ReturnTypes": [
       {
         "Type": "System.Collections.Generic.IEnumerable\u00601[[ServerSide.DTOs.Booking.UserBookingDTO, ServerSide, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "ServerSide.Controllers.RoomController",
-    "Method": "GetAllForLibrarian",
-    "RelativePath": "room_librarian",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": [
-      {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[ServerSide.DTOs.Room.RoomLibrarian, ServerSide, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",

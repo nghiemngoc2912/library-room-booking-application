@@ -1,18 +1,30 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const ListRoom = () => {
+  const [statusFilter, setStatusFilter] = useState('');
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [roomsPerPage] = useState(5);
+  const [roomsPerPage] = useState(3);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchRooms = async () => {
       try {
         setLoading(true);
-        const response = await fetch('https://localhost:7238/room_librarian');
+        const params = new URLSearchParams();
+        if (searchTerm) params.append('search', searchTerm);
+        if (statusFilter !== '') params.append('status', statusFilter);
+
+        const response = await fetch(`https://localhost:7238/api/Room/room_librarian/filter?${params.toString()}`, {
+          credentials: 'include',
+        });
+
+        if (!response.ok) throw new Error('Không thể tải danh sách phòng.');
+
         const data = await response.json();
         setRooms(data);
       } catch (err) {
@@ -24,14 +36,10 @@ const ListRoom = () => {
     };
 
     fetchRooms();
-  }, []);
+  }, [searchTerm, statusFilter]);
 
-  // Filter rooms based on search term
-  const filteredRooms = rooms.filter(room =>
-    room.roomName.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredRooms = rooms;
 
-  // Pagination logic
   const indexOfLastRoom = currentPage * roomsPerPage;
   const indexOfFirstRoom = indexOfLastRoom - roomsPerPage;
   const currentRooms = filteredRooms.slice(indexOfFirstRoom, indexOfLastRoom);
@@ -39,55 +47,75 @@ const ListRoom = () => {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  const handleUpdate = (roomId) => {
+    navigate(`/room_management/update?roomId=${roomId}`);
+  };
+
   return (
     <div style={{ maxWidth: 1000, margin: '2rem auto', padding: '2rem', border: '1px solid #eee', borderRadius: '10px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
       <h1 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>🏠 Room Management</h1>
-      
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-        <div style={{ display: 'flex', gap: '1rem' }}>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', gap: '1rem' }}>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <button
             style={{
               backgroundColor: '#28a745',
               color: 'white',
-              padding: '0.5rem 1rem',
+              padding: '0.75rem',
               borderRadius: '6px',
               border: 'none',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              fontSize: '1rem',
             }}
           >
             Add New Room
           </button>
-          <button
-            style={{
-              backgroundColor: '#17a2b8',
-              color: 'white',
-              padding: '0.5rem 1rem',
-              borderRadius: '6px',
-              border: 'none',
-              cursor: 'pointer'
-            }}
-          >
-            Filter
-          </button>
+          <div>
+            <select
+              value={statusFilter}
+              onChange={(e) => {
+                setCurrentPage(1);
+                setStatusFilter(e.target.value);
+              }}
+              style={{
+                padding: '0.75rem',
+                borderRadius: '6px',
+                border: '1px solid #ccc',
+                width: '200px',
+                boxSizing: 'border-box',
+                fontSize: '1rem',
+              }}
+            >
+              <option value="">All</option>
+              <option value="0">Pending</option>
+              <option value="1">Active</option>
+              <option value="-1">Inactive</option>
+              <option value="-2">Maintenance</option>
+            </select>
+          </div>
         </div>
-        <input
-          type="text"
-          placeholder="Search by room name..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          style={{
-            padding: '0.5rem',
-            borderRadius: '6px',
-            border: '1px solid #ccc',
-            width: '200px'
-          }}
-        />
+        <div>
+          <input
+            type="text"
+            placeholder="Search by room name..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{
+              padding: '0.75rem',
+              borderRadius: '6px',
+              border: '1px solid #ccc',
+              width: '200px',
+              boxSizing: 'border-box',
+              fontSize: '1rem',
+            }}
+          />
+        </div>
       </div>
 
       {loading ? (
         <p>Loading...</p>
       ) : error ? (
-        <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>
+        <p style={{ color: 'red', textAlign: 'center', fontWeight: 'bold' }}>{error}</p>
       ) : (
         <>
           <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '1.5rem' }}>
@@ -106,11 +134,12 @@ const ListRoom = () => {
                   <td style={{ padding: '0.75rem', border: '1px solid #dee2e6' }}>{room.id}</td>
                   <td style={{ padding: '0.75rem', border: '1px solid #dee2e6' }}>{room.roomName}</td>
                   <td style={{ padding: '0.75rem', border: '1px solid #dee2e6' }}>
-                    {room.status === 1 ? 'Available' : 'Unavailable'}
+                    {room.status === 1 ? 'Active' : room.status === 0 ? 'Pending' : room.status === -1 ? 'Inactive' : 'Maintenance'}
                   </td>
                   <td style={{ padding: '0.75rem', border: '1px solid #dee2e6' }}>{room.capacity}</td>
                   <td style={{ padding: '0.75rem', border: '1px solid #dee2e6' }}>
                     <button
+                      onClick={() => handleUpdate(room.id)}
                       style={{
                         backgroundColor: '#007bff',
                         color: 'white',
@@ -118,7 +147,7 @@ const ListRoom = () => {
                         borderRadius: '4px',
                         border: 'none',
                         cursor: 'pointer',
-                        marginRight: '0.5rem'
+                        marginRight: '0.5rem',
                       }}
                     >
                       Update
@@ -130,7 +159,7 @@ const ListRoom = () => {
                         padding: '0.25rem 0.5rem',
                         borderRadius: '4px',
                         border: 'none',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
                       }}
                     >
                       Maintenance
@@ -152,7 +181,7 @@ const ListRoom = () => {
                   padding: '0.5rem 1rem',
                   borderRadius: '4px',
                   border: '1px solid #dee2e6',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
                 }}
               >
                 {page}
