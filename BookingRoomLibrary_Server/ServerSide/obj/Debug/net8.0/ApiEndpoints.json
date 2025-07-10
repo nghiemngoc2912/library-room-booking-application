@@ -350,6 +350,22 @@
   },
   {
     "ContainingType": "ServerSide.Controllers.RoomController",
+    "Method": "CreateRoom",
+    "RelativePath": "api/Room",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "createRoomDTO",
+        "Type": "ServerSide.DTOs.Room.CreateRoomDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ServerSide.Controllers.RoomController",
     "Method": "GetAll",
     "RelativePath": "api/Room",
     "HttpMethod": "GET",

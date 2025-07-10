@@ -51,6 +51,10 @@ const ListRoom = () => {
     navigate(`/room_management/update?roomId=${roomId}`);
   };
 
+  const handleCreate = () => {
+    navigate('/room_management/create');
+  };
+
   return (
     <div style={{ maxWidth: 1000, margin: '2rem auto', padding: '2rem', border: '1px solid #eee', borderRadius: '10px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
       <h1 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>🏠 Room Management</h1>
@@ -58,6 +62,7 @@ const ListRoom = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', gap: '1rem' }}>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <button
+            onClick={handleCreate}
             style={{
               backgroundColor: '#28a745',
               color: 'white',

@@ -37,6 +37,39 @@ namespace ServerSide.Services
             return new UpdateRoomDTO(roomRepository.GetById(id));
         }
 
+        public bool CreateRoom(CreateRoomDTO createRoomDTO)
+        {
+            if (createRoomDTO == null)
+            {
+                throw new ArgumentNullException("DTO không hợp lệ.");
+            }
+
+            if (string.IsNullOrWhiteSpace(createRoomDTO.RoomName))
+            {
+                throw new ArgumentException("Tên phòng không được để trống.");
+            }
+
+            if (createRoomDTO.Capacity <= 0)
+            {
+                throw new ArgumentException("Sức chứa phải lớn hơn 0.");
+            }
+
+            // Validate Status as byte: allow 0, 1, 254 (-2), 255 (-1)
+            if (!(createRoomDTO.Status == 0 || createRoomDTO.Status == 1 || createRoomDTO.Status == 254 || createRoomDTO.Status == 255))
+            {
+                throw new ArgumentException("Trạng thái không hợp lệ. Giá trị hợp lệ: -2 (Maintenance), -1 (Inactive), 0 (Pending), 1 (Active).");
+            }
+
+            var room = new Room
+            {
+                RoomName = createRoomDTO.RoomName,
+                Capacity = createRoomDTO.Capacity,
+                Status = createRoomDTO.Status
+            };
+
+            return roomRepository.Create(room);
+        }
+
         public bool UpdateRoom(UpdateRoomDTO updateRoomDTO)
         {
             if (updateRoomDTO == null)
@@ -68,7 +101,7 @@ namespace ServerSide.Services
 
             room.RoomName = updateRoomDTO.RoomName;
             room.Capacity = updateRoomDTO.Capacity;
-            room.Status = updateRoomDTO.Status; // No conversion needed, both are byte
+            room.Status = updateRoomDTO.Status;
 
             return roomRepository.Update(room);
         }
@@ -105,6 +138,7 @@ namespace ServerSide.Services
         IEnumerable<RoomLibrarian> GetAllRoomsForStaffManagement();
         CreateBookingRoomDTO GetRoomByIdForBooking(int id);
         UpdateRoomDTO GetRoomByIdForUpdate(int id);
+        bool CreateRoom(CreateRoomDTO createRoomDTO);
         bool UpdateRoom(UpdateRoomDTO updateRoomDTO);
         IEnumerable<RoomLibrarian> GetFilteredRoomsForLibrarian(string search = null, int? status = null);
     }

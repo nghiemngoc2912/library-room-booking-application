@@ -11,12 +11,24 @@ namespace ServerSide.Repositories
             this.context = context;
         }
 
+        public bool Create(Room room)
+        {
+            if (room == null)
+            {
+                return false;
+            }
+
+            context.Rooms.Add(room);
+            context.SaveChanges();
+            return true;
+        }
+
         public IEnumerable<Room> GetAll()
         {
             return context.Rooms.ToList();
         }
 
-        Room IRoomRepository.GetById(int id)
+        public Room GetById(int id)
         {
             return context.Rooms.Find(id);
         }
@@ -38,8 +50,10 @@ namespace ServerSide.Repositories
             return true;
         }
     }
+
     public interface IRoomRepository
     {
+        bool Create(Room room);
         IEnumerable<Room> GetAll();
         Room GetById(int id);
         bool Update(Room room);
