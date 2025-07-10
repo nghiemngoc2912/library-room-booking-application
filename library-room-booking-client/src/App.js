@@ -15,6 +15,8 @@ import CreateRoom from './pages/roomManagement/CreateRoom';
 import ListSlot from './pages/slotManagement/ListSlot';
 import CreateSlot from './pages/slotManagement/CreateSlot';
 import UpdateSlot from './pages/slotManagement/UpdateSlot';
+import RequestRoom from './pages/admin/RequestRoom';
+import DetailRequestRoom from './pages/admin/DetailRequestRoom';
 import Login from './pages/auth/Login';
 import NewsPage from './pages/roomBooking/NewsPage';
 import ProfilePage from './pages/student/ProfilePage';
@@ -34,9 +36,6 @@ export const useAuth = () => {
   }
   return context;
 };
-
-import BookingDetailPage from './pages/roomBooking/BookingDetail';
-import StudentList from './pages/user/StudentList';
 
 const App = () => {
   const [role, setRole] = useState(null);
@@ -160,6 +159,23 @@ const App = () => {
           element={
             <ProtectedRoute allowedRoles={[2]}>
               <LibrarianLayout><UpdateSlot /></LibrarianLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/request_room"
+          element={
+            <ProtectedRoute allowedRoles={[3]}>
+              <AdminLayout><RequestRoom /></AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/request_room/detail"
+          element={
+            <ProtectedRoute allowedRoles={[3]}>
+              <AdminLayout><DetailRequestRoom /></AdminLayout>
             </ProtectedRoute>
           }
         />

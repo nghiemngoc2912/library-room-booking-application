@@ -50,6 +50,19 @@ namespace ServerSide.Repositories
             return true;
         }
 
+        public bool Delete(int id)
+        {
+            var room = context.Rooms.Find(id);
+            if (room == null)
+            {
+                return false;
+            }
+
+            context.Rooms.Remove(room);
+            context.SaveChanges();
+            return true;
+        }
+
         public void Save()
         {
             context.SaveChanges();  
@@ -63,5 +76,6 @@ namespace ServerSide.Repositories
         Room GetById(int id);
         bool Update(Room room);
         void Save();
+        bool Delete(int id);
     }
 }

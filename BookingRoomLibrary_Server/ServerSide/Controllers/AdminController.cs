@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ServerSide.DTOs.Admin;
+using ServerSide.DTOs;
 using ServerSide.Services;
 
 namespace ServerSide.Controllers
@@ -9,10 +9,12 @@ namespace ServerSide.Controllers
     public class AdminController : ControllerBase
     {
         private readonly IAdminService _adminService;
+        private readonly IRoomService _roomService;
 
-        public AdminController(IAdminService adminService)
+        public AdminController(IAdminService adminService, IRoomService roomService)
         {
             _adminService = adminService;
+            _roomService = roomService;
         }
 
         [HttpGet("statistics/bookings")]
@@ -42,6 +44,86 @@ namespace ServerSide.Controllers
         {
             var data = _adminService.GetUsageStatistics(period, startDate, endDate);
             return Ok(data);
+        }
+
+        [HttpGet("pending_rooms")]
+        public IActionResult GetPendingRooms([FromQuery] string search = null)
+        {
+            try
+            {
+                var rooms = _roomService.GetPendingRooms(search);
+                return Ok(rooms.Select(r => new
+                {
+                    r.Id,
+                    r.RoomName,
+                    r.Capacity,
+                    Status = r.Status == 0 ? "Pending" : r.Status.ToString()
+                }));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
+        [HttpGet("pending_rooms/{id}")]
+        public IActionResult GetPendingRoomById(int id)
+        {
+            try
+            {
+                var room = _roomService.GetPendingRoomById(id);
+                if (room == null)
+                {
+                    return NotFound("Room not found or not in Pending status.");
+                }
+                return Ok(new
+                {
+                    room.Id,
+                    room.RoomName,
+                    room.Capacity,
+                    Status = room.Status == 0 ? "Pending" : room.Status.ToString()
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
+        [HttpPut("pending_rooms/accept/{id}")]
+        public IActionResult AcceptRoom(int id)
+        {
+            try
+            {
+                var accepted = _roomService.AcceptRoom(id);
+                if (!accepted)
+                {
+                    return BadRequest("Room not found or not in Pending status.");
+                }
+                return Ok("Room accepted successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
+        [HttpDelete("pending_rooms/reject/{id}")]
+        public IActionResult RejectRoom(int id)
+        {
+            try
+            {
+                var rejected = _roomService.RejectRoom(id);
+                if (!rejected)
+                {
+                    return BadRequest("Room not found or not in Pending status.");
+                }
+                return Ok("Room rejected and deleted successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
         }
     }
 }

@@ -16,7 +16,12 @@ import AdbIcon from '@mui/icons-material/Adb';
 import Badge from '@mui/material/Badge';
 import { useNavigate } from 'react-router-dom';
 
-const pages = ['Manage rules', 'Manage librarians', 'Dashboard'];
+const pages = [
+  { name: 'Manage rules', path: '/admin/manage_rules' },
+  { name: 'Manage librarians', path: '/admin/manage_librarians' },
+  { name: 'Dashboard', path: '/admin' },
+  { name: 'Request Room', path: '/admin/request_room' }
+];
 const settings = ['Profile', 'Logout'];
 
 function AdminHeader() {
@@ -40,21 +45,25 @@ function AdminHeader() {
   };
 
   const handleLogout = async () => {
-  try {
-    await fetch('https://localhost:7238/api/auth/logout', {
-      method: 'POST',
-      credentials: 'include', // Bắt buộc để gửi session cookie
-    });
-  } catch (err) {
-    console.error('Logout failed', err);
-  }
+    try {
+      await fetch('https://localhost:7238/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch (err) {
+      console.error('Logout failed', err);
+    }
 
-  // Xóa local/session storage nếu bạn dùng thêm
-  localStorage.removeItem('authToken');
-  sessionStorage.clear();
+    localStorage.removeItem('authToken');
+    sessionStorage.clear();
 
-  handleCloseUserMenu();
-  navigate('/login');
+    handleCloseUserMenu();
+    navigate('/login');
+  };
+
+  const handlePageNavigation = (path) => {
+    navigate(path);
+    handleCloseNavMenu();
   };
 
   return (
@@ -108,8 +117,8 @@ function AdminHeader() {
               sx={{ display: { xs: 'block', md: 'none' } }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
+                <MenuItem key={page.name} onClick={() => handlePageNavigation(page.path)}>
+                  <Typography sx={{ textAlign: 'center' }}>{page.name}</Typography>
                 </MenuItem>
               ))}
             </Menu>
@@ -136,17 +145,17 @@ function AdminHeader() {
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
               <Button
-                key={page}
-                onClick={handleCloseNavMenu}
+                key={page.name}
+                onClick={() => handlePageNavigation(page.path)}
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
-                {page}
+                {page.name}
               </Button>
             ))}
           </Box>
           <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center', gap: 2 }}>
             <Badge badgeContent={3} color="error" overlap="circular">
-              <NotificationsIcon /> 
+              <NotificationsIcon />
             </Badge>
             <Tooltip title="Account setting">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>

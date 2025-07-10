@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ServerSide.DTOs;
 using ServerSide.DTOs.Room;
 using ServerSide.Models;
 using ServerSide.Repositories;
@@ -157,6 +158,49 @@ namespace ServerSide.Services
             roomRepository.Save();
             return true;
         }
+
+        public IEnumerable<RoomRequestDTO> GetPendingRooms(string search = null)
+        {
+            var rooms = roomRepository.GetAll().Where(r => r.Status == 0).AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                rooms = rooms.Where(r => r.RoomName != null && r.RoomName.ToLower().Contains(search.ToLower()));
+            }
+
+            return rooms.Select(r => new RoomRequestDTO(r)).ToList();
+        }
+
+        public RoomRequestDTO GetPendingRoomById(int id)
+        {
+            var room = roomRepository.GetById(id);
+            if (room == null || room.Status != 0)
+            {
+                return null;
+            }
+            return new RoomRequestDTO(room);
+        }
+
+        public bool AcceptRoom(int id)
+        {
+            var room = roomRepository.GetById(id);
+            if (room == null || room.Status != 0)
+            {
+                return false;
+            }
+            room.Status = 1; // Active
+            return roomRepository.Update(room);
+        }
+
+        public bool RejectRoom(int id)
+        {
+            var room = roomRepository.GetById(id);
+            if (room == null || room.Status != 0)
+            {
+                return false;
+            }
+            return roomRepository.Delete(id);
+        }
     }
 
     public interface IRoomService
@@ -169,5 +213,9 @@ namespace ServerSide.Services
         bool UpdateRoom(UpdateRoomDTO updateRoomDTO);
         IEnumerable<RoomLibrarian> GetFilteredRoomsForLibrarian(string search = null, int? status = null);
         bool ToggleMaintenance(int roomId);
+        IEnumerable<RoomRequestDTO> GetPendingRooms(string search = null);
+        RoomRequestDTO GetPendingRoomById(int id);
+        bool AcceptRoom(int id);
+        bool RejectRoom(int id);
     }
 }

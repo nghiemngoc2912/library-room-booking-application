@@ -111,6 +111,96 @@
         }
       }
     },
+    "/api/Admin/pending_rooms": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Admin/pending_rooms/{id}": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Admin/pending_rooms/accept/{id}": {
+      "put": {
+        "tags": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Admin/pending_rooms/reject/{id}": {
+      "delete": {
+        "tags": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Auth/login": {
       "post": {
         "tags": [
@@ -270,19 +360,7 @@
         "requestBody": {
           "content": {
             "application/json": {
-            "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateBookingDTO"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateBookingDTO"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateBookingDTO"
                 "$ref": "#/components/schemas/CreateBookingDTO"
               }
             },
@@ -298,6 +376,92 @@
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Booking/{id}": {
+      "get": {
+        "tags": [
+          "Booking"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingDetailDTO"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingDetailDTO"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingDetailDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Booking/{id}/checkin": {
+      "patch": {
+        "tags": [
+          "Booking"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Booking/{id}/checkout": {
+      "patch": {
+        "tags": [
+          "Booking"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -757,18 +921,15 @@
               "text/plain": {
                 "schema": {
                   "$ref": "#/components/schemas/CreateBookingRoomDTO"
-                  "$ref": "#/components/schemas/CreateBookingRoomDTO"
                 }
               },
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CreateBookingRoomDTO"
-                  "$ref": "#/components/schemas/CreateBookingRoomDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateBookingRoomDTO"
                   "$ref": "#/components/schemas/CreateBookingRoomDTO"
                 }
               }
@@ -1085,7 +1246,7 @@
         }
       }
     },
-    "/api/User/Search": {
+    "/api/User/search": {
       "get": {
         "tags": [
           "User"
@@ -1145,6 +1306,36 @@
             "schema": {
               "type": "integer",
               "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/User/students": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
             }
           }
         ],
@@ -1263,9 +1454,16 @@
         },
         "additionalProperties": false
       },
-      "CreateBookingDTO": {
+      "BookingDetailDTO": {
         "type": "object",
         "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdBy": {
+            "$ref": "#/components/schemas/UserBookingDTO"
+          },
           "bookingDate": {
             "type": "string",
             "format": "date"
@@ -1282,17 +1480,35 @@
             "type": "string",
             "nullable": true
           },
-          "studentListCode": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "checkInAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "checkOutAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "students": {
             "type": "array",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/UserBookingDTO"
             },
             "nullable": true
           }
         },
         "additionalProperties": false
       },
-      "CreateBookingRoomDTO": {
       "CreateBookingDTO": {
         "type": "object",
         "properties": {
@@ -1332,10 +1548,6 @@
           "roomName": {
             "type": "string",
             "nullable": true
-          },
-          "capacity": {
-            "type": "integer",
-            "format": "int32"
           },
           "capacity": {
             "type": "integer",
@@ -1909,20 +2121,6 @@
             "items": {
               "$ref": "#/components/schemas/Booking"
             },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "UserBookingDTO": {
-        "type": "object",
-        "properties": {
-          "fullName": {
-            "type": "string",
-            "nullable": true
-          },
-          "code": {
-            "type": "string",
             "nullable": true
           }
         },
