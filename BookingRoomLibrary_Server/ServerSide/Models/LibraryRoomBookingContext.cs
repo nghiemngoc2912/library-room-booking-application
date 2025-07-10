@@ -216,7 +216,7 @@ public partial class LibraryRoomBookingContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.RoomName).HasMaxLength(100);
-            entity.Property(e => e.Status).HasDefaultValue((byte)1);
+            entity.Property(e => e.Status);
         });
 
         modelBuilder.Entity<Rule>(entity =>

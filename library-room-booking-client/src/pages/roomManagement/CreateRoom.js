@@ -23,7 +23,7 @@ const CreateRoom = () => {
     }
 
     try {
-      const response = await fetch(`https://localhost:7238/api/Room`, {
+      const response = await fetch(`https://localhost:7238/api/Room/room_librarian/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

@@ -132,7 +132,6 @@ const App = () => {
           }
         />
 
-        {/* Các Route khác vẫn giữ nguyên */}
         <Route
           path="/booking"
           element={

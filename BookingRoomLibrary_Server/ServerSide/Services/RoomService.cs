@@ -130,6 +130,33 @@ namespace ServerSide.Services
 
             return rooms.Select(r => new RoomLibrarian(r)).ToList();
         }
+
+        public bool ToggleMaintenance(int roomId)
+        {
+            var room = roomRepository.GetById(roomId);
+            if (room == null)
+            {
+                return false;
+            }
+
+            // Toggle logic
+            if (room.Status == 1)         // Active
+            {
+                room.Status = 254;        // Maintenance (-2)
+            }
+            else if (room.Status == 254)  // Maintenance (-2)
+            {
+                room.Status = 1;          // Active
+            }
+            else
+            {
+                throw new InvalidOperationException("Chỉ phòng đang hoạt động hoặc bảo trì mới được chuyển trạng thái.");
+            }
+
+            roomRepository.Update(room);
+            roomRepository.Save();
+            return true;
+        }
     }
 
     public interface IRoomService
@@ -141,5 +168,6 @@ namespace ServerSide.Services
         bool CreateRoom(CreateRoomDTO createRoomDTO);
         bool UpdateRoom(UpdateRoomDTO updateRoomDTO);
         IEnumerable<RoomLibrarian> GetFilteredRoomsForLibrarian(string search = null, int? status = null);
+        bool ToggleMaintenance(int roomId);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ServerSide.DTOs.Room;
 using ServerSide.Models;
 using ServerSide.Services;
@@ -17,7 +18,27 @@ namespace ServerSide.Controllers
             this.roomService = roomService;
         }
 
-        [HttpPost]
+        [HttpPut("room_librarian/maintenance/{roomId}")]
+        public IActionResult ToggleMaintenance(int roomId)
+        {
+            try
+            {
+                bool result = roomService.ToggleMaintenance(roomId);
+                if (!result)
+                {
+                    return NotFound("Room not found.");
+                }
+
+                return Ok(new { message = "Room status updated successfully." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+        [HttpPost("room_librarian/create")]
         public IActionResult CreateRoom([FromBody] CreateRoomDTO createRoomDTO)
         {
             try
@@ -77,7 +98,7 @@ namespace ServerSide.Controllers
             return roomService.GetRoomByIdForBooking(id);
         }
 
-        [HttpGet("update_room/{id}")]
+        [HttpGet("room_librarian/update_room/{id}")]
         public IActionResult GetByIdForUpdate(int id)
         {
             try
@@ -101,7 +122,7 @@ namespace ServerSide.Controllers
             }
         }
 
-        [HttpPut("update_room/{id}")]
+        [HttpPut("room_librarian/update_room/{id}")]
         public IActionResult UpdateRoom(int id, [FromBody] UpdateRoomDTO updateRoomDTO)
         {
             if (id != updateRoomDTO.Id)

@@ -350,22 +350,6 @@
   },
   {
     "ContainingType": "ServerSide.Controllers.RoomController",
-    "Method": "CreateRoom",
-    "RelativePath": "api/Room",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "createRoomDTO",
-        "Type": "ServerSide.DTOs.Room.CreateRoomDTO",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "ServerSide.Controllers.RoomController",
     "Method": "GetAll",
     "RelativePath": "api/Room",
     "HttpMethod": "GET",
@@ -432,6 +416,22 @@
   },
   {
     "ContainingType": "ServerSide.Controllers.RoomController",
+    "Method": "CreateRoom",
+    "RelativePath": "api/Room/room_librarian/create",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "createRoomDTO",
+        "Type": "ServerSide.DTOs.Room.CreateRoomDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ServerSide.Controllers.RoomController",
     "Method": "GetFilteredRoomsForLibrarian",
     "RelativePath": "api/Room/room_librarian/filter",
     "HttpMethod": "GET",
@@ -453,8 +453,24 @@
   },
   {
     "ContainingType": "ServerSide.Controllers.RoomController",
+    "Method": "ToggleMaintenance",
+    "RelativePath": "api/Room/room_librarian/maintenance/{roomId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "roomId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ServerSide.Controllers.RoomController",
     "Method": "GetByIdForUpdate",
-    "RelativePath": "api/Room/update_room/{id}",
+    "RelativePath": "api/Room/room_librarian/update_room/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -470,7 +486,7 @@
   {
     "ContainingType": "ServerSide.Controllers.RoomController",
     "Method": "UpdateRoom",
-    "RelativePath": "api/Room/update_room/{id}",
+    "RelativePath": "api/Room/room_librarian/update_room/{id}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,

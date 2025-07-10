@@ -15,7 +15,7 @@ const UpdateRoom = () => {
     const fetchRoom = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`https://localhost:7238/api/Room/update_room/${roomId}`, {
+        const response = await fetch(`https://localhost:7238/api/Room/room_librarian/update_room/${roomId}`, {
           credentials: 'include',
         });
         if (!response.ok) {
@@ -69,7 +69,7 @@ const UpdateRoom = () => {
     }
 
     try {
-      const response = await fetch(`https://localhost:7238/api/Room/update_room/${roomId}`, {
+      const response = await fetch(`https://localhost:7238/api/Room/room_librarian/update_room/${roomId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -185,7 +185,6 @@ const UpdateRoom = () => {
             >
               <option value="0">Pending</option>
               <option value="1">Active</option>
-              <option value="-1">Inactive</option>
               <option value="-2">Maintenance</option>
             </select>
           </div>

@@ -563,7 +563,30 @@
         }
       }
     },
-    "/api/Room": {
+    "/api/Room/room_librarian/maintenance/{roomId}": {
+      "put": {
+        "tags": [
+          "Room"
+        ],
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Room/room_librarian/create": {
       "post": {
         "tags": [
           "Room"
@@ -592,7 +615,9 @@
             "description": "OK"
           }
         }
-      },
+      }
+    },
+    "/api/Room": {
       "get": {
         "tags": [
           "Room"
@@ -737,7 +762,7 @@
         }
       }
     },
-    "/api/Room/update_room/{id}": {
+    "/api/Room/room_librarian/update_room/{id}": {
       "get": {
         "tags": [
           "Room"

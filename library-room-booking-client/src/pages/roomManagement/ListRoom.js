@@ -8,7 +8,7 @@ const ListRoom = () => {
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [roomsPerPage] = useState(3);
+  const [roomsPerPage] = useState(5);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -54,6 +54,40 @@ const ListRoom = () => {
   const handleCreate = () => {
     navigate('/room_management/create');
   };
+
+  const handleMaintenanceToggle = async (roomId, currentStatus) => {
+    const isMaintaining = currentStatus === 1; // Nếu đang Active thì sẽ chuyển sang Maintenance
+
+    const confirmMessage = isMaintaining
+      ? 'Bạn có chắc chắn muốn chuyển phòng sang trạng thái bảo trì không?'
+      : 'Bạn có chắc chắn muốn khôi phục phòng khỏi bảo trì không?';
+
+    const confirmed = window.confirm(confirmMessage);
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch(`https://localhost:7238/api/Room/room_librarian/maintenance/${roomId}`, {
+        method: 'PUT',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('Không thể cập nhật trạng thái phòng.');
+      }
+
+      // Cập nhật lại danh sách phòng
+      const updatedRooms = rooms.map(room =>
+        room.id === roomId
+          ? { ...room, status: isMaintaining ? -2 : 1 }
+          : room
+      );
+      setRooms(updatedRooms);
+    } catch (err) {
+      console.error(err);
+      alert('Cập nhật trạng thái thất bại!');
+    }
+  };
+
 
   return (
     <div style={{ maxWidth: 1000, margin: '2rem auto', padding: '2rem', border: '1px solid #eee', borderRadius: '10px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
@@ -157,18 +191,22 @@ const ListRoom = () => {
                     >
                       Update
                     </button>
-                    <button
-                      style={{
-                        backgroundColor: '#dc3545',
-                        color: 'white',
-                        padding: '0.25rem 0.5rem',
-                        borderRadius: '4px',
-                        border: 'none',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      Maintenance
-                    </button>
+
+                    {(room.status === 1 || room.status === -2) && (
+                      <button
+                        onClick={() => handleMaintenanceToggle(room.id, room.status)}
+                        style={{
+                          backgroundColor: room.status === 1 ? '#ffc107' : '#6c757d',
+                          color: 'white',
+                          padding: '0.25rem 0.5rem',
+                          borderRadius: '4px',
+                          border: 'none',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {room.status === 1 ? 'Bảo trì' : 'Hủy bảo trì'}
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}

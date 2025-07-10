@@ -49,6 +49,11 @@ namespace ServerSide.Repositories
             context.SaveChanges();
             return true;
         }
+
+        public void Save()
+        {
+            context.SaveChanges();  
+        }
     }
 
     public interface IRoomRepository
@@ -57,5 +62,6 @@ namespace ServerSide.Repositories
         IEnumerable<Room> GetAll();
         Room GetById(int id);
         bool Update(Room room);
+        void Save();
     }
 }
