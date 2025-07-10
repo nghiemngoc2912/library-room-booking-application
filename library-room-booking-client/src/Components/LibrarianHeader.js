@@ -16,7 +16,7 @@ import AdbIcon from '@mui/icons-material/Adb';
 import Badge from '@mui/material/Badge';
 import { useNavigate } from 'react-router-dom';
 
-const pages = ['Home', 'Room', 'Students', 'Report', 'Setting', 'News', 'Rules'];
+const pages = ['Home', 'Room', 'Slot', 'Students', 'Report', 'Setting', 'News', 'Rules'];
 const settings = ['Profile', 'Logout'];
 
 function LibrarianHeader() {
@@ -62,8 +62,9 @@ function LibrarianHeader() {
       navigate('/home');
     } else if (page === 'Room') {
       navigate('/room_management');
+    } else if (page === 'Slot') {
+      navigate('/slot_management');
     } else {
-      // Placeholder for other pages
       navigate(`/${page.toLowerCase()}`);
     }
   };

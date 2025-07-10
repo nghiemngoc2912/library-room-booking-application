@@ -12,6 +12,9 @@ import Home from './pages/roomBooking/Home';
 import ListRoom from './pages/roomManagement/ListRoom'; 
 import UpdateRoom from './pages/roomManagement/UpdateRoom';
 import CreateRoom from './pages/roomManagement/CreateRoom';
+import ListSlot from './pages/slotManagement/ListSlot';
+import CreateSlot from './pages/slotManagement/CreateSlot';
+import UpdateSlot from './pages/slotManagement/UpdateSlot';
 import Login from './pages/auth/Login';
 import NewsPage from './pages/roomBooking/NewsPage';
 import ProfilePage from './pages/student/ProfilePage';
@@ -71,7 +74,6 @@ const App = () => {
     return children;
   };
 
-  // Hiển thị loading toàn cục khi ứng dụng đang khởi tạo và kiểm tra xác thực
   if (loading) {
     return <div>Loading Application...</div>;
   }
@@ -128,6 +130,31 @@ const App = () => {
           element={
             <ProtectedRoute allowedRoles={[2]}>
               <LibrarianLayout><CreateRoom /></LibrarianLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/slot_management"
+          element={
+            <ProtectedRoute allowedRoles={[2]}>
+              <LibrarianLayout><ListSlot /></LibrarianLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/slot_management/create"
+          element={
+            <ProtectedRoute allowedRoles={[2]}>
+              <LibrarianLayout><CreateSlot /></LibrarianLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/slot_management/update"
+          element={
+            <ProtectedRoute allowedRoles={[2]}>
+              <LibrarianLayout><UpdateSlot /></LibrarianLayout>
             </ProtectedRoute>
           }
         />

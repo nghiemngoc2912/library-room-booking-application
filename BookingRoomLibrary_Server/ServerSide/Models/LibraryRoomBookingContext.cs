@@ -246,6 +246,7 @@ public partial class LibraryRoomBookingContext : DbContext
             entity.ToTable("Slot");
 
             entity.Property(e => e.Id).HasColumnName("ID");
+            entity.Property(e => e.Status);
         });
 
         modelBuilder.Entity<User>(entity =>
