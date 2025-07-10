@@ -18,6 +18,8 @@ import UpdateSlot from './pages/slotManagement/UpdateSlot';
 import Login from './pages/auth/Login';
 import NewsPage from './pages/roomBooking/NewsPage';
 import ProfilePage from './pages/student/ProfilePage';
+import BookingDetailPage from './pages/roomBooking/BookingDetail';
+import StudentList from './pages/user/StudentList';
 import AdminDashboard from './pages/admin/AdminDashboard';
 
 // Không cần import HomeLayoutWrapper nữa
@@ -32,6 +34,9 @@ export const useAuth = () => {
   }
   return context;
 };
+
+import BookingDetailPage from './pages/roomBooking/BookingDetail';
+import StudentList from './pages/user/StudentList';
 
 const App = () => {
   const [role, setRole] = useState(null);
@@ -191,6 +196,9 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+
+        <Route path="/booking/detail/:id" element={<DefaultLayout><BookingDetailPage /></DefaultLayout>} />
+        <Route path="/user/students" element={<DefaultLayout><StudentList /></DefaultLayout>} />
 
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>

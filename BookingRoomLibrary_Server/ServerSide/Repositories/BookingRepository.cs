@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using ServerSide.Models;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ServerSide.Repositories
 {
@@ -12,12 +15,48 @@ namespace ServerSide.Repositories
             this.context = context;
         }
 
+        void IBookingRepository.Add(Booking booking)
+        {
+            context.Bookings.Add(booking);
+            context.SaveChanges();
+        }
+
+        public void Add(Booking booking)
+        {
+            context.Bookings.Add(booking);
+            context.SaveChanges();
+        }
+
         public IEnumerable<Booking> GetBookingByDateAndStatus(DateOnly date, byte status)
         {
             return context.Bookings
                 .Where(x => x.BookingDate == date && x.Status == status)
                 .ToList();
         }
+
+        public int GetBookingCountByDateAndUser(User user, DateOnly fromDate, DateOnly toDate)
+        {
+            return context.Bookings
+                .Where(b =>
+                    b.BookingDate >= fromDate &&
+                    b.BookingDate <= toDate &&
+                    b.Students.Any(s => s.Id == user.Id))
+                .Count();
+        }
+        public Booking GetBookingById(int id)
+        {
+            return context.Bookings
+                .Include(b => b.Students)
+                .Include(b=>b.Slot)
+                .FirstOrDefault(b=>b.Id==id);
+        }
+
+        void IBookingRepository.UpdateBooking(Booking booking)
+        {
+            context.Bookings.Update(booking);
+            context.SaveChanges();
+        }
+    
 
         public async Task<List<Booking>> GetBookingsByUser(int userId, DateOnly? from, DateOnly? to, int page, int pageSize)
         {
@@ -35,7 +74,6 @@ namespace ServerSide.Repositories
 
             if (from.HasValue)
                 query = query.Where(b => b.BookingDate >= from.Value);
-
             if (to.HasValue)
                 query = query.Where(b => b.BookingDate <= to.Value);
 
@@ -53,35 +91,21 @@ namespace ServerSide.Repositories
 
             if (from.HasValue)
                 query = query.Where(b => b.BookingDate >= from.Value);
-
             if (to.HasValue)
                 query = query.Where(b => b.BookingDate <= to.Value);
 
             return await query.CountAsync();
         }
-
-        public void Add(Booking booking)
-        {
-            context.Bookings.Add(booking);
-            context.SaveChanges();
-        }
-
-        public int GetBookingCountByDateAndUser(User user, DateOnly fromDate, DateOnly toDate)
-        {
-            return context.Bookings
-                .Where(b => b.Students.Contains(user)
-                            && b.BookingDate >= fromDate
-                            && b.BookingDate <= toDate)
-                .Count();
-        }
     }
 
     public interface IBookingRepository
     {
-        IEnumerable<Booking> GetBookingByDateAndStatus(DateOnly date, byte status);
-        void Add(Booking booking);
-        int GetBookingCountByDateAndUser(User user, DateOnly fromDate, DateOnly toDate);
         Task<List<Booking>> GetBookingsByUser(int userId, DateOnly? from, DateOnly? to, int page, int pageSize);
+        void Add(Booking booking);
+        IEnumerable<Booking> GetBookingByDateAndStatus(DateOnly date, byte status);
+        int GetBookingCountByDateAndUser(User user, DateOnly fromDate, DateOnly toDate);
         Task<int> CountBookingsByUser(int userId, DateOnly? from, DateOnly? to);
+        Booking GetBookingById(int id);
+        void UpdateBooking(Booking booking);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ServerSide.DTOs.Booking;
 using ServerSide.Exceptions;
+using ServerSide.Models;
 using ServerSide.Services;
 
 namespace ServerSide.Controllers
@@ -22,12 +23,9 @@ namespace ServerSide.Controllers
             return _bookingService.GetBookingByDateAndStatus(date, status);
         }
 
-        
-
         [HttpPost]
-        public IActionResult CreateBooking([FromBody]CreateBookingDTO createBookingDTO)
+        public IActionResult CreateBooking([FromBody] CreateBookingDTO createBookingDTO)
         {
-
             try
             {
                 _bookingService.CreateBooking(createBookingDTO);
@@ -41,6 +39,44 @@ namespace ServerSide.Controllers
             {
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
+        }
+
+        [HttpGet("{id}")]
+        public BookingDetailDTO GetDetailBookingById(int id)
+        {
+            return _bookingService.GetDetailBookingById(id);
+        }
+
+        [HttpPatch("{id}/checkin")]
+        public IActionResult CheckinBooking(int id)
+        {
+            var (success, message, booking) = _bookingService.CheckIn(id);
+
+            if (!success)
+                return BadRequest(new { message });
+
+            return Ok(new
+            {
+                message,
+                bookingId = booking!.Id,
+                checkinTime = booking.CheckInAt
+            });
+        }
+
+        [HttpPatch("{id}/checkout")]
+        public IActionResult CheckoutBooking(int id)
+        {
+            var (success, message, booking) = _bookingService.CheckOut(id); 
+
+            if (!success)
+                return BadRequest(new { message });
+
+            return Ok(new
+            {
+                message,
+                bookingId = booking!.Id,
+                checkoutTime = booking.CheckOutAt // Changed to checkoutTime
+            });
         }
 
         [HttpGet("user/{userId}/history")]
