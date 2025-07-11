@@ -34,8 +34,8 @@ namespace ServerSide.Controllers
             [FromQuery] DateTime? startDate = null,
             [FromQuery] DateTime? endDate = null)
         {
-            var data = _adminService.GetRatingStatistics(startDate, endDate);
-            return Ok(data);
+            //var data = _adminService.GetRatingStatistics(startDate, endDate);
+            return Ok(null);
         }
 
         [HttpGet("statistics/usage")]

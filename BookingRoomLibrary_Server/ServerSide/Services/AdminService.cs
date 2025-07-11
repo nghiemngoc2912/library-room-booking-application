@@ -5,16 +5,16 @@ namespace ServerSide.Services
 {
     public class AdminService : IAdminService
     {
-        private readonly IAdminRepository _repository;
+        private readonly IBookingRepository _bookingRepository;
 
-        public AdminService(IAdminRepository repository)
+        public AdminService(IBookingRepository bookingRepository)
         {
-            _repository = repository;
+            _bookingRepository = bookingRepository;
         }
 
         public BookingStatisticsDTO GetBookingStatistics(string period, DateTime? startDate, DateTime? endDate)
         {
-            var data = _repository.GetBookingStatistics(period, startDate, endDate).Result;
+            var data = _bookingRepository.GetBookingStatistics(period, startDate, endDate).Result;
 
             return new BookingStatisticsDTO
             {
@@ -23,19 +23,19 @@ namespace ServerSide.Services
             };
         }
 
-        public RatingStatisticsDTO GetRatingStatistics(DateTime? startDate, DateTime? endDate)
-        {
-            var data = _repository.GetRatingStatistics(startDate, endDate).Result;
+        //public RatingStatisticsDTO GetRatingStatistics(DateTime? startDate, DateTime? endDate)
+        //{
+        //    var data = _repository.GetRatingStatistics(startDate, endDate).Result;
 
-            return new RatingStatisticsDTO
-            {
-                Ratings = data.Select(x => (int)((dynamic)x).Count).ToList()
-            };
-        }
+        //    return new RatingStatisticsDTO
+        //    {
+        //        Ratings = data.Select(x => (int)((dynamic)x).Count).ToList()
+        //    };
+        //}
 
         public UsageStatisticsDTO GetUsageStatistics(string period, DateTime? startDate, DateTime? endDate)
         {
-            var data = _repository.GetUsageStatistics(period, startDate, endDate).Result;
+            var data = _bookingRepository.GetUsageStatistics(period, startDate, endDate).Result;
 
             return new UsageStatisticsDTO
             {
@@ -48,7 +48,7 @@ namespace ServerSide.Services
     public interface IAdminService
     {
         BookingStatisticsDTO GetBookingStatistics(string period, DateTime? startDate, DateTime? endDate);
-        RatingStatisticsDTO GetRatingStatistics(DateTime? startDate, DateTime? endDate);
+        //RatingStatisticsDTO GetRatingStatistics(DateTime? startDate, DateTime? endDate);
         UsageStatisticsDTO GetUsageStatistics(string period, DateTime? startDate, DateTime? endDate);
     }
 }
