@@ -7,6 +7,7 @@ const UpdateSlot = () => {
   const navigate = useNavigate();
 
   const [slot, setSlot] = useState({ id: '', order: '', fromTime: '', toTime: '', status: '1' });
+  const [isPending, setIsPending] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
@@ -29,6 +30,7 @@ const UpdateSlot = () => {
           toTime: data.toTime,
           status: data.status.toString(),
         });
+        setIsPending(data.status === 0);
       } catch (err) {
         console.error(err);
         setError('Không thể tải thông tin slot.');
@@ -68,10 +70,13 @@ const UpdateSlot = () => {
       return;
     }
 
-    const status = parseInt(slot.status);
-    if (![0, 1, -1, -2].includes(status)) {
-      setError('Trạng thái không hợp lệ. Vui lòng chọn một giá trị hợp lệ.');
-      return;
+    // Status validation only for non-pending slots
+    if (!isPending) {
+      const status = parseInt(slot.status);
+      if (![0, 1, -1, -2].includes(status)) {
+        setError('Trạng thái không hợp lệ. Vui lòng chọn một giá trị hợp lệ.');
+        return;
+      }
     }
 
     try {
@@ -84,7 +89,7 @@ const UpdateSlot = () => {
           order: order,
           fromTime: slot.fromTime,
           toTime: slot.toTime,
-          status: status,
+          status: isPending ? 0 : parseInt(slot.status), // Keep status as 0 if pending
         }),
       });
 
@@ -201,19 +206,26 @@ const UpdateSlot = () => {
               value={slot.status}
               onChange={handleChange}
               required
+              disabled={isPending}
               style={{
                 padding: '0.75rem',
                 borderRadius: '6px',
                 border: '1px solid #ccc',
                 width: '100%',
                 boxSizing: 'border-box',
+                backgroundColor: isPending ? '#f8f9fa' : 'white',
               }}
             >
-              <option value="0">Pending</option>
+              {/* <option value="0">Pending</option> */}
               <option value="1">Active</option>
               <option value="-1">Inactive</option>
-              <option value="-2">Maintenance</option>
+              {/* <option value="-2">Maintenance</option> */}
             </select>
+            {isPending && (
+              <p style={{ color: '#6c757d', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+                Status cannot be changed while slot is pending.
+              </p>
+            )}
           </div>
           <button
             type="submit"

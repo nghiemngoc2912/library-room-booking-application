@@ -7,6 +7,7 @@ const UpdateRoom = () => {
   const navigate = useNavigate();
 
   const [room, setRoom] = useState({ id: '', roomName: '', capacity: '', status: '1' });
+  const [isPending, setIsPending] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
@@ -26,8 +27,9 @@ const UpdateRoom = () => {
           id: data.id,
           roomName: data.roomName,
           capacity: data.capacity,
-          status: data.status.toString(), // Convert to string for select
+          status: data.status.toString(),
         });
+        setIsPending(data.status === 0);
       } catch (err) {
         console.error(err);
         setError('Không thể tải thông tin phòng.');
@@ -49,15 +51,9 @@ const UpdateRoom = () => {
     setError('');
     setMessage('');
 
-    // Validate status
-    const status = parseInt(room.status);
-    if (![0, 1, -1, -2].includes(status)) {
-      setError('Trạng thái không hợp lệ. Vui lòng chọn một giá trị hợp lệ.');
-      return;
-    }
-
     // Validate capacity
-    if (room.capacity <= 0) {
+    const capacity = parseInt(room.capacity);
+    if (isNaN(capacity) || capacity <= 0) {
       setError('Sức chứa phải lớn hơn 0.');
       return;
     }
@@ -68,6 +64,15 @@ const UpdateRoom = () => {
       return;
     }
 
+    // Validate status only for non-pending rooms
+    if (!isPending) {
+      const status = parseInt(room.status);
+      if (![0, 1, -2].includes(status)) {
+        setError('Trạng thái không hợp lệ. Vui lòng chọn một giá trị hợp lệ.');
+        return;
+      }
+    }
+
     try {
       const response = await fetch(`https://localhost:7238/api/Room/room_librarian/update_room/${roomId}`, {
         method: 'PUT',
@@ -76,8 +81,8 @@ const UpdateRoom = () => {
         body: JSON.stringify({
           id: room.id,
           roomName: room.roomName,
-          capacity: parseInt(room.capacity),
-          status: status, // Send as int, back-end will deserialize to byte
+          capacity: capacity,
+          status: isPending ? 0 : parseInt(room.status), // Keep status as 0 if pending
         }),
       });
 
@@ -175,18 +180,25 @@ const UpdateRoom = () => {
               value={room.status}
               onChange={handleChange}
               required
+              disabled={isPending}
               style={{
                 padding: '0.75rem',
                 borderRadius: '6px',
                 border: '1px solid #ccc',
                 width: '100%',
                 boxSizing: 'border-box',
+                backgroundColor: isPending ? '#f8f9fa' : 'white',
               }}
             >
-              <option value="0">Pending</option>
+              {/* <option value="0">Pending</option> */}
               <option value="1">Active</option>
               <option value="-2">Maintenance</option>
             </select>
+            {isPending && (
+              <p style={{ color: '#6c757d', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+                Status cannot be changed while room is pending.
+              </p>
+            )}
           </div>
           <button
             type="submit"
