@@ -1,50 +1,64 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using ServerSide.Models;
 using ServerSide.Repositories;
 using ServerSide.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// CORS: Chỉ định rõ frontend domain và cho phép credentials (cookie/session)
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("FrontendPolicy", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.WithOrigins("http://localhost:3000") // React app domain
+              .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowAnyHeader();
+              .AllowCredentials(); // Cho phép gửi cookie/session
     });
 });
+builder.Services.AddDistributedMemoryCache();
+// Session configuration
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.SameSite = SameSiteMode.None; // ← ADD THIS
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // ← ADD THIS if using HTTPS
+});
 
-//builder.Services.AddControllers().AddJsonOptions(x =>
-//{
-//    x.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
-//});
+
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// DB context
 builder.Services.AddDbContext<LibraryRoomBookingContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MyCnn")));
-//DI repo
+
+// DI Repositories
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<ISlotRepository, SlotRepository>();
 builder.Services.AddScoped<INewsRepository, NewsRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-//DI service
-builder.Services.AddScoped<IBookingService,BookingService>();
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+
+// DI Services
+builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<ISlotService, SlotService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<INewsService, NewsService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
 
 
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Middleware pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -53,8 +67,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowAll");
+// Order matters: UseCors before UseSession and UseAuthorization
+app.UseCors("FrontendPolicy");
 
+app.UseSession();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
