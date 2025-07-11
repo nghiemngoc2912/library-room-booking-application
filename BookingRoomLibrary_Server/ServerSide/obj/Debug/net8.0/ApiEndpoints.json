@@ -65,6 +65,70 @@
   },
   {
     "ContainingType": "ServerSide.Controllers.AdminController",
+    "Method": "GetPendingSlots",
+    "RelativePath": "api/Admin/pending_slots",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "search",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ServerSide.Controllers.AdminController",
+    "Method": "GetPendingSlotById",
+    "RelativePath": "api/Admin/pending_slots/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ServerSide.Controllers.AdminController",
+    "Method": "AcceptSlot",
+    "RelativePath": "api/Admin/pending_slots/accept/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ServerSide.Controllers.AdminController",
+    "Method": "RejectSlot",
+    "RelativePath": "api/Admin/pending_slots/reject/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ServerSide.Controllers.AdminController",
     "Method": "GetBookingStatistics",
     "RelativePath": "api/Admin/statistics/bookings",
     "HttpMethod": "GET",

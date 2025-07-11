@@ -160,6 +160,49 @@ namespace ServerSide.Services
             slot.Status = 1; // Active
             return slotRepository.Update(slot);
         }
+
+        public IEnumerable<SlotRequestDTO> GetPendingSlots(string search = null)
+        {
+            var slots = slotRepository.GetAll().Where(s => s.Status == 0).AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                slots = slots.Where(s => s.Order.ToString().Contains(search));
+            }
+
+            return slots.Select(s => new SlotRequestDTO(s)).ToList();
+        }
+
+        public SlotRequestDTO GetPendingSlotById(int id)
+        {
+            var slot = slotRepository.GetById(id);
+            if (slot == null || slot.Status != 0)
+            {
+                return null;
+            }
+            return new SlotRequestDTO(slot);
+        }
+
+        public bool AcceptSlot(int id)
+        {
+            var slot = slotRepository.GetById(id);
+            if (slot == null || slot.Status != 0)
+            {
+                return false;
+            }
+            slot.Status = 1; // Active
+            return slotRepository.Update(slot);
+        }
+
+        public bool RejectSlot(int id)
+        {
+            var slot = slotRepository.GetById(id);
+            if (slot == null || slot.Status != 0)
+            {
+                return false;
+            }
+            return slotRepository.Delete(id);
+        }
     }
 
     public interface ISlotService
@@ -172,5 +215,9 @@ namespace ServerSide.Services
         bool UpdateSlot(SlotDTO slotDTO);
         bool DeactivateSlot(int id);
         bool ActivateSlot(int id);
+        IEnumerable<SlotRequestDTO> GetPendingSlots(string search = null);
+        SlotRequestDTO GetPendingSlotById(int id);
+        bool AcceptSlot(int id);
+        bool RejectSlot(int id);
     }
 }

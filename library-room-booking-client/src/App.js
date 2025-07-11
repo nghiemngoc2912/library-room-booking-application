@@ -17,6 +17,8 @@ import CreateSlot from './pages/slotManagement/CreateSlot';
 import UpdateSlot from './pages/slotManagement/UpdateSlot';
 import RequestRoom from './pages/admin/RequestRoom';
 import DetailRequestRoom from './pages/admin/DetailRequestRoom';
+import SlotRequest from './pages/admin/SlotRequest';
+import DetailSlotRequest from './pages/admin/DetailSlotRequest';
 import Login from './pages/auth/Login';
 import NewsPage from './pages/roomBooking/NewsPage';
 import ProfilePage from './pages/student/ProfilePage';
@@ -176,6 +178,23 @@ const App = () => {
           element={
             <ProtectedRoute allowedRoles={[3]}>
               <AdminLayout><DetailRequestRoom /></AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/request_slot"
+          element={
+            <ProtectedRoute allowedRoles={[3]}>
+              <AdminLayout><SlotRequest /></AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/request_slot/detail"
+          element={
+            <ProtectedRoute allowedRoles={[3]}>
+              <AdminLayout><DetailSlotRequest /></AdminLayout>
             </ProtectedRoute>
           }
         />

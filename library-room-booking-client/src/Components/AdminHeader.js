@@ -20,7 +20,8 @@ const pages = [
   { name: 'Manage rules', path: '/admin/manage_rules' },
   { name: 'Manage librarians', path: '/admin/manage_librarians' },
   { name: 'Dashboard', path: '/admin' },
-  { name: 'Request Room', path: '/admin/request_room' }
+  { name: 'Request Room', path: '/admin/request_room' },
+  { name: 'Request Slot', path: '/admin/request_slot' }
 ];
 const settings = ['Profile', 'Logout'];
 

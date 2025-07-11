@@ -50,6 +50,18 @@ namespace ServerSide.Repositories
             context.SaveChanges();
             return true;
         }
+        public bool Delete(int id)
+        {
+            var slot = context.Slots.Find(id);
+            if (slot == null)
+            {
+                return false;
+            }
+
+            context.Slots.Remove(slot);
+            context.SaveChanges();
+            return true;
+        }
     }
 
     public interface ISlotRepository
@@ -58,5 +70,6 @@ namespace ServerSide.Repositories
         IEnumerable<Slot> GetAll();
         Slot GetById(int id);
         bool Update(Slot slot);
+        bool Delete(int id);
     }
 }

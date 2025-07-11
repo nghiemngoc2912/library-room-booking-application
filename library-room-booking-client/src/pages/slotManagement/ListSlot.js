@@ -8,7 +8,7 @@ const ListSlot = () => {
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [slotsPerPage] = useState(3);
+  const [slotsPerPage] = useState(6);
   const navigate = useNavigate();
 
   useEffect(() => {

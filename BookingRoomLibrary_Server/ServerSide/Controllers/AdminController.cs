@@ -10,11 +10,13 @@ namespace ServerSide.Controllers
     {
         private readonly IAdminService _adminService;
         private readonly IRoomService _roomService;
+        private readonly ISlotService _slotService;
 
-        public AdminController(IAdminService adminService, IRoomService roomService)
+        public AdminController(IAdminService adminService, IRoomService roomService, ISlotService slotService)
         {
             _adminService = adminService;
             _roomService = roomService;
+            _slotService = slotService;
         }
 
         [HttpGet("statistics/bookings")]
@@ -119,6 +121,88 @@ namespace ServerSide.Controllers
                     return BadRequest("Room not found or not in Pending status.");
                 }
                 return Ok("Room rejected and deleted successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
+        [HttpGet("pending_slots")]
+        public IActionResult GetPendingSlots([FromQuery] string search = null)
+        {
+            try
+            {
+                var slots = _slotService.GetPendingSlots(search);
+                return Ok(slots.Select(s => new
+                {
+                    s.Id,
+                    s.Order,
+                    FromTime = s.FromTime.ToString("HH:mm"),
+                    ToTime = s.ToTime.ToString("HH:mm"),
+                    Status = s.Status == 0 ? "Pending" : s.Status.ToString()
+                }));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
+        [HttpGet("pending_slots/{id}")]
+        public IActionResult GetPendingSlotById(int id)
+        {
+            try
+            {
+                var slot = _slotService.GetPendingSlotById(id);
+                if (slot == null)
+                {
+                    return NotFound("Slot not found or not in Pending status.");
+                }
+                return Ok(new
+                {
+                    slot.Id,
+                    slot.Order,
+                    FromTime = slot.FromTime.ToString("HH:mm"),
+                    ToTime = slot.ToTime.ToString("HH:mm"),
+                    Status = slot.Status == 0 ? "Pending" : slot.Status.ToString()
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
+        [HttpPut("pending_slots/accept/{id}")]
+        public IActionResult AcceptSlot(int id)
+        {
+            try
+            {
+                var accepted = _slotService.AcceptSlot(id);
+                if (!accepted)
+                {
+                    return BadRequest("Slot not found or not in Pending status.");
+                }
+                return Ok("Slot accepted successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
+        [HttpDelete("pending_slots/reject/{id}")]
+        public IActionResult RejectSlot(int id)
+        {
+            try
+            {
+                var rejected = _slotService.RejectSlot(id);
+                if (!rejected)
+                {
+                    return BadRequest("Slot not found or not in Pending status.");
+                }
+                return Ok("Slot rejected and deleted successfully.");
             }
             catch (Exception ex)
             {
