@@ -1,291 +1,184 @@
-import React, { useState } from "react";
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Button,
-  IconButton,
-  Menu,
-  MenuItem,
-  Avatar,
-  Box,
-  useTheme,
-  useMediaQuery,
-  Drawer,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Divider,
-} from "@mui/material";
-import {
-  Menu as MenuIcon,
-  Newspaper,
-  Rule,
-  Assessment,
-  Notifications,
-  Person,
-  Logout,
-  MenuBook,
-} from "@mui/icons-material";
-// import { Link, useNavigate } from "react-router-dom";
+import * as React from 'react';
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Toolbar from '@mui/material/Toolbar';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import Menu from '@mui/material/Menu';
+import MenuIcon from '@mui/icons-material/Menu';
+import Container from '@mui/material/Container';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import AccountCircle from '@mui/icons-material/AccountCircle';
+import Button from '@mui/material/Button';
+import Tooltip from '@mui/material/Tooltip';
+import MenuItem from '@mui/material/MenuItem';
+import AdbIcon from '@mui/icons-material/Adb';
+import Badge from '@mui/material/Badge';
+import { useNavigate } from 'react-router-dom';
 
-const Header = () => {
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-//   const navigate = useNavigate();
+const pages = ['Booking Room', 'News', 'Rules', 'Reports'];
+const settings = ['Profile', 'Logout'];
 
-  const handleProfileMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
+function Header() {
+  const [anchorElNav, setAnchorElNav] = React.useState(null);
+  const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const navigate = useNavigate();
+
+  const handleOpenNavMenu = (event) => {
+    setAnchorElNav(event.currentTarget);
+  };
+  const handleOpenUserMenu = (event) => {
+    setAnchorElUser(event.currentTarget);
   };
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
+  const handleCloseNavMenu = () => {
+    setAnchorElNav(null);
   };
 
-  const handleMobileToggle = () => {
-    setMobileOpen(!mobileOpen);
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
   };
 
-  const handleLogout = () => {
-    handleMenuClose();
-    console.log("Logout clicked");
+  const handleLogout = async () => {
+  try {
+    await fetch('https://localhost:7238/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include', // Bắt buộc để gửi session cookie
+    });
+  } catch (err) {
+    console.error('Logout failed', err);
+  }
+
+  // Xóa local/session storage nếu bạn dùng thêm
+  localStorage.removeItem('authToken');
+  sessionStorage.clear();
+
+  handleCloseUserMenu();
+  navigate('/login');
   };
-
-  const menuItems = [
-    { text: "News", icon: <Newspaper />, path: "/news" },
-    { text: "Rules", icon: <Rule />, path: "/rules" },
-    { text: "Reports", icon: <Assessment />, path: "/reports" },
-    { text: "Notifications", icon: <Notifications />, path: "/notifications" },
-  ];
-
-  const renderDesktopMenu = () => (
-    <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 1 }}>
-      {menuItems.map((item) => (
-        <Button
-          key={item.text}
-          color="inherit"
-          startIcon={item.icon}
-        //   component={Link}
-          to={item.path}
-          sx={{
-            textTransform: "none",
-            fontWeight: 500,
-            px: 2,
-            py: 1,
-            "&:hover": {
-              backgroundColor: "rgba(255, 255, 255, 0.1)",
-              borderRadius: 1,
-            },
-          }}
-        >
-          {item.text}
-        </Button>
-      ))}
-
-      <IconButton
-        size="large"
-        edge="end"
-        aria-label="account of current user"
-        aria-controls="profile-menu"
-        aria-haspopup="true"
-        onClick={handleProfileMenuOpen}
-        color="inherit"
-        sx={{ ml: 2 }}
-      >
-        <Avatar sx={{ width: 32, height: 32, bgcolor: "primary.light" }}>
-          JD
-        </Avatar>
-      </IconButton>
-
-      <Menu
-        id="profile-menu"
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-      >
-        <MenuItem
-          onClick={() => {
-            handleMenuClose();
-            // navigate("/profile");
-          }}
-          sx={{ minWidth: 150 }}
-        >
-          <ListItemIcon>
-            <Person fontSize="small" />
-          </ListItemIcon>
-          <Typography variant="inherit">John Doe</Typography>
-        </MenuItem>
-        <Divider />
-        <MenuItem onClick={handleLogout}>
-          <ListItemIcon>
-            <Logout fontSize="small" />
-          </ListItemIcon>
-          <Typography variant="inherit">Logout</Typography>
-        </MenuItem>
-      </Menu>
-    </Box>
-  );
-
-  const renderMobileDrawer = () => (
-    <Drawer
-      variant="temporary"
-      open={mobileOpen}
-      onClose={handleMobileToggle}
-      ModalProps={{ keepMounted: true }}
-      sx={{
-        display: { xs: "block", md: "none" },
-        "& .MuiDrawer-paper": {
-          boxSizing: "border-box",
-          width: 280,
-          backgroundColor: "#1976d2",
-          color: "white",
-        },
-      }}
-    >
-      <Box sx={{ overflow: "auto", pt: 2 }}>
-        <Box sx={{ display: "flex", alignItems: "center", px: 2, mb: 2 }}>
-          <MenuBook sx={{ mr: 1, fontSize: 28 }} />
-          <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
-            Library Management
-          </Typography>
-        </Box>
-        <Divider sx={{ bgcolor: "rgba(255,255,255,0.2)", mb: 1 }} />
-
-        <List>
-          {menuItems.map((item) => (
-            <ListItem
-              key={item.text}
-            //   component={Link}
-              to={item.path}
-              onClick={handleMobileToggle}
-              sx={{
-                color: "inherit",
-                textDecoration: "none",
-                "&:hover": {
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
-                },
-              }}
-            >
-              <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>
-                {item.icon}
-              </ListItemIcon>
-              <ListItemText primary={item.text} />
-            </ListItem>
-          ))}
-        </List>
-
-        <Divider sx={{ bgcolor: "rgba(255,255,255,0.2)", my: 1 }} />
-
-        <List>
-          <ListItem
-            // component={Link}
-            to="/profile"
-            onClick={handleMobileToggle}
-            sx={{
-              color: "inherit",
-              textDecoration: "none",
-              "&:hover": {
-                backgroundColor: "rgba(255, 255, 255, 0.1)",
-              },
-            }}
-          >
-            <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>
-              <Person />
-            </ListItemIcon>
-            <ListItemText primary="John Doe" />
-          </ListItem>
-
-          <ListItem
-            onClick={() => {
-              handleMobileToggle();
-              handleLogout();
-            }}
-            sx={{
-              color: "inherit",
-              cursor: "pointer",
-              "&:hover": {
-                backgroundColor: "rgba(255, 255, 255, 0.1)",
-              },
-            }}
-          >
-            <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>
-              <Logout />
-            </ListItemIcon>
-            <ListItemText primary="Logout" />
-          </ListItem>
-        </List>
-      </Box>
-    </Drawer>
-  );
 
   return (
-    <>
-      <AppBar
-        position="fixed"
-        elevation={2}
-        sx={{
-          bgcolor: "#1976d2",
-          backgroundImage: "linear-gradient(135deg, #1976d2 0%, #1565c0 100%)",
-        }}
-      >
-        <Toolbar sx={{ justifyContent: "space-between" }}>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            {isMobile && (
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                edge="start"
-                onClick={handleMobileToggle}
-                sx={{ mr: 2 }}
-              >
-                <MenuIcon />
-              </IconButton>
-            )}
+    <AppBar position="static">
+      <Container maxWidth="xl">
+        <Toolbar disableGutters>
+          <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+          <Typography
+            variant="h6"
+            noWrap
+            component="a"
+            href="#app-bar-with-responsive-menu"
+            sx={{
+              mr: 2,
+              display: { xs: 'none', md: 'flex' },
+              fontFamily: 'monospace',
+              fontWeight: 700,
+              letterSpacing: '.3rem',
+              color: 'inherit',
+              textDecoration: 'none',
+            }}
+          >
+            Logo
+          </Typography>
 
-            <MenuBook sx={{ mr: 1, fontSize: 28 }} />
-            <Typography
-              variant="h6"
-              component="div"
-              sx={{
-                fontWeight: 600,
-                letterSpacing: 0.5,
-                display: { xs: "none", sm: "block" },
-              }}
+          <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+            <IconButton
+              size="large"
+              aria-label="account of current user"
+              aria-controls="menu-appbar"
+              aria-haspopup="true"
+              onClick={handleOpenNavMenu}
+              color="inherit"
             >
-              Library Management System
-            </Typography>
-            <Typography
-              variant="h6"
-              component="div"
-              sx={{
-                fontWeight: 600,
-                letterSpacing: 0.5,
-                display: { xs: "block", sm: "none" },
+              <MenuIcon />
+            </IconButton>
+            <Menu
+              id="menu-appbar"
+              anchorEl={anchorElNav}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
               }}
+              keepMounted
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+              open={Boolean(anchorElNav)}
+              onClose={handleCloseNavMenu}
+              sx={{ display: { xs: 'block', md: 'none' } }}
             >
-              LMS
-            </Typography>
+              {pages.map((page) => (
+                <MenuItem key={page} onClick={handleCloseNavMenu}>
+                  <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
+                </MenuItem>
+              ))}
+            </Menu>
           </Box>
-
-          {renderDesktopMenu()}
+          <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
+          <Typography
+            variant="h5"
+            noWrap
+            component="a"
+            href="#app-bar-with-responsive-menu"
+            sx={{
+              mr: 2,
+              display: { xs: 'flex', md: 'none' },
+              flexGrow: 1,
+              fontFamily: 'monospace',
+              fontWeight: 700,
+              letterSpacing: '.3rem',
+              color: 'inherit',
+              textDecoration: 'none',
+            }}
+          >
+            LOGO
+          </Typography>
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+            {pages.map((page) => (
+              <Button
+                key={page}
+                onClick={handleCloseNavMenu}
+                sx={{ my: 2, color: 'white', display: 'block' }}
+              >
+                {page}
+              </Button>
+            ))}
+          </Box>
+          <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Badge badgeContent={3} color="error" overlap="circular">
+              <NotificationsIcon /> 
+            </Badge>
+            <Tooltip title="Account setting">
+              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                <AccountCircle fontSize="large" />
+              </IconButton>
+            </Tooltip>
+            <Menu
+              sx={{ mt: '45px' }}
+              id="menu-appbar"
+              anchorEl={anchorElUser}
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              open={Boolean(anchorElUser)}
+              onClose={handleCloseUserMenu}
+            >
+              {settings.map((setting) => (
+                <MenuItem key={setting} onClick={setting === 'Logout' ? handleLogout : handleCloseUserMenu}>
+                  <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
+                </MenuItem>
+              ))}
+            </Menu>
+          </Box>
         </Toolbar>
-      </AppBar>
-
-      {renderMobileDrawer()}
-      <Toolbar />
-    </>
+      </Container>
+    </AppBar>
   );
-};
-
+}
 export default Header;

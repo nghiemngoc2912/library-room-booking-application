@@ -5,16 +5,26 @@ using ServerSide.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// CORS
+// CORS: Chỉ định rõ frontend domain và cho phép credentials (cookie/session)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontendPolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:3000")
+        policy.WithOrigins("http://localhost:3000") // React app domain
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials();
+              .AllowCredentials(); // Cho phép gửi cookie/session
     });
+});
+builder.Services.AddDistributedMemoryCache();
+// Session configuration
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.SameSite = SameSiteMode.None; // ← ADD THIS
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // ← ADD THIS if using HTTPS
 });
 
 // Session
@@ -29,22 +39,36 @@ builder.Services.AddSession(options =>
 });
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// DB
+
+// DB context
 builder.Services.AddDbContext<LibraryRoomBookingContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MyCnn")));
 
-// DI repo
+// DI Repositories
+builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+builder.Services.AddScoped<IRoomRepository, RoomRepository>();
+builder.Services.AddScoped<ISlotRepository, SlotRepository>();
+builder.Services.AddScoped<INewsRepository, NewsRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IRuleRepository, RuleRepository>();
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 
-
-// DI service
+// DI Services
+builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<IRoomService, RoomService>();
+builder.Services.AddScoped<ISlotService, SlotService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<INewsService, NewsService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IRuleService, RuleService>();
 builder.Services.AddScoped<IReportService, ReportService>();
@@ -53,7 +77,7 @@ builder.Services.AddScoped<IStudentService, StudentService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Middleware pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -62,15 +86,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Sử dụng đúng CORS policy:
+// Order matters: UseCors before UseSession and UseAuthorization
 app.UseCors("FrontendPolicy");
 
-// Session
 app.UseSession();
 
-// Nếu có auth:
 app.UseAuthentication();
-
 app.UseAuthorization();
 
 app.MapControllers();

@@ -37,6 +37,11 @@ public partial class LibraryRoomBookingContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+        var builder = new ConfigurationBuilder();
+        builder.SetBasePath(Directory.GetCurrentDirectory());
+        builder.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+        var configuration = builder.Build();
+        optionsBuilder.UseSqlServer(configuration.GetConnectionString("MyCnn"));
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -211,7 +216,7 @@ public partial class LibraryRoomBookingContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.RoomName).HasMaxLength(100);
-            entity.Property(e => e.Status).HasDefaultValue((byte)1);
+            entity.Property(e => e.Status);
         });
 
         modelBuilder.Entity<Rule>(entity =>
@@ -241,6 +246,7 @@ public partial class LibraryRoomBookingContext : DbContext
             entity.ToTable("Slot");
 
             entity.Property(e => e.Id).HasColumnName("ID");
+            entity.Property(e => e.Status);
         });
 
         modelBuilder.Entity<User>(entity =>
