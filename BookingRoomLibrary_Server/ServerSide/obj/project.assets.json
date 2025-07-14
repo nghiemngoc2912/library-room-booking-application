@@ -2,6 +2,21 @@
   "version": 3,
   "targets": {
     "net8.0": {
+      "AutoMapper/3.2.1": {
+        "type": "package",
+        "compile": {
+          "lib/net40/AutoMapper.Net4.dll": {},
+          "lib/net40/AutoMapper.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net40/AutoMapper.Net4.dll": {},
+          "lib/net40/AutoMapper.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Azure.Core/1.38.0": {
         "type": "package",
         "dependencies": {
@@ -45,6 +60,28 @@
           "lib/netstandard2.0/Azure.Identity.dll": {
             "related": ".xml"
           }
+        }
+      },
+      "Glimpse/1.8.6": {
+        "type": "package",
+        "compile": {
+          "lib/net45/Glimpse.Core.dll": {}
+        },
+        "runtime": {
+          "lib/net45/Glimpse.Core.dll": {}
+        }
+      },
+      "Glimpse.AutoMapper/1.0.2": {
+        "type": "package",
+        "dependencies": {
+          "AutoMapper": "3.2.1",
+          "Glimpse": "1.8.6"
+        },
+        "compile": {
+          "lib/net45/Glimpse.AutoMapper.dll": {}
+        },
+        "runtime": {
+          "lib/net45/Glimpse.AutoMapper.dll": {}
         }
       },
       "Humanizer.Core/2.14.1": {
@@ -1588,6 +1625,58 @@
     }
   },
   "libraries": {
+    "AutoMapper/3.2.1": {
+      "sha512": "NsmDRNXT6SWEVAxkCv+fJefuxC+4UFap3+i5e3quM54zdnZqZHBSiodGgGx+TqymQyUdrcHX6L85bvCl1oJBog==",
+      "type": "package",
+      "path": "automapper/3.2.1",
+      "hasTools": true,
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "automapper.3.2.1.nupkg.sha512",
+        "automapper.nuspec",
+        "lib/MonoAndroid/AutoMapper.Android.dll",
+        "lib/MonoAndroid/AutoMapper.dll",
+        "lib/MonoAndroid/AutoMapper.xml",
+        "lib/MonoTouch/AutoMapper.dll",
+        "lib/MonoTouch/AutoMapper.iOS.dll",
+        "lib/MonoTouch/AutoMapper.xml",
+        "lib/net40/AutoMapper.Net4.dll",
+        "lib/net40/AutoMapper.dll",
+        "lib/net40/AutoMapper.xml",
+        "lib/portable-windows8+net40+wp8+sl5+MonoAndroid+MonoTouch/AutoMapper.dll",
+        "lib/portable-windows8+net40+wp8+sl5+MonoAndroid+MonoTouch/AutoMapper.xml",
+        "lib/portable-windows8+net40+wp8+wpa81+sl5+MonoAndroid+MonoTouch/AutoMapper.dll",
+        "lib/portable-windows8+net40+wp8+wpa81+sl5+MonoAndroid+MonoTouch/AutoMapper.xml",
+        "lib/sl5/AutoMapper.SL5.dll",
+        "lib/sl5/AutoMapper.dll",
+        "lib/sl5/AutoMapper.xml",
+        "lib/windows8/AutoMapper.WinRT.dll",
+        "lib/windows8/AutoMapper.dll",
+        "lib/windows8/AutoMapper.xml",
+        "lib/wp8/AutoMapper.WP8.dll",
+        "lib/wp8/AutoMapper.dll",
+        "lib/wp8/AutoMapper.xml",
+        "lib/wpa81/AutoMapper.WPA81.dll",
+        "lib/wpa81/AutoMapper.dll",
+        "lib/wpa81/AutoMapper.xml",
+        "tools/AutoMapper.targets",
+        "tools/MonoAndroid/Install.ps1",
+        "tools/MonoAndroid/uninstall.ps1",
+        "tools/MonoTouch/Install.ps1",
+        "tools/MonoTouch/uninstall.ps1",
+        "tools/net40/Install.ps1",
+        "tools/net40/uninstall.ps1",
+        "tools/sl5/Install.ps1",
+        "tools/sl5/uninstall.ps1",
+        "tools/windows8/Install.ps1",
+        "tools/windows8/uninstall.ps1",
+        "tools/wp8/Install.ps1",
+        "tools/wp8/uninstall.ps1",
+        "tools/wpa81/Install.ps1",
+        "tools/wpa81/uninstall.ps1"
+      ]
+    },
     "Azure.Core/1.38.0": {
       "sha512": "IuEgCoVA0ef7E4pQtpC3+TkPbzaoQfa77HlfJDmfuaJUCVJmn7fT0izamZiryW5sYUFKizsftIxMkXKbgIcPMQ==",
       "type": "package",
@@ -1624,6 +1713,38 @@
         "azureicon.png",
         "lib/netstandard2.0/Azure.Identity.dll",
         "lib/netstandard2.0/Azure.Identity.xml"
+      ]
+    },
+    "Glimpse/1.8.6": {
+      "sha512": "jubTSNDTgjCcCLibXAB28hnC2MPRjjG5PIrx4Wc5ZILsx8qt3bdEGGIS2LRMQk8mcGHWhEFFPLWFaJQJyWtS9Q==",
+      "type": "package",
+      "path": "glimpse/1.8.6",
+      "hasTools": true,
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "docs/Glimpse.Core.Documentation.chm",
+        "glimpse.1.8.6.nupkg.sha512",
+        "glimpse.nuspec",
+        "lib/net35/Glimpse.Core.dll",
+        "lib/net40/Glimpse.Core.dll",
+        "lib/net45/Glimpse.Core.dll",
+        "tools/glimpse.psm1",
+        "tools/init.ps1",
+        "tools/install.ps1",
+        "tools/uninstall.ps1"
+      ]
+    },
+    "Glimpse.AutoMapper/1.0.2": {
+      "sha512": "BMXgkaDJxA9iKz11qAXxBOerkT6bKavP/ov+LFfL6GrHQMCNO1HV+Ws1IE65+Wg8V9KU5g8OutKR4+3czIOB2A==",
+      "type": "package",
+      "path": "glimpse.automapper/1.0.2",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "glimpse.automapper.1.0.2.nupkg.sha512",
+        "glimpse.automapper.nuspec",
+        "lib/net45/Glimpse.AutoMapper.dll"
       ]
     },
     "Humanizer.Core/2.14.1": {
@@ -4413,25 +4534,31 @@
   },
   "projectFileDependencyGroups": {
     "net8.0": [
+      "Glimpse.AutoMapper >= 1.0.2",
       "Microsoft.EntityFrameworkCore.SqlServer >= 8.0.16",
       "Microsoft.EntityFrameworkCore.Tools >= 8.0.16",
       "Swashbuckle.AspNetCore >= 8.1.4"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\nghie\\.nuget\\packages\\": {}
+    "C:\\Users\\TRANG\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\SU25\\PRN232\\LibraryRoomBooking\\BookingRoomLibrary_Server\\ServerSide\\ServerSide.csproj",
+      "projectUniqueName": "F:\\Semester 9\\PRN232\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\ServerSide.csproj",
       "projectName": "ServerSide",
-      "projectPath": "D:\\SU25\\PRN232\\LibraryRoomBooking\\BookingRoomLibrary_Server\\ServerSide\\ServerSide.csproj",
-      "packagesPath": "C:\\Users\\nghie\\.nuget\\packages\\",
-      "outputPath": "D:\\SU25\\PRN232\\LibraryRoomBooking\\BookingRoomLibrary_Server\\ServerSide\\obj\\",
+      "projectPath": "F:\\Semester 9\\PRN232\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\ServerSide.csproj",
+      "packagesPath": "C:\\Users\\TRANG\\.nuget\\packages\\",
+      "outputPath": "F:\\Semester 9\\PRN232\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\nghie\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\TRANG\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -4456,12 +4583,17 @@
         "enableAudit": "true",
         "auditLevel": "low",
         "auditMode": "direct"
-      }
+      },
+      "SdkAnalysisLevel": "9.0.100"
     },
     "frameworks": {
       "net8.0": {
         "targetAlias": "net8.0",
         "dependencies": {
+          "Glimpse.AutoMapper": {
+            "target": "Package",
+            "version": "[1.0.2, )"
+          },
           "Microsoft.EntityFrameworkCore.SqlServer": {
             "target": "Package",
             "version": "[8.0.16, )"
@@ -4496,8 +4628,40 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.101/PortableRuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'AutoMapper 3.2.1' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net8.0'. This package may not be fully compatible with your project.",
+      "libraryId": "AutoMapper",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    },
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'Glimpse 1.8.6' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net8.0'. This package may not be fully compatible with your project.",
+      "libraryId": "Glimpse",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    },
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'Glimpse.AutoMapper 1.0.2' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net8.0'. This package may not be fully compatible with your project.",
+      "libraryId": "Glimpse.AutoMapper",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    }
+  ]
 }

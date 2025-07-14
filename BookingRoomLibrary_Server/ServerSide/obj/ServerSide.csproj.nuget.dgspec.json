@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "D:\\SU25\\PRN232\\LibraryRoomBooking\\BookingRoomLibrary_Server\\ServerSide\\ServerSide.csproj": {}
+    "F:\\Semester 9\\PRN232\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\ServerSide.csproj": {}
   },
   "projects": {
-    "D:\\SU25\\PRN232\\LibraryRoomBooking\\BookingRoomLibrary_Server\\ServerSide\\ServerSide.csproj": {
+    "F:\\Semester 9\\PRN232\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\ServerSide.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\SU25\\PRN232\\LibraryRoomBooking\\BookingRoomLibrary_Server\\ServerSide\\ServerSide.csproj",
+        "projectUniqueName": "F:\\Semester 9\\PRN232\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\ServerSide.csproj",
         "projectName": "ServerSide",
-        "projectPath": "D:\\SU25\\PRN232\\LibraryRoomBooking\\BookingRoomLibrary_Server\\ServerSide\\ServerSide.csproj",
-        "packagesPath": "C:\\Users\\nghie\\.nuget\\packages\\",
-        "outputPath": "D:\\SU25\\PRN232\\LibraryRoomBooking\\BookingRoomLibrary_Server\\ServerSide\\obj\\",
+        "projectPath": "F:\\Semester 9\\PRN232\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\ServerSide.csproj",
+        "packagesPath": "C:\\Users\\TRANG\\.nuget\\packages\\",
+        "outputPath": "F:\\Semester 9\\PRN232\\library-room-booking-application\\BookingRoomLibrary_Server\\ServerSide\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\nghie\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\TRANG\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -39,12 +43,17 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.100"
       },
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Glimpse.AutoMapper": {
+              "target": "Package",
+              "version": "[1.0.2, )"
+            },
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
               "version": "[8.0.16, )"
@@ -79,7 +88,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.101/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

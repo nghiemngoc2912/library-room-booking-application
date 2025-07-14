@@ -1,11 +1,12 @@
 {
   "Version": 1,
-  "Hash": "KAIgHtRcDGE5l3svKJJJN69mWg7cBxrT/3A2v0SSCjY=",
+  "Hash": "sOeGoHTbEUwQlkfxzOdWGNfgj+r6Osasc1K3UKOM1+w=",
   "Source": "ServerSide",
   "BasePath": "_content/ServerSide",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
   "DiscoveryPatterns": [],
-  "Assets": []
+  "Assets": [],
+  "Endpoints": []
 }

@@ -8,12 +8,25 @@
     ".NETCoreApp,Version=v8.0": {
       "ServerSide/1.0.0": {
         "dependencies": {
+          "Glimpse.AutoMapper": "1.0.2",
           "Microsoft.EntityFrameworkCore.SqlServer": "8.0.16",
           "Microsoft.EntityFrameworkCore.Tools": "8.0.16",
           "Swashbuckle.AspNetCore": "8.1.4"
         },
         "runtime": {
           "ServerSide.dll": {}
+        }
+      },
+      "AutoMapper/3.2.1": {
+        "runtime": {
+          "lib/net40/AutoMapper.Net4.dll": {
+            "assemblyVersion": "3.2.1.0",
+            "fileVersion": "3.2.1.0"
+          },
+          "lib/net40/AutoMapper.dll": {
+            "assemblyVersion": "3.2.1.0",
+            "fileVersion": "3.2.1.0"
+          }
         }
       },
       "Azure.Core/1.38.0": {
@@ -48,6 +61,26 @@
           "lib/netstandard2.0/Azure.Identity.dll": {
             "assemblyVersion": "1.11.4.0",
             "fileVersion": "1.1100.424.31005"
+          }
+        }
+      },
+      "Glimpse/1.8.6": {
+        "runtime": {
+          "lib/net45/Glimpse.Core.dll": {
+            "assemblyVersion": "1.8.6.0",
+            "fileVersion": "1.8.6.0"
+          }
+        }
+      },
+      "Glimpse.AutoMapper/1.0.2": {
+        "dependencies": {
+          "AutoMapper": "3.2.1",
+          "Glimpse": "1.8.6"
+        },
+        "runtime": {
+          "lib/net45/Glimpse.AutoMapper.dll": {
+            "assemblyVersion": "1.0.5322.11914",
+            "fileVersion": "1.0.0.0"
           }
         }
       },
@@ -960,6 +993,13 @@
       "serviceable": false,
       "sha512": ""
     },
+    "AutoMapper/3.2.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-NsmDRNXT6SWEVAxkCv+fJefuxC+4UFap3+i5e3quM54zdnZqZHBSiodGgGx+TqymQyUdrcHX6L85bvCl1oJBog==",
+      "path": "automapper/3.2.1",
+      "hashPath": "automapper.3.2.1.nupkg.sha512"
+    },
     "Azure.Core/1.38.0": {
       "type": "package",
       "serviceable": true,
@@ -973,6 +1013,20 @@
       "sha512": "sha512-Sf4BoE6Q3jTgFkgBkx7qztYOFELBCo+wQgpYDwal/qJ1unBH73ywPztIJKXBXORRzAeNijsuxhk94h0TIMvfYg==",
       "path": "azure.identity/1.11.4",
       "hashPath": "azure.identity.1.11.4.nupkg.sha512"
+    },
+    "Glimpse/1.8.6": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-jubTSNDTgjCcCLibXAB28hnC2MPRjjG5PIrx4Wc5ZILsx8qt3bdEGGIS2LRMQk8mcGHWhEFFPLWFaJQJyWtS9Q==",
+      "path": "glimpse/1.8.6",
+      "hashPath": "glimpse.1.8.6.nupkg.sha512"
+    },
+    "Glimpse.AutoMapper/1.0.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-BMXgkaDJxA9iKz11qAXxBOerkT6bKavP/ov+LFfL6GrHQMCNO1HV+Ws1IE65+Wg8V9KU5g8OutKR4+3czIOB2A==",
+      "path": "glimpse.automapper/1.0.2",
+      "hashPath": "glimpse.automapper.1.0.2.nupkg.sha512"
     },
     "Humanizer.Core/2.14.1": {
       "type": "package",
