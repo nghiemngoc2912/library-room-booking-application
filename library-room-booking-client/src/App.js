@@ -26,19 +26,16 @@ import BookingDetailPage from './pages/roomBooking/BookingDetail';
 import StudentList from './pages/user/StudentList';
 import AdminDashboard from './pages/admin/AdminDashboard';
 
-
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Link, Navigate, useNavigate } from 'react-router-dom';
-import RulesPage from './Pages/rule/RulesPage';
-import ReportsPage from './Pages/report/ReportsPage';
-import AddRulePage from './Pages/rule/AddRulePage';
-import EditRulePage from './Pages/rule/EditRulePage';
-import AddReportPage from './Pages/report/AddReportPage';
-import ReportDetailPage from './Pages/report/ReportDetailPage';
-import StudentInfoPage from './Pages/report/StudentInfoPage';
-import HistoryReportPage from './Pages/report/HistoryReportPage';
-import ReportTypeDetailsPage from './Pages/report/ReportTypeDetailsPage';
-import { Container, AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
+import { BrowserRouter as Router, Link, useNavigate } from 'react-router-dom';
+import RulesPage from './pages/rule/RulesPage';
+import ReportsPage from './pages/report/ReportsPage';
+import AddRulePage from './pages/rule/AddRulePage';
+import EditRulePage from './pages/rule/EditRulePage';
+import AddReportPage from './pages/report/AddReportPage';
+import ReportDetailPage from './pages/report/ReportDetailPage';
+import StudentInfoPage from './pages/report/StudentInfoPage';
+import HistoryReportPage from './pages/report/HistoryReportPage';
+import ReportTypeDetailsPage from './pages/report/ReportTypeDetailsPage';
 import './App.css';
 
 // Không cần import HomeLayoutWrapper nữa
@@ -266,3 +263,4 @@ const App = () => {
     </AuthContext.Provider>
   );
 };
+export default App;
