@@ -1,3 +1,4 @@
+﻿using Glimpse.Core.Extensibility;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ServerSide.Constants;
@@ -17,18 +18,21 @@ namespace ServerSide.Services
         private readonly ISlotService slotService;
         private readonly IRoomService roomService;
         private readonly LibraryRoomBookingContext context;
+        private readonly IStudentService studentService;
 
         public BookingService(
             IBookingRepository repository,
             IUserService userService,
             ISlotService slotService,
             IRoomService roomService,
-            LibraryRoomBookingContext context)
+            LibraryRoomBookingContext context,
+            IStudentService studentService)
         {
             this.repository = repository;
             this.userService = userService;
             this.slotService = slotService;
             this.roomService = roomService;
+            this.studentService = studentService;
             this.context = context;
         }
 
@@ -196,7 +200,7 @@ namespace ServerSide.Services
             {
                 return (false, $"You can check in within {BookingRules.MaxTimeToCheckin} minutes before and after: {slotStart:HH:mm}", booking);
             }
-
+            booking.Status = 1;
             booking.CheckInAt = now;
             repository.UpdateBooking(booking);
 
@@ -218,15 +222,41 @@ namespace ServerSide.Services
             var early = slotEnd.AddMinutes(-BookingRules.MaxTimeToCheckout);
             var late = slotEnd.AddMinutes(BookingRules.MaxTimeToCheckout);
 
-            if (now < early || now > late)
+            if (now < early)
             {
                 return (false, $"You can check out within {BookingRules.MaxTimeToCheckout} minutes before and after: {slotEnd:HH:mm}", booking);
             }
-
+            if (now > late)
+            {
+                studentService.SubtractReputationAsync(booking.CreatedBy, -10, "");
+            }
+            booking.Status = 2;
             booking.CheckOutAt = now;
             repository.UpdateBooking(booking);
 
             return (true, "Check-out successfully", booking);
+        }
+
+        public async Task CancelExpiredBookingsAsync()
+        {
+            var expiredBookings = await repository.GetExpiredBooking();
+
+            foreach (var booking in expiredBookings)
+            {
+                booking.Status = 4;
+                //tru diem reputation
+                await studentService.SubtractReputationAsync(booking.CreatedBy, -10, "");
+            }
+
+            await context.SaveChangesAsync();
+        }
+
+        void IBookingService.CancelBooking(int id)
+        {
+            var booking=repository.GetBookingById(id);
+            if (booking == null) return;
+            booking.Status = 3;
+            repository.UpdateBooking(booking);
         }
     }
 
@@ -241,7 +271,7 @@ namespace ServerSide.Services
         bool CheckBookingAvailable(Booking booking);
         Task<(int total, List<BookingHistoryDTO> data)> GetBookingHistoryAsync(int userId, DateTime? from, DateTime? to, int page, int pageSize);
         Task AddRatingAsync(int bookingId, CreateRatingDTO dto);
-
-
+        Task CancelExpiredBookingsAsync();
+        void CancelBooking(int id);
     }
 }
