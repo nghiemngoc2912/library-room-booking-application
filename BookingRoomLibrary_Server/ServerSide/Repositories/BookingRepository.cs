@@ -177,6 +177,20 @@ namespace ServerSide.Repositories
 
             return grouped;
         }
+
+        public async Task<IEnumerable<Booking>> GetExpiredBooking()
+        {
+            var now = DateTime.Now;
+
+            return context.Bookings
+                .Include(b => b.Slot)
+                .Where(b => b.Status == 0 && b.CheckInAt == null)
+                .AsEnumerable() // Chuyển sang client-side LINQ
+                .Where(b =>
+                    b.BookingDate.ToDateTime(b.Slot.FromTime).AddMinutes(15) < now
+                )
+                .ToList();
+        }
     }
 
     public interface IBookingRepository
@@ -190,5 +204,6 @@ namespace ServerSide.Repositories
         void UpdateBooking(Booking booking);
         Task<List<object>> GetBookingStatistics(string period, DateTime? startDate, DateTime? endDate);
         Task<List<object>> GetUsageStatistics(string period, DateTime? startDate, DateTime? endDate);
+        Task<IEnumerable<Booking>> GetExpiredBooking();
     }
 }
