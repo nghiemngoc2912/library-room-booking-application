@@ -244,7 +244,7 @@ const App = () => {
           }
         />
 
-        <Route path="/booking/detail/:id" element={<DefaultLayout><BookingDetailPage /></DefaultLayout>} />
+        <Route path="/booking/detail/:id" element={<DefaultLayout><BookingDetailPage role={role} /></DefaultLayout>} />
         <Route path="/user/students" element={<DefaultLayout><StudentList /></DefaultLayout>} />
 
                   <Route path="/rules" element={<RulesPage />} />
