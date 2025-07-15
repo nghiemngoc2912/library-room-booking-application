@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ServerSide.Helpers;
 using ServerSide.Models;
 using ServerSide.Repositories;
 using ServerSide.Services;
@@ -74,6 +75,7 @@ builder.Services.AddScoped<IRuleService, RuleService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 
+builder.Services.AddHostedService<BookingCleanupJob>();
 
 var app = builder.Build();
 
