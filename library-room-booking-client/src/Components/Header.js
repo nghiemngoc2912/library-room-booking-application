@@ -8,20 +8,21 @@ import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import AccountCircle from '@mui/icons-material/AccountCircle'
+import AccountCircle from '@mui/icons-material/AccountCircle';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import Badge from '@mui/material/Badge';
+import { useNavigate } from 'react-router-dom';
 
-
-const pages = ['News', 'Rules', 'Reports'];
+const pages = ['Booking Room', 'News', 'Rules', 'Reports'];
 const settings = ['Profile', 'Logout'];
 
 function Header() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const navigate = useNavigate();
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -36,6 +37,24 @@ function Header() {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+  };
+
+  const handleLogout = async () => {
+  try {
+    await fetch('https://localhost:7238/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include', // Bắt buộc để gửi session cookie
+    });
+  } catch (err) {
+    console.error('Logout failed', err);
+  }
+
+  // Xóa local/session storage nếu bạn dùng thêm
+  localStorage.removeItem('authToken');
+  sessionStorage.clear();
+
+  handleCloseUserMenu();
+  navigate('/login');
   };
 
   return (
@@ -125,13 +144,13 @@ function Header() {
               </Button>
             ))}
           </Box>
-          <Box sx={{ flexGrow: 0 ,display:"flex", alignItems: 'center', gap:2}}>
+          <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center', gap: 2 }}>
             <Badge badgeContent={3} color="error" overlap="circular">
               <NotificationsIcon /> 
             </Badge>
             <Tooltip title="Account setting">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <AccountCircle fontSize="large" />
+                <AccountCircle fontSize="large" />
               </IconButton>
             </Tooltip>
             <Menu
@@ -151,7 +170,7 @@ function Header() {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                <MenuItem key={setting} onClick={setting === 'Logout' ? handleLogout : handleCloseUserMenu}>
                   <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
                 </MenuItem>
               ))}

@@ -108,5 +108,9 @@ namespace ServerSide.Controllers
                 });
             }
         }
+        [HttpPatch("cancel/{id}")]
+        public void CancelBooking(int id) {
+            _bookingService.CancelBooking(id);
+        }
     }
 }

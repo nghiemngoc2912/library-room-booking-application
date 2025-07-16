@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ServerSide.Constants;
 using ServerSide.DTOs.Booking;
 using ServerSide.DTOs.Room;
+using ServerSide.DTOs.Rating;
 using ServerSide.Exceptions;
 using ServerSide.Models;
 using ServerSide.Repositories;
@@ -17,21 +18,24 @@ namespace ServerSide.Services
         private readonly ISlotService slotService;
         private readonly IRoomService roomService;
         private readonly LibraryRoomBookingContext context;
+        private readonly IStudentService studentService;
         private readonly IRatingService _ratingService;
 
         public BookingService(
-        IBookingRepository repository,
-        IUserService userService,
-        ISlotService slotService,
-        IRoomService roomService,
-        LibraryRoomBookingContext context,
-        IRatingService ratingService)
+            IBookingRepository repository,
+            IUserService userService,
+            ISlotService slotService,
+            IRoomService roomService,
+            LibraryRoomBookingContext context,
+            IStudentService studentService,
+            IRatingService ratingService)
         {
             this.repository = repository;
             this.userService = userService;
             this.slotService = slotService;
             this.roomService = roomService;
             this.context = context;
+            this.studentService = studentService;
             this._ratingService = ratingService;
         }
 
@@ -104,7 +108,7 @@ namespace ServerSide.Services
         }
 
         public async Task<(int total, List<BookingHistoryDTO> data)> GetBookingHistoryAsync(
-    int userId, DateTime? from, DateTime? to, int page, int pageSize)
+            int userId, DateTime? from, DateTime? to, int page, int pageSize)
         {
             DateOnly? fromDate = from.HasValue ? DateOnly.FromDateTime(from.Value) : null;
             DateOnly? toDate = to.HasValue ? DateOnly.FromDateTime(to.Value) : null;
@@ -117,7 +121,6 @@ namespace ServerSide.Services
             foreach (var b in bookings)
             {
                 var rating = await _ratingService.GetRatingByBookingAndUserAsync(b.Id, userId);
-
                 result.Add(new BookingHistoryDTO
                 {
                     Id = b.Id,
@@ -130,7 +133,6 @@ namespace ServerSide.Services
 
             return (total, result);
         }
-
 
         public BookingDetailDTO GetDetailBookingById(int id)
         {
@@ -154,6 +156,7 @@ namespace ServerSide.Services
                 Students = booking.Students?.Select(s => new UserBookingDTO(s)).ToList()
             };
         }
+
         public (bool success, string message, Booking booking) CheckIn(int id)
         {
             var booking = repository.GetBookingById(id);
@@ -170,10 +173,9 @@ namespace ServerSide.Services
             var late = slotStart.AddMinutes(BookingRules.MaxTimeToCheckin);
 
             if (now < early || now > late)
-            {
                 return (false, $"You can check in within {BookingRules.MaxTimeToCheckin} minutes before and after: {slotStart:HH:mm}", booking);
-            }
 
+            booking.Status = 1;
             booking.CheckInAt = now;
             repository.UpdateBooking(booking);
 
@@ -195,15 +197,36 @@ namespace ServerSide.Services
             var early = slotEnd.AddMinutes(-BookingRules.MaxTimeToCheckout);
             var late = slotEnd.AddMinutes(BookingRules.MaxTimeToCheckout);
 
-            if (now < early || now > late)
-            {
+            if (now < early)
                 return (false, $"You can check out within {BookingRules.MaxTimeToCheckout} minutes before and after: {slotEnd:HH:mm}", booking);
-            }
 
+            if (now > late)
+                studentService.SubtractReputationAsync(booking.CreatedBy, -10, "");
+
+            booking.Status = 2;
             booking.CheckOutAt = now;
             repository.UpdateBooking(booking);
 
             return (true, "Check-out successfully", booking);
+        }
+
+        public async Task CancelExpiredBookingsAsync()
+        {
+            var expiredBookings = await repository.GetExpiredBooking();
+            foreach (var booking in expiredBookings)
+            {
+                booking.Status = 4;
+                await studentService.SubtractReputationAsync(booking.CreatedBy, -10, "");
+            }
+            await context.SaveChangesAsync();
+        }
+
+        public void CancelBooking(int id)
+        {
+            var booking = repository.GetBookingById(id);
+            if (booking == null) return;
+            booking.Status = 3;
+            repository.UpdateBooking(booking);
         }
     }
 
@@ -217,7 +240,7 @@ namespace ServerSide.Services
         int GetBookingCountByDateAndUser(User user, DateOnly fromDate, DateOnly toDate);
         bool CheckBookingAvailable(Booking booking);
         Task<(int total, List<BookingHistoryDTO> data)> GetBookingHistoryAsync(int userId, DateTime? from, DateTime? to, int page, int pageSize);
-
-
+        Task CancelExpiredBookingsAsync();
+        void CancelBooking(int id);
     }
 }

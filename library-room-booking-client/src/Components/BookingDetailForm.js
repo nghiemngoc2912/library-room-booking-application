@@ -3,11 +3,13 @@ import { Button, TextField, Select, MenuItem, FormControl, InputLabel } from '@m
 
 export default function BookingDetailForm({
   booking,
+  role,
   slots,
   rooms,
   onChange,
-  onUpdate,
-  onDelete,
+  onCheckin,
+  onCheckout,
+  onCancel,
   onBack
 }) {
   if (!booking) return <div>Loading...</div>;
@@ -93,8 +95,15 @@ export default function BookingDetailForm({
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <Button variant="contained" onClick={onBack}>Back to booking history</Button>
         <div>
-          <Button variant="contained" color="primary" onClick={onUpdate} style={{ marginRight: 8 }}>Update</Button>
-          <Button variant="contained" color="error" onClick={onDelete}>Delete</Button>
+          {role === 1 && booking.status === 0 && (
+            <Button variant="contained" color="warning" onClick={onCancel}>Cancel</Button>
+          )}
+          {role === 2 && booking.status === 0 && (
+            <Button variant="contained" color="success" onClick={onCheckin}>Check-in</Button>
+          )}
+          {role === 2 && booking.status === 1 && (
+            <Button variant="contained" color="info" onClick={onCheckout}>Check-out</Button>
+          )}
         </div>
       </div>
     </form>
