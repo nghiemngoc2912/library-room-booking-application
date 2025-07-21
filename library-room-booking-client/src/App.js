@@ -26,6 +26,18 @@ import BookingDetailPage from './pages/roomBooking/BookingDetail';
 import StudentList from './pages/user/StudentList';
 import AdminDashboard from './pages/admin/AdminDashboard';
 
+import { BrowserRouter as Router, Link, useNavigate } from 'react-router-dom';
+import RulesPage from './pages/rule/RulesPage';
+import ReportsPage from './pages/report/ReportsPage';
+import AddRulePage from './pages/rule/AddRulePage';
+import EditRulePage from './pages/rule/EditRulePage';
+import AddReportPage from './pages/report/AddReportPage';
+import ReportDetailPage from './pages/report/ReportDetailPage';
+import StudentInfoPage from './pages/report/StudentInfoPage';
+import HistoryReportPage from './pages/report/HistoryReportPage';
+import ReportTypeDetailsPage from './pages/report/ReportTypeDetailsPage';
+import './App.css';
+
 // Không cần import HomeLayoutWrapper nữa
 
 // Tạo Auth Context để chia sẻ role và loading state
@@ -239,13 +251,23 @@ const App = () => {
           }
         />
 
-        <Route path="/booking/detail/:id" element={<DefaultLayout><BookingDetailPage /></DefaultLayout>} />
+        <Route path="/booking/detail/:id" element={<DefaultLayout><BookingDetailPage role={role} /></DefaultLayout>} />
         <Route path="/user/students" element={<DefaultLayout><StudentList /></DefaultLayout>} />
+
+                  <Route path="/rules" element={<RulesPage />} />
+          <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/add-rule" element={<AddRulePage />} />
+          <Route path="/edit-rule" element={<EditRulePage />} />
+          <Route path="/add-report" element={<AddReportPage />} />
+          <Route path="/report-detail" element={<ReportDetailPage />} />
+          <Route path="/student-info" element={<StudentInfoPage />} />
+          <Route path="/history-report" element={<HistoryReportPage />} />
+          <Route path="/report-type-details" element={<ReportTypeDetailsPage />} />
+          <Route path="/" element={<Navigate to="/reports" />} />
 
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </AuthContext.Provider>
   );
 };
-
 export default App;

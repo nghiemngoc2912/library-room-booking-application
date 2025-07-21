@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ServerSide.Constants;
 using ServerSide.DTOs.Booking;
 using ServerSide.DTOs.Room;
+using ServerSide.DTOs.Rating;
 using ServerSide.Exceptions;
 using ServerSide.Models;
 using ServerSide.Repositories;
@@ -17,19 +18,25 @@ namespace ServerSide.Services
         private readonly ISlotService slotService;
         private readonly IRoomService roomService;
         private readonly LibraryRoomBookingContext context;
+        private readonly IStudentService studentService;
+        private readonly IRatingService _ratingService;
 
         public BookingService(
             IBookingRepository repository,
             IUserService userService,
             ISlotService slotService,
             IRoomService roomService,
-            LibraryRoomBookingContext context)
+            LibraryRoomBookingContext context,
+            IStudentService studentService,
+            IRatingService ratingService)
         {
             this.repository = repository;
             this.userService = userService;
             this.slotService = slotService;
             this.roomService = roomService;
             this.context = context;
+            this.studentService = studentService;
+            this._ratingService = ratingService;
         }
 
         public IEnumerable<HomeBookingDTO> GetBookingByDateAndStatus(DateOnly date, byte status)
@@ -38,7 +45,7 @@ namespace ServerSide.Services
             return listRaw.Select(x => new HomeBookingDTO(x)).ToList();
         }
 
-        public void CreateBooking(CreateBookingDTO createBookingDTO)
+        public void CreateBooking(CreateBookingDTO createBookingDTO, int userId)
         {
             var slot = slotService.GetById(createBookingDTO.SlotId);
             CreateBookingValidation.ValidateBookingDate(createBookingDTO, slot);
@@ -80,7 +87,7 @@ namespace ServerSide.Services
                 SlotId = createBookingDTO.SlotId,
                 Reason = createBookingDTO.Reason,
                 Students = users,
-                CreatedBy = users[0].Id
+                CreatedBy = userId
             };
 
             if (!CheckBookingAvailable(booking))
@@ -109,52 +116,24 @@ namespace ServerSide.Services
             var total = await repository.CountBookingsByUser(userId, fromDate, toDate);
             var bookings = await repository.GetBookingsByUser(userId, fromDate, toDate, page, pageSize);
 
-            var result = bookings.Select(b => new BookingHistoryDTO
+            var result = new List<BookingHistoryDTO>();
+
+            foreach (var b in bookings)
             {
-                Id = b.Id,
-                BookingDate = b.BookingDate.ToString("yyyy-MM-dd"),
-                RoomName = b.Room.RoomName,
-                Slot = $"{b.Slot.FromTime} - {b.Slot.ToTime}",
-                Rating = b.Ratings
-                    .Where(r => r.StudentId == userId)
-                    .Select(r => new RatingDTO
-                    {
-                        RatingValue = r.RatingValue,
-                        Comment = r.Comment
-                    }).FirstOrDefault()
-            }).ToList();
+                var rating = await _ratingService.GetRatingByBookingAndUserAsync(b.Id, userId);
+                result.Add(new BookingHistoryDTO
+                {
+                    Id = b.Id,
+                    BookingDate = b.BookingDate.ToString("yyyy-MM-dd"),
+                    RoomName = b.Room.RoomName,
+                    Slot = $"{b.Slot.FromTime} - {b.Slot.ToTime}",
+                    Rating = rating
+                });
+            }
 
             return (total, result);
         }
 
-        public async Task AddRatingAsync(int bookingId, CreateRatingDTO dto)
-        {
-            var alreadyRated = await context.Ratings
-                .AnyAsync(r => r.BookingId == bookingId && r.StudentId == dto.StudentId);
-
-            if (alreadyRated)
-                throw new Exception("You have already rated this booking.");
-
-            var joined = await context.Bookings
-                .Where(b => b.Id == bookingId)
-                .SelectMany(b => b.Students)
-                .AnyAsync(s => s.Id == dto.StudentId);
-
-            if (!joined)
-                throw new Exception("This student did not join the booking.");
-
-            var rating = new Rating
-            {
-                BookingId = bookingId,
-                StudentId = dto.StudentId,
-                RatingValue = dto.RatingValue,
-                Comment = dto.Comment,
-                CreatedDate = DateTime.Now
-            };
-
-            context.Ratings.Add(rating);
-            await context.SaveChangesAsync();
-        }
         public BookingDetailDTO GetDetailBookingById(int id)
         {
             var booking = repository.GetBookingById(id);
@@ -177,6 +156,7 @@ namespace ServerSide.Services
                 Students = booking.Students?.Select(s => new UserBookingDTO(s)).ToList()
             };
         }
+
         public (bool success, string message, Booking booking) CheckIn(int id)
         {
             var booking = repository.GetBookingById(id);
@@ -192,11 +172,10 @@ namespace ServerSide.Services
             var early = slotStart.AddMinutes(-BookingRules.MaxTimeToCheckin);
             var late = slotStart.AddMinutes(BookingRules.MaxTimeToCheckin);
 
-            if (now < early || now > late)
-            {
+            if (now < early || now > late){
                 return (false, $"You can check in within {BookingRules.MaxTimeToCheckin} minutes before and after: {slotStart:HH:mm}", booking);
             }
-
+            booking.Status = BookingRoomStatus.Checkined;
             booking.CheckInAt = now;
             repository.UpdateBooking(booking);
 
@@ -218,15 +197,38 @@ namespace ServerSide.Services
             var early = slotEnd.AddMinutes(-BookingRules.MaxTimeToCheckout);
             var late = slotEnd.AddMinutes(BookingRules.MaxTimeToCheckout);
 
-            if (now < early || now > late)
-            {
+            if (now < early)
                 return (false, $"You can check out within {BookingRules.MaxTimeToCheckout} minutes before and after: {slotEnd:HH:mm}", booking);
-            }
 
+            if (now > late)
+            {
+                studentService.SubtractReputationAsync(booking.CreatedBy, -10, "");
+            }
+            booking.Status = BookingRoomStatus.Checkouted;
             booking.CheckOutAt = now;
             repository.UpdateBooking(booking);
 
             return (true, "Check-out successfully", booking);
+        }
+
+        public async Task CancelExpiredBookingsAsync()
+        {
+            var expiredBookings = await repository.GetExpiredBooking();
+            foreach (var booking in expiredBookings)
+            {
+                booking.Status = BookingRoomStatus.AutoCanceled;
+                //tru diem reputation
+                await studentService.SubtractReputationAsync(booking.CreatedBy, -10, "");
+            }
+            await context.SaveChangesAsync();
+        }
+
+        public void CancelBooking(int id)
+        {
+            var booking = repository.GetBookingById(id);
+            if (booking == null) return;
+            booking.Status = BookingRoomStatus.Canceled;
+            repository.UpdateBooking(booking);
         }
     }
 
@@ -235,13 +237,12 @@ namespace ServerSide.Services
         BookingDetailDTO GetDetailBookingById(int id);
         (bool success, string message, Booking booking) CheckIn(int id);
         (bool success, string message, Booking booking) CheckOut(int id);
-        void CreateBooking(CreateBookingDTO createBookingDTO);
+        void CreateBooking(CreateBookingDTO createBookingDTO,int userId);
         IEnumerable<HomeBookingDTO> GetBookingByDateAndStatus(DateOnly date, byte status);
         int GetBookingCountByDateAndUser(User user, DateOnly fromDate, DateOnly toDate);
         bool CheckBookingAvailable(Booking booking);
         Task<(int total, List<BookingHistoryDTO> data)> GetBookingHistoryAsync(int userId, DateTime? from, DateTime? to, int page, int pageSize);
-        Task AddRatingAsync(int bookingId, CreateRatingDTO dto);
-
-
+        Task CancelExpiredBookingsAsync();
+        void CancelBooking(int id);
     }
 }
