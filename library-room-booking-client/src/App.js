@@ -53,6 +53,7 @@ export const useAuth = () => {
 };
 
 const App = () => {
+  const [userId, setUserId] = useState(null);
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
@@ -73,7 +74,9 @@ const App = () => {
         if (response.ok) {
           const data = await response.json();
           setRole(data.role);
+          setUserId(data.userId);
         } else {
+          setUserId(null);
           setRole(null);
         }
       } catch (err) {
@@ -259,7 +262,7 @@ const App = () => {
           path="/student/profile"
           element={
             <ProtectedRoute allowedRoles={[1, 2]}>
-              <DefaultLayout><ProfilePage userId={2} /></DefaultLayout>
+              <DefaultLayout><ProfilePage userId={userId} /></DefaultLayout>
             </ProtectedRoute>
           }
         />

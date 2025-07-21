@@ -14,7 +14,9 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import Badge from '@mui/material/Badge';
+import { useAuth } from '../App'
 import { useNavigate } from 'react-router-dom';
+
 
 const pages = [
   { name: 'Manage rules', path: '/admin/manage_rules' },
@@ -23,7 +25,7 @@ const pages = [
   { name: 'Request Room', path: '/admin/request_room' },
   { name: 'Request Slot', path: '/admin/request_slot' }
 ];
-const settings = ['Profile', 'Logout'];
+const settings = ['Logout'];
 
 function AdminHeader() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -45,6 +47,8 @@ function AdminHeader() {
     setAnchorElUser(null);
   };
 
+  const { setRole } = useAuth();
+
   const handleLogout = async () => {
     try {
       await fetch('https://localhost:7238/api/auth/logout', {
@@ -57,9 +61,10 @@ function AdminHeader() {
 
     localStorage.removeItem('authToken');
     sessionStorage.clear();
+    setRole(null);
 
     handleCloseUserMenu();
-    navigate('/login');
+    navigate('/login', { replace: true });
   };
 
   const handlePageNavigation = (path) => {
