@@ -21,14 +21,25 @@ namespace ServerSide.Controllers
         }
 
         [HttpGet("statistics/bookings")]
-        public IActionResult GetBookingStatistics(
-            [FromQuery] string period = "month",
+        public async Task<IActionResult> GetBookingStatistics(
             [FromQuery] DateTime? startDate = null,
             [FromQuery] DateTime? endDate = null)
         {
-            var data = _adminService.GetBookingStatistics(period, startDate, endDate);
-            return Ok(data);
+            try
+            {
+                var data = await _adminService.GetBookingStatistics(startDate, endDate);
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "An error occurred while fetching booking statistics",
+                    error = ex.Message
+                });
+            }
         }
+
 
         [HttpGet("statistics/ratings")]
         public async Task<IActionResult> GetRatingStatistics(

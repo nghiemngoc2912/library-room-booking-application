@@ -15,11 +15,11 @@ namespace ServerSide.Services
             _bookingRepository = bookingRepository;
         }
 
-        public async Task<BookingStatisticsDTO> GetBookingStatistics(string period, DateTime? startDate, DateTime? endDate)
+        public async Task<BookingStatisticsDTO> GetBookingStatistics(DateTime? startDate, DateTime? endDate)
         {
             try
             {
-                var data = await _bookingRepository.GetBookingStatistics(period, startDate, endDate);
+                var data = await _bookingRepository.GetBookingStatistics(startDate, endDate);
                 return new BookingStatisticsDTO
                 {
                     Dates = data.Select(x => (string)((dynamic)x).Date).ToList(),
@@ -32,6 +32,7 @@ namespace ServerSide.Services
                 throw;
             }
         }
+
 
         public async Task<RatingStatisticsDTO> GetRatingStatistics(DateTime? startDate, DateTime? endDate)
         {
@@ -81,7 +82,7 @@ namespace ServerSide.Services
 
     public interface IAdminService
     {
-        Task<BookingStatisticsDTO> GetBookingStatistics(string period, DateTime? startDate, DateTime? endDate);
+        Task<BookingStatisticsDTO> GetBookingStatistics(DateTime? startDate, DateTime? endDate);
         Task<RatingStatisticsDTO> GetRatingStatistics(DateTime? startDate, DateTime? endDate);
         Task<UsageStatisticsDTO> GetUsageStatistics(string period, DateTime? startDate, DateTime? endDate);
     }

@@ -100,46 +100,55 @@ namespace ServerSide.Repositories
 
             return await query.CountAsync();
         }
-
-        public async Task<List<object>> GetBookingStatistics(string period, DateTime? startDate, DateTime? endDate)
+        public async Task<List<object>> GetBookingStatistics(DateTime? startDate, DateTime? endDate)
         {
-            var bookings = await context.Bookings
-                .Where(b => b.Status == 0)
-                .ToListAsync();
-
-            if (startDate.HasValue)
+            try
             {
-                var start = DateOnly.FromDateTime(startDate.Value);
-                bookings = bookings.Where(b => b.BookingDate >= start).ToList();
-            }
-
-            if (endDate.HasValue)
-            {
-                var end = DateOnly.FromDateTime(endDate.Value);
-                bookings = bookings.Where(b => b.BookingDate <= end).ToList();
-            }
+                Console.WriteLine($"Fetching booking statistics with startDate: {startDate}, endDate: {endDate}");
+                var query = context.Bookings.AsQueryable(); // bỏ điều kiện lọc status
 
 
-            var grouped = bookings
-                .GroupBy(b =>
+                if (startDate.HasValue)
                 {
-                    return period switch
-                    {
-                        "week" => b.BookingDate.ToDateTime(TimeOnly.MinValue).ToString("yyyy-") +
-                                  System.Globalization.CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(
-                                      b.BookingDate.ToDateTime(TimeOnly.MinValue),
-                                      System.Globalization.CalendarWeekRule.FirstDay,
-                                      DayOfWeek.Monday
-                                  ).ToString("D2"),
-                        "year" => b.BookingDate.ToString("yyyy"),
-                        _ => b.BookingDate.ToString("yyyy-MM")
-                    };
-                })
-                .Select(g => new { Date = g.Key, Count = g.Count() })
-                .OrderBy(x => x.Date)
-                .ToList<object>();
+                    var start = DateOnly.FromDateTime(startDate.Value);
+                    Console.WriteLine($"Applying startDate filter: {start}");
+                    query = query.Where(b => b.BookingDate >= start);
+                }
 
-            return grouped;
+                if (endDate.HasValue)
+                {
+                    var end = DateOnly.FromDateTime(endDate.Value);
+                    Console.WriteLine($"Applying endDate filter: {end}");
+                    query = query.Where(b => b.BookingDate <= end);
+                }
+
+                var groupedRaw = await query
+                    .GroupBy(b => b.BookingDate)
+                    .Select(g => new
+                    {
+                        Date = g.Key,
+                        Count = g.Count()
+                    })
+                    .OrderBy(x => x.Date)
+                    .ToListAsync();
+
+                Console.WriteLine($"Query result: {System.Text.Json.JsonSerializer.Serialize(groupedRaw)}");
+
+                var result = groupedRaw
+                    .Select(g => new
+                    {
+                        Date = g.Date.ToString("yyyy-MM-dd"),
+                        Count = g.Count
+                    })
+                    .ToList<object>();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetBookingStatistics: {ex.Message}, StackTrace: {ex.StackTrace}");
+                throw;
+            }
         }
 
         public async Task<List<object>> GetUsageStatistics(string period, DateTime? startDate, DateTime? endDate)
@@ -250,7 +259,7 @@ namespace ServerSide.Repositories
         Task<int> CountBookingsByUser(int userId, DateOnly? from, DateOnly? to);
         Booking GetBookingById(int id);
         void UpdateBooking(Booking booking);
-        Task<List<object>> GetBookingStatistics(string period, DateTime? startDate, DateTime? endDate);
+        Task<List<object>> GetBookingStatistics(DateTime? startDate, DateTime? endDate);
         Task<List<object>> GetUsageStatistics(string period, DateTime? startDate, DateTime? endDate);
         Task<List<ServerSide.DTOs.Admin.RatingGroupResult>> GetRatingStatistics(DateTime? startDate, DateTime? endDate);
         Task<IEnumerable<Booking>> GetExpiredBooking();

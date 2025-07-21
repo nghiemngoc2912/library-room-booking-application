@@ -25,7 +25,7 @@ const pages = [
   { name: 'Request Room', path: '/admin/request_room' },
   { name: 'Request Slot', path: '/admin/request_slot' }
 ];
-const settings = ['Logout'];
+const settings = ['Profile','Logout'];
 
 function AdminHeader() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
