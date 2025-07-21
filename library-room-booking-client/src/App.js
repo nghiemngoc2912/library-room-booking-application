@@ -47,9 +47,16 @@ const App = () => {
   // useEffect để fetch thông tin người dùng hiện tại
   useEffect(() => {
     const checkAuth = async () => {
+      // Không gọi lại nếu role đã được thiết lập
+      if (role !== null) {
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       try {
-        const response = await fetch('https://localhost:7238/api/auth/current-user', { credentials: 'include' });
+        const response = await fetch('https://localhost:7238/api/auth/current-user', { 
+          credentials: 'include' 
+        });
         if (response.ok) {
           const data = await response.json();
           setRole(data.role);
@@ -64,7 +71,7 @@ const App = () => {
       }
     };
     checkAuth();
-  }, [location]);
+  }, [location, role]);
 
   // Component ProtectedRoute để bảo vệ các tuyến đường dựa trên vai trò
   const ProtectedRoute = ({ children, allowedRoles }) => {

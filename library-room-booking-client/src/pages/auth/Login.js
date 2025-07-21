@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react'; // Thêm useContext
 import { useNavigate } from 'react-router-dom';
 import { login } from '../../api/AuthAPI';
+import { useAuth } from '../../App'; // Import useAuth từ App.js
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
+  const { setRole } = useAuth(); // Lấy setRole từ AuthContext
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,7 +19,8 @@ function Login() {
       const role = response.data.role;
 
       if (role != null) {
-        navigate('/home');
+        setRole(role); // Cập nhật role ngay lập tức
+        navigate('/home', { replace: true }); // Sử dụng replace để tránh thêm lịch sử trình duyệt
       } else {
         setErrorMsg('Role không hợp lệ. Vui lòng liên hệ quản trị viên.');
       }
