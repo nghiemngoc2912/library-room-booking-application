@@ -28,7 +28,21 @@ namespace ServerSide.Controllers
         {
             try
             {
-                _bookingService.CreateBooking(createBookingDTO);
+                //use session to retrieve booking user
+                var userId_raw = HttpContext.Session.GetString("UserId");
+                if (string.IsNullOrEmpty(userId_raw))
+                {
+                    return Unauthorized(new { message = "Not logged in" });
+                }
+                int userId = 0;
+                try
+                {
+                    userId=int.Parse(userId_raw);
+                }catch(Exception ex)
+                {
+                    return BadRequest(new { message = "Please check your login" });
+                }
+                _bookingService.CreateBooking(createBookingDTO,userId);
                 return Ok("Booking created successfully");
             }
             catch (BookingPolicyViolationException ex)
