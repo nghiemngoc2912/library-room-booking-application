@@ -14,6 +14,7 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import Badge from '@mui/material/Badge';
+import { useAuth } from '../App'
 import { useNavigate } from 'react-router-dom';
 
 const pages = ['Booking Room', 'News', 'Rules', 'Reports'];
@@ -39,22 +40,25 @@ function Header() {
     setAnchorElUser(null);
   };
 
+  const { setRole } = useAuth();
+
   const handleLogout = async () => {
   try {
     await fetch('https://localhost:7238/api/auth/logout', {
       method: 'POST',
-      credentials: 'include', // Bắt buộc để gửi session cookie
+      credentials: 'include',
     });
+    console.log("Đăng xuất thành công");
   } catch (err) {
     console.error('Logout failed', err);
   }
 
-  // Xóa local/session storage nếu bạn dùng thêm
   localStorage.removeItem('authToken');
   sessionStorage.clear();
+  setRole(null);
 
   handleCloseUserMenu();
-  navigate('/login');
+  navigate('/login', { replace: true });
   };
 
   return (

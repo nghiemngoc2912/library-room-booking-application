@@ -68,6 +68,7 @@ namespace ServerSide.Controllers
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
+            Response.Cookies.Delete(".AspNetCore.Session"); 
             return Ok(new { message = "Logged out successfully" });
         }
 

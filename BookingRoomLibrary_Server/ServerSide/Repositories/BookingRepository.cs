@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Glimpse.Core.Extensibility;
+using Microsoft.EntityFrameworkCore;
+using ServerSide.DTOs.Admin;
+using ServerSide.DTOs.Rating;
 using ServerSide.Models;
 using System.Collections.Generic;
 using System.Globalization;
@@ -191,6 +194,30 @@ namespace ServerSide.Repositories
                 )
                 .ToList();
         }
+
+        public async Task<List<RatingGroupResult>> GetRatingStatistics(DateTime? startDate, DateTime? endDate)
+        {
+            var query = context.Ratings.AsQueryable();
+
+            if (startDate.HasValue)
+                query = query.Where(r => r.CreatedDate >= startDate.Value);
+
+            if (endDate.HasValue)
+                query = query.Where(r => r.CreatedDate <= endDate.Value);
+
+            var result = await query
+                .GroupBy(r => r.RatingValue)
+                .Select(g => new RatingGroupResult
+                {
+                    RatingValue = g.Key,
+                    Count = g.Count()
+                })
+                .ToListAsync();
+
+            return result;
+        }
+
+
     }
 
     public interface IBookingRepository
@@ -204,6 +231,7 @@ namespace ServerSide.Repositories
         void UpdateBooking(Booking booking);
         Task<List<object>> GetBookingStatistics(string period, DateTime? startDate, DateTime? endDate);
         Task<List<object>> GetUsageStatistics(string period, DateTime? startDate, DateTime? endDate);
+        Task<List<RatingGroupResult>> GetRatingStatistics(DateTime? startDate, DateTime? endDate);
         Task<IEnumerable<Booking>> GetExpiredBooking();
     }
 }

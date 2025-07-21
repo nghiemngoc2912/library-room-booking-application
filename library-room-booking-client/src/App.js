@@ -20,6 +20,7 @@ import DetailRequestRoom from './pages/admin/DetailRequestRoom';
 import SlotRequest from './pages/admin/SlotRequest';
 import DetailSlotRequest from './pages/admin/DetailSlotRequest';
 import Login from './pages/auth/Login';
+import Unauthorized from './pages/auth/Unauthorized'
 import NewsPage from './pages/roomBooking/NewsPage';
 import ProfilePage from './pages/student/ProfilePage';
 import BookingDetailPage from './pages/roomBooking/BookingDetail';
@@ -83,7 +84,7 @@ const App = () => {
       }
     };
     checkAuth();
-  }, [location, role]);
+  }, [location.pathname]);
 
   // Component ProtectedRoute để bảo vệ các tuyến đường dựa trên vai trò
   const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -94,7 +95,7 @@ const App = () => {
       return <Navigate to="/login" replace />;
     }
     if (!allowedRoles.includes(role)) {
-      return <Navigate to={role === 1 ? '/home' : '/login'} replace />;
+      return <Navigate to="/unauthorized" replace />;
     }
     return children;
   };
@@ -102,6 +103,21 @@ const App = () => {
   if (loading) {
     return <div>Loading Application...</div>;
   }
+
+  const PublicRoute = ({ children }) => {
+    const { role, loading } = useAuth();
+
+    if (loading) {
+      return <div>Loading...</div>;
+    }
+
+    // Nếu đã đăng nhập => redirect về /home
+    if (role !== null) {
+      return <Navigate to="/home" replace />;
+    }
+
+    return children; // Nếu chưa login => cho vào trang login
+  };
 
   // Hàm trợ giúp để chọn layout dựa trên role
   const getHomeLayout = () => {
@@ -112,7 +128,6 @@ const App = () => {
     } else if (role === 3) {
       return <AdminLayout><Home /></AdminLayout>;
     }
-    // Fallback nếu role không khớp, có thể trả về null, một layout mặc định, hoặc chuyển hướng
     return <DefaultLayout><Home /></DefaultLayout>; // Mặc định về DefaultLayout
   };
 
@@ -121,7 +136,13 @@ const App = () => {
     <AuthContext.Provider value={{ role, loading, setRole }}>
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
+        } />
+
+        <Route path="/unauthorized" element={<Unauthorized />} />
 
         {/* Route cho trang Home, sử dụng hàm getHomeLayout để chọn layout động */}
         <Route
@@ -254,16 +275,16 @@ const App = () => {
         <Route path="/booking/detail/:id" element={<DefaultLayout><BookingDetailPage role={role} /></DefaultLayout>} />
         <Route path="/user/students" element={<DefaultLayout><StudentList /></DefaultLayout>} />
 
-                  <Route path="/rules" element={<RulesPage />} />
-          <Route path="/reports" element={<ReportsPage />} />
-          <Route path="/add-rule" element={<AddRulePage />} />
-          <Route path="/edit-rule" element={<EditRulePage />} />
-          <Route path="/add-report" element={<AddReportPage />} />
-          <Route path="/report-detail" element={<ReportDetailPage />} />
-          <Route path="/student-info" element={<StudentInfoPage />} />
-          <Route path="/history-report" element={<HistoryReportPage />} />
-          <Route path="/report-type-details" element={<ReportTypeDetailsPage />} />
-          <Route path="/" element={<Navigate to="/reports" />} />
+        <Route path="/rules" element={<RulesPage />} />
+        <Route path="/reports" element={<ReportsPage />} />
+        <Route path="/add-rule" element={<AddRulePage />} />
+        <Route path="/edit-rule" element={<EditRulePage />} />
+        <Route path="/add-report" element={<AddReportPage />} />
+        <Route path="/report-detail" element={<ReportDetailPage />} />
+        <Route path="/student-info" element={<StudentInfoPage />} />
+        <Route path="/history-report" element={<HistoryReportPage />} />
+        <Route path="/report-type-details" element={<ReportTypeDetailsPage />} />
+        <Route path="/" element={<Navigate to="/reports" />} />
 
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
