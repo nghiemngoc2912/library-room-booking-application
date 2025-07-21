@@ -3,6 +3,8 @@ using ServerSide.DTOs.Booking;
 using ServerSide.Exceptions;
 using ServerSide.Models;
 using ServerSide.Services;
+using ServerSide.DTOs.Rating;
+
 
 namespace ServerSide.Controllers
 {
@@ -11,10 +13,12 @@ namespace ServerSide.Controllers
     public class BookingController : ControllerBase
     {
         private readonly IBookingService _bookingService;
+        private readonly IRatingService _ratingService;
 
-        public BookingController(IBookingService bookingService)
+        public BookingController(IBookingService bookingService, IRatingService ratingService)
         {
             _bookingService = bookingService;
+            _ratingService = ratingService; 
         }
 
         [HttpGet("date/{date}/status/{status}")]
@@ -89,7 +93,7 @@ namespace ServerSide.Controllers
             {
                 message,
                 bookingId = booking!.Id,
-                checkoutTime = booking.CheckOutAt // Changed to checkoutTime
+                checkoutTime = booking.CheckOutAt 
             });
         }
 
@@ -107,7 +111,7 @@ namespace ServerSide.Controllers
         {
             try
             {
-                await _bookingService.AddRatingAsync(bookingId, dto);
+                await _ratingService.AddRatingAsync(bookingId, dto);
                 return Ok(new { message = "Rating submitted." });
             }
             catch (Exception ex)
