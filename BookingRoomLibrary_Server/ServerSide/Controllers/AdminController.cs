@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ServerSide.DTOs;
+using ServerSide.DTOs.Admin;
 using ServerSide.Services;
 
 namespace ServerSide.Controllers
@@ -30,23 +31,37 @@ namespace ServerSide.Controllers
         }
 
         [HttpGet("statistics/ratings")]
-        public IActionResult GetRatingStatistics(
+        public async Task<IActionResult> GetRatingStatistics(
             [FromQuery] DateTime? startDate = null,
             [FromQuery] DateTime? endDate = null)
         {
-            var data = _adminService.GetRatingStatistics(startDate, endDate);
-            return Ok(data);
+            try
+            {
+                var data = await _adminService.GetRatingStatistics(startDate, endDate);
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while fetching rating statistics", error = ex.Message });
+            }
         }
 
 
         [HttpGet("statistics/usage")]
-        public IActionResult GetUsageStatistics(
+        public async Task<IActionResult> GetUsageStatistics(
             [FromQuery] string period = "month",
             [FromQuery] DateTime? startDate = null,
             [FromQuery] DateTime? endDate = null)
         {
-            var data = _adminService.GetUsageStatistics(period, startDate, endDate);
-            return Ok(data);
+            try
+            {
+                var data = _adminService.GetUsageStatistics(period, startDate, endDate);
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while fetching usage statistics", error = ex.Message });
+            }
         }
 
         [HttpGet("pending_rooms")]

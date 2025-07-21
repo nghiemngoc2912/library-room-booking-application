@@ -144,44 +144,57 @@ namespace ServerSide.Repositories
 
         public async Task<List<object>> GetUsageStatistics(string period, DateTime? startDate, DateTime? endDate)
         {
-            // Lấy dữ liệu thô từ DB
-            var bookings = await context.Bookings
-                .Where(b => b.CheckInAt.HasValue && b.CheckOutAt.HasValue)
-                .ToListAsync();
-
-            // Lọc theo ngày nếu có
-            if (startDate.HasValue)
+            try
             {
-                bookings = bookings.Where(b => b.CheckInAt.Value.Date >= startDate.Value.Date).ToList();
-            }
+                var bookings = await context.Bookings
+                    .Where(b => b.CheckInAt.HasValue && b.CheckOutAt.HasValue)
+                    .ToListAsync();
 
-            if (endDate.HasValue)
-            {
-                bookings = bookings.Where(b => b.CheckInAt.Value.Date <= endDate.Value.Date).ToList();
-            }
-
-            // Chuyển và group theo period
-            var grouped = bookings
-                .Select(b => new
+                if (startDate.HasValue)
                 {
-                    Date = period switch
-                    {
-                        "week" => ISOWeek.GetYear(b.CheckInAt.Value) + "-" + ISOWeek.GetWeekOfYear(b.CheckInAt.Value),
-                        "year" => b.CheckInAt.Value.ToString("yyyy"),
-                        _ => b.CheckInAt.Value.ToString("yyyy-MM")
-                    },
-                    Duration = (b.CheckOutAt.Value - b.CheckInAt.Value).TotalHours
-                })
-                .GroupBy(x => x.Date)
-                .Select(g => new { Date = g.Key, Duration = g.Average(x => x.Duration) })
-                .OrderBy(x => x.Date)
-                .Cast<object>()
-                .ToList();
+                    bookings = bookings.Where(b => b.CheckInAt.Value.Date >= startDate.Value.Date).ToList();
+                }
 
-            return grouped;
+                if (endDate.HasValue)
+                {
+                    bookings = bookings.Where(b => b.CheckInAt.Value.Date <= endDate.Value.Date).ToList();
+                }
+
+                if (!bookings.Any())
+                {
+                    return new List<object>(); // Return empty list if no data
+                }
+
+                var grouped = bookings
+                    .Select(b => new
+                    {
+                        Date = period switch
+                        {
+                            "week" => ISOWeek.GetYear(b.CheckInAt.Value) + "-" + ISOWeek.GetWeekOfYear(b.CheckInAt.Value).ToString("D2"),
+                            "year" => b.CheckInAt.Value.ToString("yyyy"),
+                            _ => b.CheckInAt.Value.ToString("yyyy-MM")
+                        },
+                        Duration = (b.CheckOutAt.Value - b.CheckInAt.Value).TotalHours
+                    })
+                    .GroupBy(x => x.Date)
+                    .Select(g => new
+                    {
+                        Date = g.Key,
+                        Duration = g.Any() ? g.Average(x => x.Duration) : 0.0
+                    })
+                    .OrderBy(x => x.Date)
+                    .ToList<object>();
+
+                return grouped;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetUsageStatistics: {ex.Message}");
+                throw; // Or handle the error as needed
+            }
         }
 
-        public async Task<IEnumerable<Booking>> GetExpiredBooking()
+    public async Task<IEnumerable<Booking>> GetExpiredBooking()
         {
             var now = DateTime.Now;
 
@@ -195,26 +208,34 @@ namespace ServerSide.Repositories
                 .ToList();
         }
 
-        public async Task<List<RatingGroupResult>> GetRatingStatistics(DateTime? startDate, DateTime? endDate)
+        public async Task<List<ServerSide.DTOs.Admin.RatingGroupResult>> GetRatingStatistics(DateTime? startDate, DateTime? endDate)
         {
-            var query = context.Ratings.AsQueryable();
+            try
+            {
+                var query = context.Ratings.AsQueryable();
 
-            if (startDate.HasValue)
-                query = query.Where(r => r.CreatedDate >= startDate.Value);
+                if (startDate.HasValue)
+                    query = query.Where(r => r.CreatedDate >= startDate.Value);
 
-            if (endDate.HasValue)
-                query = query.Where(r => r.CreatedDate <= endDate.Value);
+                if (endDate.HasValue)
+                    query = query.Where(r => r.CreatedDate <= endDate.Value);
 
-            var result = await query
-                .GroupBy(r => r.RatingValue)
-                .Select(g => new RatingGroupResult
-                {
-                    RatingValue = g.Key,
-                    Count = g.Count()
-                })
-                .ToListAsync();
+                var result = await query
+                    .GroupBy(r => r.RatingValue)
+                    .Select(g => new ServerSide.DTOs.Admin.RatingGroupResult
+                    {
+                        RatingValue = g.Key,
+                        Count = g.Count()
+                    })
+                    .ToListAsync();
 
-            return result;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetRatingStatistics: {ex.Message}");
+                throw;
+            }
         }
 
 
@@ -231,7 +252,7 @@ namespace ServerSide.Repositories
         void UpdateBooking(Booking booking);
         Task<List<object>> GetBookingStatistics(string period, DateTime? startDate, DateTime? endDate);
         Task<List<object>> GetUsageStatistics(string period, DateTime? startDate, DateTime? endDate);
-        Task<List<RatingGroupResult>> GetRatingStatistics(DateTime? startDate, DateTime? endDate);
+        Task<List<ServerSide.DTOs.Admin.RatingGroupResult>> GetRatingStatistics(DateTime? startDate, DateTime? endDate);
         Task<IEnumerable<Booking>> GetExpiredBooking();
     }
 }

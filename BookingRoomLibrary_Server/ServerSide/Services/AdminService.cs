@@ -1,4 +1,7 @@
-﻿using ServerSide.DTOs.Admin;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using ServerSide.DTOs.Admin;
 using ServerSide.Repositories;
 
 namespace ServerSide.Services
@@ -12,57 +15,74 @@ namespace ServerSide.Services
             _bookingRepository = bookingRepository;
         }
 
-        public BookingStatisticsDTO GetBookingStatistics(string period, DateTime? startDate, DateTime? endDate)
+        public async Task<BookingStatisticsDTO> GetBookingStatistics(string period, DateTime? startDate, DateTime? endDate)
         {
-            var data = _bookingRepository.GetBookingStatistics(period, startDate, endDate).Result;
-
-            return new BookingStatisticsDTO
+            try
             {
-                Dates = data.Select(x => (string)((dynamic)x).Date).ToList(),
-                Counts = data.Select(x => (int)((dynamic)x).Count).ToList()
-            };
-        }
-
-        public RatingStatisticsDTO GetRatingStatistics(DateTime? startDate, DateTime? endDate)
-        {
-            var data = _bookingRepository.GetRatingStatistics(startDate, endDate).Result;
-
-            var ratingCounts = new int[5]; // index 0 = 1 sao, index 4 = 5 sao
-
-            foreach (var item in data)
-            {
-                if (item.RatingValue >= 1 && item.RatingValue <= 5)
+                var data = await _bookingRepository.GetBookingStatistics(period, startDate, endDate);
+                return new BookingStatisticsDTO
                 {
-                    ratingCounts[item.RatingValue - 1] = item.Count;
-                }
+                    Dates = data.Select(x => (string)((dynamic)x).Date).ToList(),
+                    Counts = data.Select(x => (int)((dynamic)x).Count).ToList()
+                };
             }
-
-            return new RatingStatisticsDTO
+            catch (Exception ex)
             {
-                Ratings = ratingCounts.ToList()
-            };
+                Console.WriteLine($"Error in GetBookingStatistics: {ex.Message}");
+                throw;
+            }
         }
 
-
-
-        public UsageStatisticsDTO GetUsageStatistics(string period, DateTime? startDate, DateTime? endDate)
+        public async Task<RatingStatisticsDTO> GetRatingStatistics(DateTime? startDate, DateTime? endDate)
         {
-            var data = _bookingRepository.GetUsageStatistics(period, startDate, endDate).Result;
-
-            return new UsageStatisticsDTO
+            try
             {
-                Dates = data.Select(x => (string)((dynamic)x).Date).ToList(),
-                Durations = data.Select(x => (double)((dynamic)x).Duration).ToList()
-            };
+                var data = await _bookingRepository.GetRatingStatistics(startDate, endDate);
+                var ratingCounts = new int[5]; // index 0 = 1 star, index 4 = 5 stars
+
+                foreach (var item in data)
+                {
+                    if (item.RatingValue >= 1 && item.RatingValue <= 5)
+                    {
+                        ratingCounts[item.RatingValue - 1] = item.Count;
+                    }
+                }
+
+                return new RatingStatisticsDTO
+                {
+                    Ratings = ratingCounts.ToList()
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetRatingStatistics: {ex.Message}");
+                throw;
+            }
+        }
+
+        public async Task<UsageStatisticsDTO> GetUsageStatistics(string period, DateTime? startDate, DateTime? endDate)
+        {
+            try
+            {
+                var data = await _bookingRepository.GetUsageStatistics(period, startDate, endDate);
+                return new UsageStatisticsDTO
+                {
+                    Dates = data.Select(x => (string)((dynamic)x).Date).ToList(),
+                    Durations = data.Select(x => (double)((dynamic)x).Duration).ToList()
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetUsageStatistics: {ex.Message}");
+                throw;
+            }
         }
     }
 
     public interface IAdminService
     {
-        BookingStatisticsDTO GetBookingStatistics(string period, DateTime? startDate, DateTime? endDate);
-        //RatingStatisticsDTO GetRatingStatistics(DateTime? startDate, DateTime? endDate);
-        UsageStatisticsDTO GetUsageStatistics(string period, DateTime? startDate, DateTime? endDate);
-        RatingStatisticsDTO GetRatingStatistics(DateTime? startDate, DateTime? endDate);
-
+        Task<BookingStatisticsDTO> GetBookingStatistics(string period, DateTime? startDate, DateTime? endDate);
+        Task<RatingStatisticsDTO> GetRatingStatistics(DateTime? startDate, DateTime? endDate);
+        Task<UsageStatisticsDTO> GetUsageStatistics(string period, DateTime? startDate, DateTime? endDate);
     }
 }
