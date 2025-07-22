@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ServerSide.Constants;
 using ServerSide.DTOs.Booking;
 using ServerSide.DTOs.User;
+using ServerSide.Filters;
 using ServerSide.Models;
 using ServerSide.Services;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace ServerSide.Controllers
 {
+    [RoleFilter((int)Roles.Student, (int)Roles.Staff, (int)Roles.Admin)]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -41,6 +43,21 @@ namespace ServerSide.Controllers
         {
             var result = userService.GetAllStudents(keyword, page, Pagination.DefaultPageSize);
             return Ok(result);
+        }
+        [HttpGet("staffs")]
+        public IActionResult GetStaffLists([FromQuery] string? keyword, [FromQuery] int page = 1)
+        {
+            var result = userService.GetAllStaffs(keyword, page, Pagination.DefaultPageSize);
+            return Ok(result);
+        }
+        [HttpPatch("{id}/status")]
+        public IActionResult UpdateUserStatus(int id, [FromQuery] byte status)
+        {
+            var updatedUser = userService.UpdateStatus(id, status);
+            if (updatedUser == null)
+                return NotFound(new { message = "User not found" });
+
+            return Ok(updatedUser);
         }
     }
 }

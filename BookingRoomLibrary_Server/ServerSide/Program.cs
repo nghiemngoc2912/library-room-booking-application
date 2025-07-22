@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ServerSide.Constants;
 using ServerSide.Helpers;
+using ServerSide.Middlewares;
 using ServerSide.Models;
 using ServerSide.Repositories;
 using ServerSide.Services;
@@ -102,5 +103,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.Run();

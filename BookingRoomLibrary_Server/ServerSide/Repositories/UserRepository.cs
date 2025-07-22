@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Glimpse.Core.Extensibility;
+using Microsoft.EntityFrameworkCore;
 using ServerSide.Models;
 
 namespace ServerSide.Repositories
@@ -50,6 +51,12 @@ namespace ServerSide.Repositories
 
             return query;
         }
+
+        public void UpdateAccount(Account account)
+        {
+            context.Accounts.Update(account);
+            context.SaveChanges();
+        }
     }
 
     public interface IUserRepository
@@ -59,5 +66,6 @@ namespace ServerSide.Repositories
         IQueryable<User> GetUsersByRole(int role, string? keyword);      
         IEnumerable<User> SearchUserByCode(string code);
         Task<User?> GetUserWithReports(int userId);
+        void UpdateAccount(Account account);
     }
 }

@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ServerSide.Constants;
 using ServerSide.DTOs;
 using ServerSide.DTOs.Report;
+using ServerSide.Filters;
 using ServerSide.Services;
 
 namespace ServerSide.Controllers;
 
+[RoleFilter((int)Roles.Student, (int)Roles.Staff,(int)Roles.Admin)]
 [Route("api/[controller]")]
 [ApiController]
 public class ReportsController : ControllerBase
@@ -15,7 +18,7 @@ public class ReportsController : ControllerBase
     {
         _reportService = reportService ?? throw new ArgumentNullException(nameof(reportService));
     }
-
+    [RoleFilter((int)Roles.Staff)]
     [HttpGet]
     public async Task<IActionResult> GetReports()
     {
@@ -55,7 +58,7 @@ public class ReportsController : ControllerBase
             return StatusCode(500, $"Error retrieving report types: {ex.Message}");
         }
     }
-
+    [RoleFilter((int)Roles.Student)]
     [HttpPost]
     public async Task<IActionResult> CreateReport([FromBody] ReportDTO reportDto)
     {

@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ServerSide.Constants;
 using ServerSide.DTOs.Student;
+using ServerSide.Filters;
 using ServerSide.Services;
 
 namespace ServerSide.Controllers
 {
+    [RoleFilter((int)Roles.Student, (int)Roles.Staff, (int)Roles.Admin)]
     [Route("api/[controller]")]
     [ApiController]
     public class StudentController : ControllerBase

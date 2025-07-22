@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ServerSide.Constants;
 using ServerSide.DTOs;
+using ServerSide.Filters;
 using ServerSide.Services;
 
 namespace ServerSide.Controllers
 {
+    [RoleFilter((int)Roles.Admin)]
     [Route("api/[controller]")]
     [ApiController]
     public class AdminController : ControllerBase
