@@ -1,4 +1,5 @@
-﻿using ServerSide.Constants;
+﻿using Microsoft.Extensions.Options;
+using ServerSide.Constants;
 using ServerSide.DTOs.Booking;
 using ServerSide.DTOs.Room;
 using ServerSide.Exceptions;
@@ -9,26 +10,29 @@ namespace ServerSide.Validations
 {
     public class CreateBookingValidation
     {
-        internal static void ValidateBookingDate(CreateBookingDTO createBookingDTO, Slot slot)
+        private readonly BookingRules _rules;
+        public CreateBookingValidation(IOptions<BookingRules> options) {
+            _rules = options.Value;
+        }
+        public void ValidateBookingDate(CreateBookingDTO createBookingDTO, Slot slot)
         {
             var today = DateOnly.FromDateTime(DateTime.Now);
             var now = DateTime.Now;
             if (createBookingDTO.BookingDate < today)
                 throw new BookingPolicyViolationException("Booking date cannot be in the past.");
 
-            if (createBookingDTO.BookingDate > today.AddDays(BookingRules.MaxIntervalDayToBook))
-                throw new BookingPolicyViolationException($"Booking date cannot be more than {BookingRules.MaxIntervalDayToBook} days in advance.");
+            if (createBookingDTO.BookingDate > today.AddDays(_rules.MaxIntervalDayToBook))
+                throw new BookingPolicyViolationException($"Booking date cannot be more than {_rules.MaxIntervalDayToBook} days in advance.");
 
             if (createBookingDTO.BookingDate == today && slot.FromTime < TimeOnly.FromDateTime(now))
                 throw new BookingPolicyViolationException("Cannot book a slot in the past.");
-
         }
 
-        internal static void ValidateCapacity(CreateBookingDTO createBookingDTO, CreateBookingRoomDTO room)
+        public void ValidateCapacity(CreateBookingDTO createBookingDTO, CreateBookingRoomDTO room)
         {
-            if ((float)room.Capacity * BookingRules.MinCapacityPercentage / 100 > createBookingDTO.StudentListCode.Count())
+            if ((float)room.Capacity * _rules.MinCapacityPercentage / 100 > createBookingDTO.StudentListCode.Count())
             {
-                throw new BookingPolicyViolationException($"Number of students is less than {BookingRules.MinCapacityPercentage}% of room's capacity.");
+                throw new BookingPolicyViolationException($"Number of students is less than {_rules.MinCapacityPercentage}% of room's capacity.");
             }
             if (room.Capacity < createBookingDTO.StudentListCode.Count())
             {

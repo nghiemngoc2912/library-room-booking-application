@@ -94,6 +94,8 @@ const RoomBooking = () => {
     fetch('https://localhost:7238/api/Booking', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      withCredentials: true,
       body: JSON.stringify(payload),
     })
       .then(async (res) => {

@@ -34,16 +34,13 @@ namespace ServerSide.Services
         }
         public PageResultDTO<StudentListDTO> GetAllStudents(string? keyword, int page, int pageSize)
         {
-            var query = repository.GetUsersByRole(Roles.Student, keyword);
-
+            var query = repository.GetUsersByRole((int)Roles.Student, keyword);
             int totalItems = query.Count();
-
             var students = query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Include(u => u.Account)
                 .ToList();
-
             var studentDtos = students.Select(u => new StudentListDTO
             {
                 Id = u.Id,
@@ -52,7 +49,6 @@ namespace ServerSide.Services
                 Email = u.Email,
                 Status = u.Account.Status == 1 ? "Active" : "Inactive"
             }).ToList();
-
             return new PageResultDTO<StudentListDTO>
             {
                 Items = studentDtos,

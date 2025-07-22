@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ServerSide.Constants;
 using ServerSide.Helpers;
 using ServerSide.Models;
 using ServerSide.Repositories;
 using ServerSide.Services;
+using ServerSide.Validations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,18 +29,6 @@ builder.Services.AddSession(options =>
     options.Cookie.SameSite = SameSiteMode.None; // ← ADD THIS
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // ← ADD THIS if using HTTPS
 });
-
-// Session
-builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-    options.Cookie.SameSite = SameSiteMode.None;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-});
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -81,9 +71,16 @@ builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IRatingService, RatingService>();
 
-
-
+builder.Services.AddScoped<CreateBookingValidation>();
 builder.Services.AddHostedService<BookingCleanupJob>();
+
+var bookingRulesConfig = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("Config/bookingrules.json", optional: false, reloadOnChange: true)
+    .Build();
+
+builder.Services.Configure<BookingRules>(bookingRulesConfig);
+
 
 var app = builder.Build();
 
