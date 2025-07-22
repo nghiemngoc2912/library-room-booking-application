@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ServerSide.Constants;
+using ServerSide.DTOs;
 using ServerSide.Helpers;
 using ServerSide.Models;
 using ServerSide.Repositories;
@@ -33,6 +34,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
+
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // DB context
 builder.Services.AddDbContext<LibraryRoomBookingContext>(options =>

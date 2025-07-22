@@ -78,7 +78,7 @@ const ListRoom = () => {
       // Cập nhật lại danh sách phòng
       const updatedRooms = rooms.map(room =>
         room.id === roomId
-          ? { ...room, status: isMaintaining ? -2 : 1 }
+          ? { ...room, status: isMaintaining ? 2 : 1 }
           : room
       );
       setRooms(updatedRooms);
@@ -128,8 +128,8 @@ const ListRoom = () => {
               <option value="">All</option>
               <option value="0">Pending</option>
               <option value="1">Active</option>
-              <option value="-1">Inactive</option>
-              <option value="-2">Maintenance</option>
+              <option value="3">Inactive</option>
+              <option value="2">Maintenance</option>
             </select>
           </div>
         </div>
@@ -173,7 +173,7 @@ const ListRoom = () => {
                   <td style={{ padding: '0.75rem', border: '1px solid #dee2e6' }}>{room.id}</td>
                   <td style={{ padding: '0.75rem', border: '1px solid #dee2e6' }}>{room.roomName}</td>
                   <td style={{ padding: '0.75rem', border: '1px solid #dee2e6' }}>
-                    {room.status === 1 ? 'Active' : room.status === 0 ? 'Pending' : room.status === -1 ? 'Inactive' : 'Maintenance'}
+                    {room.status === 1 ? 'Active' : room.status === 0 ? 'Pending' : room.status === 3 ? 'Inactive' : 'Maintenance'}
                   </td>
                   <td style={{ padding: '0.75rem', border: '1px solid #dee2e6' }}>{room.capacity}</td>
                   <td style={{ padding: '0.75rem', border: '1px solid #dee2e6' }}>
@@ -192,7 +192,7 @@ const ListRoom = () => {
                       Update
                     </button>
 
-                    {(room.status === 1 || room.status === -2) && (
+                    {(room.status === 1 || room.status === 2) && (
                       <button
                         onClick={() => handleMaintenanceToggle(room.id, room.status)}
                         style={{

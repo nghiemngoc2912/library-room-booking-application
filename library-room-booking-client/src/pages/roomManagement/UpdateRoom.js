@@ -67,7 +67,7 @@ const UpdateRoom = () => {
     // Validate status only for non-pending rooms
     if (!isPending) {
       const status = parseInt(room.status);
-      if (![0, 1, -2].includes(status)) {
+      if (![0, 1, 2].includes(status)) {
         setError('Trạng thái không hợp lệ. Vui lòng chọn một giá trị hợp lệ.');
         return;
       }
@@ -192,7 +192,7 @@ const UpdateRoom = () => {
             >
               {/* <option value="0">Pending</option> */}
               <option value="1">Active</option>
-              <option value="-2">Maintenance</option>
+              <option value="2">Maintenance</option>
             </select>
             {isPending && (
               <p style={{ color: '#6c757d', fontSize: '0.9rem', marginTop: '0.5rem' }}>
