@@ -8,6 +8,7 @@ using ServerSide.Exceptions;
 using ServerSide.Models;
 using ServerSide.Repositories;
 using ServerSide.Validations;
+using Microsoft.Extensions.Options;
 
 namespace ServerSide.Services
 {
@@ -20,6 +21,9 @@ namespace ServerSide.Services
         private readonly LibraryRoomBookingContext context;
         private readonly IStudentService studentService;
         private readonly IRatingService _ratingService;
+        private readonly BookingRules _rules;
+        private readonly CreateBookingValidation validation;
+
 
         public BookingService(
             IBookingRepository repository,
@@ -28,7 +32,10 @@ namespace ServerSide.Services
             IRoomService roomService,
             LibraryRoomBookingContext context,
             IStudentService studentService,
-            IRatingService ratingService)
+            IRatingService ratingService,
+            IOptions<BookingRules> options,
+            CreateBookingValidation validation
+            )
         {
             this.repository = repository;
             this.userService = userService;
@@ -37,6 +44,8 @@ namespace ServerSide.Services
             this.context = context;
             this.studentService = studentService;
             this._ratingService = ratingService;
+            _rules = options.Value;
+            this.validation = validation;
         }
 
         public IEnumerable<HomeBookingDTO> GetBookingByDateAndStatus(DateOnly date, byte status)
@@ -48,10 +57,10 @@ namespace ServerSide.Services
         public void CreateBooking(CreateBookingDTO createBookingDTO, int userId)
         {
             var slot = slotService.GetById(createBookingDTO.SlotId);
-            CreateBookingValidation.ValidateBookingDate(createBookingDTO, slot);
+            validation.ValidateBookingDate(createBookingDTO, slot);
 
             var room = roomService.GetRoomByIdForBooking(createBookingDTO.RoomId);
-            CreateBookingValidation.ValidateCapacity(createBookingDTO, room);
+            validation.ValidateCapacity(createBookingDTO, room);
 
             var users = new List<User>();
             DateOnly bookingDate = createBookingDTO.BookingDate;
@@ -60,18 +69,18 @@ namespace ServerSide.Services
             foreach (var code in createBookingDTO.StudentListCode)
             {
                 var user = userService.GetUserByCode(code);
-                if (user == null || user.Account.Role != Roles.Student)
+                if (user == null || user.Account.Role != (byte)Roles.Student)
                     throw new BookingPolicyViolationException($"User with code {code} is not a valid student.");
 
-                if (user.Reputation < BookingRules.MinReputationToBook)
-                    throw new BookingPolicyViolationException($"User with code {code} has reputation under 50");
+                if (user.Reputation < _rules.MinReputationToBook)
+                    throw new BookingPolicyViolationException($"User with code {code} has reputation under {_rules.MinReputationToBook}");
 
                 int countDay = GetBookingCountByDateAndUser(user, bookingDate, bookingDate);
-                if (countDay >= BookingRules.MaxDailyBookingsPerStudent)
+                if (countDay >= _rules.MaxDailyBookingsPerStudent)
                     throw new BookingPolicyViolationException($"User with code {code} exceeds daily limit.");
 
                 int countWeek = GetBookingCountByDateAndUser(user, dayBeforeAWeek, bookingDate);
-                if (countWeek >= BookingRules.MaxWeeklyBookingDays)
+                if (countWeek >= _rules.MaxWeeklyBookingDays)
                     throw new BookingPolicyViolationException($"User with code {code} exceeds weekly limit.");
 
                 if (users.Contains(user))
@@ -169,13 +178,13 @@ namespace ServerSide.Services
             var now = DateTime.Now;
             var slotStart = booking.BookingDate.ToDateTime(booking.Slot.FromTime);
 
-            var early = slotStart.AddMinutes(-BookingRules.MaxTimeToCheckin);
-            var late = slotStart.AddMinutes(BookingRules.MaxTimeToCheckin);
+            var early = slotStart.AddMinutes(-_rules.MaxTimeToCheckin);
+            var late = slotStart.AddMinutes(_rules.MaxTimeToCheckin);
 
             if (now < early || now > late){
-                return (false, $"You can check in within {BookingRules.MaxTimeToCheckin} minutes before and after: {slotStart:HH:mm}", booking);
+                return (false, $"You can check in within {_rules.MaxTimeToCheckin} minutes before and after: {slotStart:HH:mm}", booking);
             }
-            booking.Status = BookingRoomStatus.Checkined;
+            booking.Status = (byte)BookingRoomStatus.Checkined;
             booking.CheckInAt = now;
             repository.UpdateBooking(booking);
 
@@ -194,17 +203,17 @@ namespace ServerSide.Services
             var now = DateTime.Now;
             var slotEnd = booking.BookingDate.ToDateTime(booking.Slot.ToTime);
 
-            var early = slotEnd.AddMinutes(-BookingRules.MaxTimeToCheckout);
-            var late = slotEnd.AddMinutes(BookingRules.MaxTimeToCheckout);
+            var early = slotEnd.AddMinutes(-_rules.MaxTimeToCheckout);
+            var late = slotEnd.AddMinutes(_rules.MaxTimeToCheckout);
 
             if (now < early)
-                return (false, $"You can check out within {BookingRules.MaxTimeToCheckout} minutes before and after: {slotEnd:HH:mm}", booking);
+                return (false, $"You can check out within {_rules.MaxTimeToCheckout} minutes before and after: {slotEnd:HH:mm}", booking);
 
             if (now > late)
             {
-                studentService.SubtractReputationAsync(booking.CreatedBy, -10, "");
+                studentService.SubtractReputationAsync(booking.CreatedBy, _rules.SubstractReputation, "");
             }
-            booking.Status = BookingRoomStatus.Checkouted;
+            booking.Status =(byte) BookingRoomStatus.Checkouted;
             booking.CheckOutAt = now;
             repository.UpdateBooking(booking);
 
@@ -216,18 +225,18 @@ namespace ServerSide.Services
             var expiredBookings = await repository.GetExpiredBooking();
             foreach (var booking in expiredBookings)
             {
-                booking.Status = BookingRoomStatus.AutoCanceled;
+                booking.Status =(byte) BookingRoomStatus.AutoCanceled;
                 //tru diem reputation
-                await studentService.SubtractReputationAsync(booking.CreatedBy, -10, "");
+                await studentService.SubtractReputationAsync(booking.CreatedBy, _rules.SubstractReputation, "");
+                repository.UpdateBooking(booking);
             }
-            await context.SaveChangesAsync();
         }
 
         public void CancelBooking(int id)
         {
             var booking = repository.GetBookingById(id);
             if (booking == null) return;
-            booking.Status = BookingRoomStatus.Canceled;
+            booking.Status = (byte)BookingRoomStatus.Canceled;
             repository.UpdateBooking(booking);
         }
     }

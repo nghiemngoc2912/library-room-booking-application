@@ -12,11 +12,10 @@ import { fetchSlots } from '../../api/SlotAPI';
 import { fetchRooms } from '../../api/RoomAPI';
 import { fetchBookingsByDateAndStatus } from '../../api/BookingAPI';
 
-export default function BookingTable({ date = '2025-06-17', status = 0}) {
+export default function BookingTable({ date, status}) {
   const [slots, setSlots] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [bookings, setBookings] = useState([]);
-
   const today = new Date().toISOString().split('T')[0];
   const isPastDate = date < today;
 

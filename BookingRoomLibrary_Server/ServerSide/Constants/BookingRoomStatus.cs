@@ -1,11 +1,11 @@
 ﻿namespace ServerSide.Constants
 {
-    public class BookingRoomStatus
+    enum BookingRoomStatus
     {
-        public const int Booked = 0;
-        public const int Checkined = 1;
-        public const int Checkouted = 2;
-        public const int Canceled = 3;
-        public const int AutoCanceled = 4;
+        Booked = 0,
+        Checkined = 1,
+        Checkouted = 2,
+        Canceled = 3,
+        AutoCanceled = 4
     }
 }

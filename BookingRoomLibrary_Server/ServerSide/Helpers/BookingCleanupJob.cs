@@ -1,4 +1,6 @@
 ﻿
+using Microsoft.Extensions.Options;
+using ServerSide.Constants;
 using ServerSide.Services;
 
 namespace ServerSide.Helpers
@@ -6,9 +8,11 @@ namespace ServerSide.Helpers
     public class BookingCleanupJob : BackgroundService
     {
         private readonly IServiceScopeFactory _scopeFactory;
-        public BookingCleanupJob(IServiceScopeFactory scopeFactory)
+        private readonly BookingRules _rules;
+        public BookingCleanupJob(IServiceScopeFactory scopeFactory,IOptions<BookingRules> options)
         {
             _scopeFactory = scopeFactory;
+            _rules = options.Value;
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -16,14 +20,14 @@ namespace ServerSide.Helpers
             {
                 var now = DateTime.Now.TimeOfDay;
 
-                if (now >= TimeSpan.FromHours(9) && now <= TimeSpan.FromHours(18))
+                if (now >= TimeSpan.FromHours(_rules.TimeStart) && now <= TimeSpan.FromHours(_rules.TimeEnd))
                 {
                     using var scope = _scopeFactory.CreateScope();
                     var bookingService = scope.ServiceProvider.GetRequiredService<IBookingService>();
                     await bookingService.CancelExpiredBookingsAsync();
                 }
 
-                await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
+                await Task.Delay(TimeSpan.FromMinutes(_rules.TimeJobInterval), stoppingToken);
             }
         }
     }
