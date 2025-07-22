@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace ServerSide.Models;
 
@@ -12,7 +11,6 @@ public partial class Rating
 
     public int BookingId { get; set; }
 
-    [Range(1, 5)]
     public int RatingValue { get; set; }
 
     public string? Comment { get; set; }

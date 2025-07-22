@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ServerSide.DTOs;
+using ServerSide.Constants;
 using ServerSide.DTOs.Room;
 using ServerSide.Models;
 using ServerSide.Repositories;
@@ -55,10 +56,9 @@ namespace ServerSide.Services
                 throw new ArgumentException("Sức chứa phải lớn hơn 0.");
             }
 
-            // Validate Status as byte: allow 0, 1, 254 (-2), 255 (-1)
-            if (!(createRoomDTO.Status == 0 || createRoomDTO.Status == 1 || createRoomDTO.Status == 254 || createRoomDTO.Status == 255))
+            if (!Enum.IsDefined(typeof(RoomStatus), createRoomDTO.Status))
             {
-                throw new ArgumentException("Trạng thái không hợp lệ. Giá trị hợp lệ: -2 (Maintenance), -1 (Inactive), 0 (Pending), 1 (Active).");
+                throw new ArgumentException("Trạng thái không hợp lệ.");
             }
 
             var room = new Room
@@ -88,10 +88,9 @@ namespace ServerSide.Services
                 throw new ArgumentException("Sức chứa phải lớn hơn 0.");
             }
 
-            // Validate Status as byte: allow 0, 1, 254 (-2), 255 (-1)
-            if (!(updateRoomDTO.Status == 0 || updateRoomDTO.Status == 1 || updateRoomDTO.Status == 254 || updateRoomDTO.Status == 255))
+            if (!Enum.IsDefined(typeof(RoomStatus), updateRoomDTO.Status))
             {
-                throw new ArgumentException("Trạng thái không hợp lệ. Giá trị hợp lệ: -2 (Maintenance), -1 (Inactive), 0 (Pending), 1 (Active).");
+                throw new ArgumentException("Trạng thái không hợp lệ.");
             }
 
             var room = roomRepository.GetById(updateRoomDTO.Id);
@@ -117,16 +116,15 @@ namespace ServerSide.Services
                 rooms = rooms.Where(r => r.RoomName.ToLower().Contains(search.ToLower()));
             }
 
-            // Filter by Status (int values: -2, -1, 0, 1; null for all)
+            // Filter by Status 
             if (status.HasValue)
             {
-                byte statusByte = status.Value switch
+                if (!Enum.IsDefined(typeof(RoomStatus), status.Value))
                 {
-                    -2 => 254,
-                    -1 => 255,
-                    _ => (byte)status.Value
-                };
-                rooms = rooms.Where(r => r.Status == statusByte);
+                    throw new ArgumentException("Trạng thái không hợp lệ.");
+                }
+
+                rooms = rooms.Where(r => r.Status == (byte)status.Value);
             }
 
             return rooms.Select(r => new RoomLibrarian(r)).ToList();
@@ -140,14 +138,14 @@ namespace ServerSide.Services
                 return false;
             }
 
-            // Toggle logic
-            if (room.Status == 1)         // Active
+            // Chỉ cho phép toggle giữa Active và Maintenance
+            if (room.Status == (byte)RoomStatus.Active)
             {
-                room.Status = 254;        // Maintenance (-2)
+                room.Status = (byte)RoomStatus.Maintenance;
             }
-            else if (room.Status == 254)  // Maintenance (-2)
+            else if (room.Status == (byte)RoomStatus.Maintenance)
             {
-                room.Status = 1;          // Active
+                room.Status = (byte)RoomStatus.Active;
             }
             else
             {
@@ -161,7 +159,7 @@ namespace ServerSide.Services
 
         public IEnumerable<RoomRequestDTO> GetPendingRooms(string search = null)
         {
-            var rooms = roomRepository.GetAll().Where(r => r.Status == 0).AsQueryable();
+            var rooms = roomRepository.GetAll().Where(r => r.Status == (byte)RoomStatus.Pending).AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(search))
             {
@@ -174,28 +172,31 @@ namespace ServerSide.Services
         public RoomRequestDTO GetPendingRoomById(int id)
         {
             var room = roomRepository.GetById(id);
-            if (room == null || room.Status != 0)
-            {
+            if (room == null)
                 return null;
-            }
+
+            if (room.Status != (byte)RoomStatus.Pending)
+                return null;
+
             return new RoomRequestDTO(room);
         }
+
 
         public bool AcceptRoom(int id)
         {
             var room = roomRepository.GetById(id);
-            if (room == null || room.Status != 0)
+            if (room == null || room.Status != (byte)RoomStatus.Pending)
             {
                 return false;
             }
-            room.Status = 1; // Active
+            room.Status = (byte)RoomStatus.Active; 
             return roomRepository.Update(room);
         }
 
         public bool RejectRoom(int id)
         {
             var room = roomRepository.GetById(id);
-            if (room == null || room.Status != 0)
+            if (room == null || room.Status != (byte)RoomStatus.Pending)
             {
                 return false;
             }

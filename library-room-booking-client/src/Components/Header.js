@@ -14,19 +14,22 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import Badge from '@mui/material/Badge';
+import { useAuth } from '../App';
 import { useNavigate } from 'react-router-dom';
 
-const pages = ['Booking Room', 'News', 'Rules', 'Reports'];
+const pages = ['Home', 'Booking Room', 'News', 'Rules', 'Reports'];
 const settings = ['Profile', 'Logout'];
 
 function Header() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const navigate = useNavigate();
+  const { setRole } = useAuth();
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
+
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
@@ -40,21 +43,40 @@ function Header() {
   };
 
   const handleLogout = async () => {
-  try {
-    await fetch('https://localhost:7238/api/auth/logout', {
-      method: 'POST',
-      credentials: 'include', // Bắt buộc để gửi session cookie
-    });
-  } catch (err) {
-    console.error('Logout failed', err);
-  }
+    try {
+      await fetch('https://localhost:7238/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+      console.log("Đăng xuất thành công");
+    } catch (err) {
+      console.error('Logout failed', err);
+    }
 
-  // Xóa local/session storage nếu bạn dùng thêm
-  localStorage.removeItem('authToken');
-  sessionStorage.clear();
+    localStorage.removeItem('authToken');
+    sessionStorage.clear();
+    setRole(null);
 
-  handleCloseUserMenu();
-  navigate('/login');
+    handleCloseUserMenu();
+    navigate('/login', { replace: true });
+  };
+
+  const handleMenuItemClick = (setting) => {
+    if (setting === 'Logout') {
+      handleLogout();
+    } else if (setting === 'Profile') {
+      navigate('/student/profile');
+      handleCloseUserMenu();
+    } else {
+      handleCloseUserMenu();
+    }
+  };
+
+  const handleNavMenuClick = (page) => {
+    if (page === 'Home') {
+      navigate('/home');
+    }
+    handleCloseNavMenu();
   };
 
   return (
@@ -108,7 +130,7 @@ function Header() {
               sx={{ display: { xs: 'block', md: 'none' } }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
+                <MenuItem key={page} onClick={() => handleNavMenuClick(page)}>
                   <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
                 </MenuItem>
               ))}
@@ -137,7 +159,7 @@ function Header() {
             {pages.map((page) => (
               <Button
                 key={page}
-                onClick={handleCloseNavMenu}
+                onClick={() => handleNavMenuClick(page)}
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
                 {page}
@@ -146,7 +168,7 @@ function Header() {
           </Box>
           <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center', gap: 2 }}>
             <Badge badgeContent={3} color="error" overlap="circular">
-              <NotificationsIcon /> 
+              <NotificationsIcon />
             </Badge>
             <Tooltip title="Account setting">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
@@ -170,7 +192,7 @@ function Header() {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={setting === 'Logout' ? handleLogout : handleCloseUserMenu}>
+                <MenuItem key={setting} onClick={() => handleMenuItemClick(setting)}>
                   <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
                 </MenuItem>
               ))}
@@ -181,4 +203,5 @@ function Header() {
     </AppBar>
   );
 }
+
 export default Header;

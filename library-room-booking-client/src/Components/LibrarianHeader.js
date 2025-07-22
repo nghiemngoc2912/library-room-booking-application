@@ -14,10 +14,11 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import Badge from '@mui/material/Badge';
+import { useAuth } from '../App'
 import { useNavigate } from 'react-router-dom';
 
 const pages = ['Home', 'Room', 'Slot', 'Students', 'Report', 'Setting', 'News', 'Rules'];
-const settings = ['Profile', 'Logout'];
+const settings = ['Profile','Logout'];
 
 function LibrarianHeader() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -38,6 +39,7 @@ function LibrarianHeader() {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+  const { setRole } = useAuth();
 
   const handleLogout = async () => {
     try {
@@ -51,9 +53,10 @@ function LibrarianHeader() {
 
     localStorage.removeItem('authToken');
     sessionStorage.clear();
+    setRole(null);
 
     handleCloseUserMenu();
-    navigate('/login');
+    navigate('/login', { replace: true });
   };
 
   const handlePageNavigation = (page) => {
