@@ -9,5 +9,6 @@
   "SubstractReputation": -10,
   "TimeStart": 9,
   "TimeEnd": 18,
-  "TimeJobInterval":5 
+  "TimeJobInterval": 5,
+  "CancelTimeInterval": 2
 }
