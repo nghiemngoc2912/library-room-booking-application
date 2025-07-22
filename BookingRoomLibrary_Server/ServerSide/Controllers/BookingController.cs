@@ -123,8 +123,19 @@ namespace ServerSide.Controllers
             }
         }
         [HttpPatch("cancel/{id}")]
-        public void CancelBooking(int id) {
-            _bookingService.CancelBooking(id);
+        public IActionResult CancelBooking(int id) {
+            try {
+                _bookingService.CancelBooking(id);
+                return Ok("Cancel Booking Successfully");
+            }
+            catch (BookingPolicyViolationException ex)
+            {
+                return BadRequest(ex.Message);
+            }catch(Exception ex)
+            {
+                return StatusCode(500, "Something when wrong: "+ex.Message);
+            }
+            
         }
     }
 }
