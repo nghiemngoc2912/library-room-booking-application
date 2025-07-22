@@ -26,6 +26,8 @@ import ProfilePage from './pages/student/ProfilePage';
 import BookingDetailPage from './pages/roomBooking/BookingDetail';
 import StudentList from './pages/user/StudentList';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import ResetPasswordPage from './pages/auth/ResetPasswordPage';
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 
 import { BrowserRouter as Router, Link, useNavigate } from 'react-router-dom';
 import RulesPage from './pages/rule/RulesPage';
@@ -61,31 +63,33 @@ const App = () => {
   // useEffect để fetch thông tin người dùng hiện tại
   useEffect(() => {
     const checkAuth = async () => {
-      // Không gọi lại nếu role đã được thiết lập
-      if (role !== null) {
-        setLoading(false);
-        return;
-      }
       setLoading(true);
       try {
-        const response = await fetch('https://localhost:7238/api/auth/current-user', { 
-          credentials: 'include' 
+        const response = await fetch('https://localhost:7238/api/auth/current-user', {
+          credentials: 'include',
         });
         if (response.ok) {
           const data = await response.json();
-          setRole(data.role);
-          setUserId(data.userId);
+          console.log('API response:', data); // Debug
+          const newUserId = data.id; // Lấy id từ API
+          const newRole = data.role; // Lấy role từ API
+          setRole(newRole);
+          setUserId(newUserId);
+          console.log('Updated userId:', newUserId, 'role:', newRole); // Debug sau khi set
         } else {
+          console.log('API error:', response.status, response.statusText);
           setUserId(null);
           setRole(null);
         }
       } catch (err) {
-        console.error("Error fetching current user:", err);
+        console.error('Network error:', err);
+        setUserId(null);
         setRole(null);
       } finally {
         setLoading(false);
       }
     };
+
     checkAuth();
   }, [location.pathname]);
 
@@ -136,7 +140,7 @@ const App = () => {
 
   return (
     // AuthContext.Provider bao bọc toàn bộ Routes để cung cấp role và loading state
-    <AuthContext.Provider value={{ role, loading, setRole }}>
+    <AuthContext.Provider value={{ role, loading, setRole, userId }}>
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={
@@ -266,6 +270,26 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/profile/change-password"
+          element={
+            <ProtectedRoute allowedRoles={[1, 2, 3]}>
+              <DefaultLayout>
+                <ProfilePage userId={userId} /> {/* Truyền userId vào ProfilePage */}
+              </DefaultLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/forgot-password" element={
+        <PublicRoute>
+          <ForgotPasswordPage />
+        </PublicRoute>
+        } />
+        <Route path="/reset-password" element={
+          <PublicRoute>
+            <ResetPasswordPage />
+          </PublicRoute>
+        } />
         <Route
           path="/admin"
           element={

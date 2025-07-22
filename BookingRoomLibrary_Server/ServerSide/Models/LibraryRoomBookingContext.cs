@@ -148,7 +148,7 @@ public partial class LibraryRoomBookingContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK__OtpCodes__3214EC07450C3372");
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
-            entity.Property(e => e.Code).HasMaxLength(10);
+            entity.Property(e => e.Code).HasMaxLength(100);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
             entity.Property(e => e.Username).HasMaxLength(255);
         });

@@ -97,7 +97,42 @@ namespace ServerSide.Controllers
             await _emailService.SendOtpEmail(decodedUsername, otp);
             return Ok("OTP sent");
         }
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDTO dto)
+        {
+            Console.WriteLine("[DEBUG] DTO nhận được:");
+            Console.WriteLine($"Email: {dto.Email}");
 
+            try
+            {
+                await _authService.ForgotPasswordAsync(dto.Email);
+                return Ok("Reset password email sent.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO dto)
+        {
+            try
+            {
+                Console.WriteLine($"[DEBUG] DTO nhận được:");
+                Console.WriteLine($"Token: {dto.Token}");
+                Console.WriteLine($"NewPassword: {dto.NewPassword}");
+                Console.WriteLine($"ConfirmPassword: {dto.ConfirmPassword}");
+
+                await _authService.ResetPasswordAsync(dto);
+                return Ok("Password reset successful.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] {ex.Message}");
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }
 

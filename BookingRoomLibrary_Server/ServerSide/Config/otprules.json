@@ -1,0 +1,5 @@
+{
+  "OtpRules": {
+    "TimeExpiredResetPasswordMinutes": 2
+  }
+}
