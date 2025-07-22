@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ServerSide.Constants;
 using ServerSide.DTOs.Booking;
@@ -236,7 +236,16 @@ namespace ServerSide.Services
         {
             var booking = repository.GetBookingById(id);
             if (booking == null) return;
+            var slot = slotService.GetById(booking.SlotId);
+            if (slot == null) return;
+            var bookingDate = booking.BookingDate;
+            var slotStartTime = slot.FromTime;
             booking.Status = (byte)BookingRoomStatus.Canceled;
+            var bookingStartDateTime = bookingDate.ToDateTime(slotStartTime);
+            if ((bookingStartDateTime - DateTime.Now).TotalHours < _rules.CancelTimeInterval)
+            {
+                throw new BookingPolicyViolationException($"You just can cancel your booking before at least {_rules.CancelTimeInterval}.");
+            }
             repository.UpdateBooking(booking);
         }
     }

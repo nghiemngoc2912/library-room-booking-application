@@ -13,5 +13,6 @@
         public int TimeStart { get; set; }
         public int TimeEnd { get; set; }
         public int TimeJobInterval { get; set; }
+        public int CancelTimeInterval { get; set;}
     }
 }
