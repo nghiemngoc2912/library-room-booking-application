@@ -97,6 +97,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRouting();
 
 // Order matters: UseCors before UseSession and UseAuthorization
 app.UseCors("FrontendPolicy");
