@@ -1,5 +1,6 @@
-﻿using Glimpse.Core.Extensibility;
+using Glimpse.Core.Extensibility;
 using Microsoft.EntityFrameworkCore;
+using ServerSide.Constants;
 using ServerSide.DTOs.Admin;
 using ServerSide.DTOs.Rating;
 using ServerSide.Models;
@@ -209,7 +210,7 @@ namespace ServerSide.Repositories
 
             return context.Bookings
                 .Include(b => b.Slot)
-                .Where(b => b.Status == 0 && b.CheckInAt == null)
+                .Where(b => b.Status == (byte)BookingRoomStatus.Booked && b.CheckInAt == null)
                 .AsEnumerable() // Chuyển sang client-side LINQ
                 .Where(b =>
                     b.BookingDate.ToDateTime(b.Slot.FromTime).AddMinutes(15) < now
