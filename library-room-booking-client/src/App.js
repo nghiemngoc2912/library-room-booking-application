@@ -36,10 +36,7 @@ import StudentInfoPage from './Pages/report/StudentInfoPage';
 import HistoryReportPage from './Pages/report/HistoryReportPage';
 import ReportTypeDetailsPage from './Pages/report/ReportTypeDetailsPage';
 
-// Không cần import HomeLayoutWrapper nữa
-
-// Tạo Auth Context để chia sẻ role và loading state
-// Export hook useAuth để các component con có thể dễ dàng sử dụng
+// Tạo Auth Context
 const AuthContext = createContext(null);
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -103,7 +100,6 @@ const App = () => {
       }
     };
 
-    // Chỉ gọi API nếu role là null, có token, và không ở trang login
     if (role === null && localStorage.getItem('authToken') && location.pathname !== '/login') {
       console.log('Fetching current user for path:', location.pathname);
       fetchCurrentUser();
@@ -113,7 +109,6 @@ const App = () => {
     }
   }, [location.pathname]);
 
-   // Component ProtectedRoute để bảo vệ các tuyến đường dựa trên vai trò
   const ProtectedRoute = ({ children, allowedRoles }) => {
     console.log('ProtectedRoute - Role:', role, 'Allowed:', allowedRoles, 'Path:', location.pathname);
     if (loading) return <div>Loading...</div>;
@@ -125,10 +120,9 @@ const App = () => {
       console.log('Redirect to login: role not allowed');
       return <Navigate to="/login" replace />;
     }
-    return children; 
+    return children;
   };
 
-// Hàm trợ giúp để chọn layout dựa trên role
   const getHomeLayout = () => {
     switch (role) {
       case 1:
@@ -136,7 +130,7 @@ const App = () => {
       case 2:
         return <LibrarianLayout><Home /></LibrarianLayout>;
       case 3:
-        return <AdminLayout><Home /></AdminLayout>;
+        return <AdminLayout><AdminDashboard /></AdminLayout>;
       default:
         console.log('Redirect to login: invalid role for home');
         return <Navigate to="/login" replace />;
@@ -151,17 +145,17 @@ const App = () => {
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
 
-        {/* Home by role */}
         <Route path="/home" element={
           <ProtectedRoute allowedRoles={[1, 2, 3]}>
             {getHomeLayout()}
           </ProtectedRoute>
         } />
 
-        {/* Student */}
         <Route path="/booking" element={
-          <ProtectedRoute allowedRoles={[1]}>
-            <DefaultLayout><RoomBooking /></DefaultLayout>
+          <ProtectedRoute allowedRoles={[1, 2]}>
+            <DefaultLayout>
+              <RoomBooking role={role} />
+            </DefaultLayout>
           </ProtectedRoute>
         } />
         <Route path="/news" element={
@@ -190,7 +184,6 @@ const App = () => {
           </ProtectedRoute>
         } />
 
-        {/* Librarian */}
         <Route path="/room_management" element={
           <ProtectedRoute allowedRoles={[2]}>
             <LibrarianLayout><ListRoom /></LibrarianLayout>
@@ -252,7 +245,6 @@ const App = () => {
           </ProtectedRoute>
         } />
 
-        {/* Admin */}
         <Route path="/admin" element={
           <ProtectedRoute allowedRoles={[3]}>
             <AdminLayout><AdminDashboard /></AdminLayout>
@@ -279,7 +271,6 @@ const App = () => {
           </ProtectedRoute>
         } />
 
-        {/* Shared */}
         <Route path="/booking/detail/:id" element={
           <ProtectedRoute allowedRoles={[1, 2]}>
             <DefaultLayout><BookingDetailPage /></DefaultLayout>
@@ -291,7 +282,6 @@ const App = () => {
           </ProtectedRoute>
         } />
 
-        {/* Catch-all */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </AuthContext.Provider>

@@ -7,41 +7,41 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { Link } from 'react-router-dom';
-
 import { fetchSlots } from '../../api/SlotAPI';
 import { fetchRooms } from '../../api/RoomAPI';
 import { fetchBookingsByDateAndStatus } from '../../api/BookingAPI';
+import { useAuth } from '../../App';
 
-export default function BookingTable({ date = '2025-06-17', status = 0}) {
+export default function BookingTable({ date = '2025-06-17', status = 0 }) {
   const [slots, setSlots] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [bookings, setBookings] = useState([]);
+  const { role } = useAuth();
 
   const today = new Date().toISOString().split('T')[0];
   const isPastDate = date < today;
 
   useEffect(() => {
-    // Luôn fetch slots và rooms
     Promise.all([fetchSlots(), fetchRooms()])
       .then(([slotsData, roomsData]) => {
         setSlots(slotsData);
         setRooms(roomsData);
       })
       .catch(err => console.error('Lỗi khi tải slots hoặc rooms:', err));
-  if (!isPastDate) {
+    if (!isPastDate) {
       fetchBookingsByDateAndStatus(date, status)
         .then(setBookings)
         .catch(err => console.error('Lỗi khi tải bookings:', err));
     } else {
-      // Nếu ngày đã qua thì không fetch booking, reset bookings
       setBookings([]);
     }
   }, [date, status, isPastDate]);
 
   const getBooking = (roomId, slotId) => {
-  return bookings.find(b => b.roomId === roomId && b.slotId === slotId);
-};
-return (
+    return bookings.find(b => b.roomId === roomId && b.slotId === slotId);
+  };
+
+  return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="booking table">
         <TableHead>
@@ -60,36 +60,33 @@ return (
               <TableCell component="th" scope="row">
                 {room.roomName}
               </TableCell>
-
               {slots.map((slot) => {
                 const isRoomInactive = room.status === 0;
-                              
                 const booking = getBooking(room.id, slot.id);
                 const cellText = isRoomInactive
                   ? '-'
                   : booking
-                  ? (
+                  ? (role === 2 ? (
                       <Link
                         to={`/booking/detail/${booking.id}`}
                         style={{ fontWeight: 'bold', textDecoration: 'underline', color: 'red' }}
                       >
                         Đã đặt
                       </Link>
-                    )
-                  : (
+                    ) : 'Đã đặt')
+                  : (role === 1 ? (
                       <Link
                         to={`/booking?roomId=${room.id}&slotId=${slot.id}&date=${date}`}
                         style={{ fontWeight: 'bold', textDecoration: 'underline' }}
                       >
                         +
                       </Link>
-                    );
+                    ) : null);
                 const bgColor = isRoomInactive
-                  ? '#e0e0e0' // xám
+                  ? '#e0e0e0'
                   : booking
-                  ? '#f8d7da' // đỏ nhạt
-                  : '#d4edda'; // xanh nhạt
-
+                  ? '#f8d7da'
+                  : '#d4edda';
                 const textColor = isRoomInactive
                   ? '#6c757d'
                   : booking
