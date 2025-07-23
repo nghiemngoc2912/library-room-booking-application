@@ -4,10 +4,12 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>1e571c9d-9336-48a8-b7be-72545acdd2fd</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Glimpse.AutoMapper" Version="1.0.2" />
+    <PackageReference Include="MailKit" Version="4.13.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.16" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.16">
       <PrivateAssets>all</PrivateAssets>
@@ -24,7 +26,6 @@
 
   <ItemGroup>
     <Folder Include="Mappers\" />
-    <Folder Include="Helpers\" />
   </ItemGroup>
 
 </Project>

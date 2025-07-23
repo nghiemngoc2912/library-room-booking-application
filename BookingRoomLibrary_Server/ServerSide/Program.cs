@@ -1,7 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ServerSide.Constants;
+using ServerSide.DTOs;
+using ServerSide.Helpers;
 using ServerSide.Models;
 using ServerSide.Repositories;
 using ServerSide.Services;
+using ServerSide.Validations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,22 +30,14 @@ builder.Services.AddSession(options =>
     options.Cookie.SameSite = SameSiteMode.None; // ← ADD THIS
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // ← ADD THIS if using HTTPS
 });
-
-// Session
-builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-    options.Cookie.SameSite = SameSiteMode.None;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-});
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
+
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // DB context
 builder.Services.AddDbContext<LibraryRoomBookingContext>(options =>
@@ -54,12 +50,15 @@ builder.Services.AddScoped<ISlotRepository, SlotRepository>();
 builder.Services.AddScoped<INewsRepository, NewsRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
+
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IRuleRepository, RuleRepository>();
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+builder.Services.AddScoped<IRatingRepository, RatingRepository>();
+
 
 // DI Services
 builder.Services.AddScoped<IBookingService, BookingService>();
@@ -68,11 +67,24 @@ builder.Services.AddScoped<ISlotService, SlotService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<INewsService, NewsService>();
 builder.Services.AddScoped<IUserService, UserService>();
+
+
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IRuleService, RuleService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
+builder.Services.AddScoped<IRatingService, RatingService>();
+
+builder.Services.AddScoped<CreateBookingValidation>();
+builder.Services.AddHostedService<BookingCleanupJob>();
+
+var bookingRulesConfig = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("Config/bookingrules.json", optional: false, reloadOnChange: true)
+    .Build();
+
+builder.Services.Configure<BookingRules>(bookingRulesConfig);
 
 
 var app = builder.Build();

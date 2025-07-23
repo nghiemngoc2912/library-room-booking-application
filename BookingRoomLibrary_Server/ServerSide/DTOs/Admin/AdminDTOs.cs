@@ -8,13 +8,20 @@
 
     public class RatingStatisticsDTO
     {
-        // Represents the number of ratings for each value (e.g., 1 to 5 stars)
-        public List<int> Ratings { get; set; } = new();
+        public List<int> Ratings { get; set; }
+    }
+
+    public class RatingGroupResult
+    {
+        public int RatingValue { get; set; }
+        public int Count { get; set; }
     }
 
     public class UsageStatisticsDTO
     {
-        public List<string> Dates { get; set; } = new();
-        public List<double> Durations { get; set; } = new(); // Durations in hours
+        public List<string> Dates { get; set; }
+        public List<double> Durations { get; set; }
     }
+
+
 }

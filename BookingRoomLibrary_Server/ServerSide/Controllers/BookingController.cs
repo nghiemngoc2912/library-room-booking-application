@@ -3,6 +3,8 @@ using ServerSide.DTOs.Booking;
 using ServerSide.Exceptions;
 using ServerSide.Models;
 using ServerSide.Services;
+using ServerSide.DTOs.Rating;
+
 
 namespace ServerSide.Controllers
 {
@@ -11,10 +13,12 @@ namespace ServerSide.Controllers
     public class BookingController : ControllerBase
     {
         private readonly IBookingService _bookingService;
+        private readonly IRatingService _ratingService;
 
-        public BookingController(IBookingService bookingService)
+        public BookingController(IBookingService bookingService, IRatingService ratingService)
         {
             _bookingService = bookingService;
+            _ratingService = ratingService; 
         }
 
         [HttpGet("date/{date}/status/{status}")]
@@ -28,7 +32,21 @@ namespace ServerSide.Controllers
         {
             try
             {
-                _bookingService.CreateBooking(createBookingDTO);
+                //use session to retrieve booking user
+                var userId_raw = HttpContext.Session.GetString("UserId");
+                if (string.IsNullOrEmpty(userId_raw))
+                {
+                    return Unauthorized(new { message = "Not logged in" });
+                }
+                int userId = 0;
+                try
+                {
+                    userId=int.Parse(userId_raw);
+                }catch(Exception ex)
+                {
+                    return BadRequest(new { message = "Please check your login" });
+                }
+                _bookingService.CreateBooking(createBookingDTO,userId);
                 return Ok("Booking created successfully");
             }
             catch (BookingPolicyViolationException ex)
@@ -75,7 +93,7 @@ namespace ServerSide.Controllers
             {
                 message,
                 bookingId = booking!.Id,
-                checkoutTime = booking.CheckOutAt // Changed to checkoutTime
+                checkoutTime = booking.CheckOutAt 
             });
         }
 
@@ -93,7 +111,7 @@ namespace ServerSide.Controllers
         {
             try
             {
-                await _bookingService.AddRatingAsync(bookingId, dto);
+                await _ratingService.AddRatingAsync(bookingId, dto);
                 return Ok(new { message = "Rating submitted." });
             }
             catch (Exception ex)
@@ -103,6 +121,21 @@ namespace ServerSide.Controllers
                     error = ex.InnerException?.Message ?? ex.Message
                 });
             }
+        }
+        [HttpPatch("cancel/{id}")]
+        public IActionResult CancelBooking(int id) {
+            try {
+                _bookingService.CancelBooking(id);
+                return Ok("Cancel Booking Successfully");
+            }
+            catch (BookingPolicyViolationException ex)
+            {
+                return BadRequest(ex.Message);
+            }catch(Exception ex)
+            {
+                return StatusCode(500, "Something when wrong: "+ex.Message);
+            }
+            
         }
     }
 }

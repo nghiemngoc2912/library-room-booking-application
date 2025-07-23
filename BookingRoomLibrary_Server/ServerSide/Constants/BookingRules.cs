@@ -2,12 +2,17 @@
 {
     public class BookingRules
     {
-        public const int MaxIntervalDayToBook = 7;
-        public const int MaxWeeklyBookingDays = 4;
-        public const int MaxDailyBookingsPerStudent = 1;
-        public const int MinReputationToBook = 50;
-        public const int MinCapacityPercentage = 80;
-        public const int MaxTimeToCheckin = 15;
-        public const int MaxTimeToCheckout = 15;
+        public int MaxIntervalDayToBook { get; set; }
+        public int MaxWeeklyBookingDays { get; set; }
+        public int MaxDailyBookingsPerStudent { get; set; }
+        public int MinReputationToBook { get; set; }
+        public int MinCapacityPercentage { get; set; }
+        public int MaxTimeToCheckin { get; set; }
+        public int MaxTimeToCheckout { get; set; }
+        public int SubstractReputation { get; set; }
+        public int TimeStart { get; set; }
+        public int TimeEnd { get; set; }
+        public int TimeJobInterval { get; set; }
+        public int CancelTimeInterval { get; set;}
     }
 }

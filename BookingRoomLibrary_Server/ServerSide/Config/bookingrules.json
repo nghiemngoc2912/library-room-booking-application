@@ -1,0 +1,14 @@
+{
+  "MaxIntervalDayToBook": 7,
+  "MaxWeeklyBookingDays": 4,
+  "MaxDailyBookingsPerStudent": 1,
+  "MinReputationToBook": 50,
+  "MinCapacityPercentage": 80,
+  "MaxTimeToCheckin": 15,
+  "MaxTimeToCheckout": 15,
+  "SubstractReputation": -10,
+  "TimeStart": 9,
+  "TimeEnd": 18,
+  "TimeJobInterval": 5,
+  "CancelTimeInterval": 2
+}

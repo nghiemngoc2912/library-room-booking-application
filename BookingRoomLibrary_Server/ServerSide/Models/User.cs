@@ -8,7 +8,7 @@ public partial class User
     public int Id { get; set; }
 
     public string FullName { get; set; } = null!;
-    public string Code { get; set; }
+
     public DateOnly? Dob { get; set; }
 
     public int AccountId { get; set; }
@@ -16,6 +16,8 @@ public partial class User
     public string? Email { get; set; }
 
     public int? Reputation { get; set; }
+
+    public string? Code { get; set; }
 
     public virtual Account Account { get; set; } = null!;
 

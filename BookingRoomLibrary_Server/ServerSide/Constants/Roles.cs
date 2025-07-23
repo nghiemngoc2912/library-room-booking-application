@@ -1,9 +1,9 @@
 ﻿namespace ServerSide.Constants
 {
-    public class Roles
+    enum Roles
     {
-        public const int Student = 1;
-        public const int Staff = 2;
-        public const int Admin = 3;
+        Student = 1,
+        Staff = 2,
+        Admin = 3
     }
 }

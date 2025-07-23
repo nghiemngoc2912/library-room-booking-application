@@ -12,10 +12,12 @@ namespace ServerSide.Controllers
     public class AuthController : Controller
     {
         private readonly IAuthService _authService;
+        private IEmailService _emailService;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService, IEmailService emailService)
         {
             _authService = authService;
+            _emailService = emailService;
         }
 
         [HttpPost("login")]
@@ -68,6 +70,7 @@ namespace ServerSide.Controllers
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
+            Response.Cookies.Delete(".AspNetCore.Session"); 
             return Ok(new { message = "Logged out successfully" });
         }
 
@@ -81,5 +84,20 @@ namespace ServerSide.Controllers
                 return Convert.ToBase64String(hash);
             }
         }
+
+        [HttpPost("send-otp")]
+        public async Task<IActionResult> SendOtp([FromQuery] string username)
+        {
+            string decodedUsername = Uri.UnescapeDataString(username); // 👈 Giải mã %40 thành @
+
+            string otp = new Random().Next(100000, 999999).ToString();
+
+            // Save OTP to DB nếu cần...
+
+            await _emailService.SendOtpEmail(decodedUsername, otp);
+            return Ok("OTP sent");
+        }
+
     }
 }
+
