@@ -1,14 +1,14 @@
 import React, { useState, useContext } from 'react'; // Thêm useContext
 import { useNavigate } from 'react-router-dom';
 import { login } from '../../api/AuthAPI';
-import { useAuth } from '../../App'; // Import useAuth từ App.js
+import { useAuth } from '../../App';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
-  const { setRole } = useAuth(); // Lấy setRole từ AuthContext
+  const { setRole } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,15 +16,25 @@ function Login() {
 
     try {
       const response = await login(email, password);
-      const role = response.data.role;
-
+      const { role, token, id } = response.data;
       if (role != null) {
         setRole(role); // Cập nhật role ngay lập tức
+        const parsedRole = parseInt(role, 10);
+        setRole(parsedRole);
+        localStorage.setItem('role', parsedRole);
+        if (token) {
+          localStorage.setItem('authToken', token);
+        }
+        if (id) {
+          localStorage.setItem('userId', id);
+        }
+        console.log('Login successful, role:', parsedRole);
         navigate('/home', { replace: true }); // Sử dụng replace để tránh thêm lịch sử trình duyệt
       } else {
         setErrorMsg('Role không hợp lệ. Vui lòng liên hệ quản trị viên.');
       }
     } catch (err) {
+      console.error('Login error:', err);
       setErrorMsg('Tài khoản hoặc mật khẩu không đúng.');
     }
   };
