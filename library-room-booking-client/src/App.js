@@ -1,6 +1,5 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import './App.css';
 
 // Import các Layout cần thiết
 import DefaultLayout from './layouts/DefaultLayout';
@@ -8,32 +7,39 @@ import LibrarianLayout from './layouts/LibrarianLayout';
 import AdminLayout from './layouts/AdminLayout';
 
 // Import các Page Components
-import Login from './Pages/auth/Login';
-import Home from './Pages/roomBooking/Home';
-import RoomBooking from './Pages/roomBooking/RoomBooking';
-import NewsPage from './Pages/roomBooking/NewsPage';
-import BookingDetailPage from './Pages/roomBooking/BookingDetail';
-import StudentList from './Pages/user/StudentList';
-import AdminDashboard from './Pages/admin/AdminDashboard';
-import ListRoom from './Pages/roomManagement/ListRoom';
-import CreateRoom from './Pages/roomManagement/CreateRoom';
-import UpdateRoom from './Pages/roomManagement/UpdateRoom';
-import ListSlot from './Pages/slotManagement/ListSlot';
-import CreateSlot from './Pages/slotManagement/CreateSlot';
-import UpdateSlot from './Pages/slotManagement/UpdateSlot';
-import RequestRoom from './Pages/admin/RequestRoom';
-import DetailRequestRoom from './Pages/admin/DetailRequestRoom';
-import SlotRequest from './Pages/admin/SlotRequest';
-import DetailSlotRequest from './Pages/admin/DetailSlotRequest';
-import RulesPage from './Pages/rule/RulesPage';
-import AddRulePage from './Pages/rule/AddRulePage';
-import EditRulePage from './Pages/rule/EditRulePage';
-import ReportsPage from './Pages/report/ReportsPage';
-import AddReportPage from './Pages/report/AddReportPage';
-import ReportDetailPage from './Pages/report/ReportDetailPage';
-import StudentInfoPage from './Pages/report/StudentInfoPage';
-import HistoryReportPage from './Pages/report/HistoryReportPage';
-import ReportTypeDetailsPage from './Pages/report/ReportTypeDetailsPage';
+import RoomBooking from './pages/roomBooking/RoomBooking';
+import Home from './pages/roomBooking/Home'; 
+import ListRoom from './pages/roomManagement/ListRoom'; 
+import UpdateRoom from './pages/roomManagement/UpdateRoom';
+import CreateRoom from './pages/roomManagement/CreateRoom';
+import ListSlot from './pages/slotManagement/ListSlot';
+import CreateSlot from './pages/slotManagement/CreateSlot';
+import UpdateSlot from './pages/slotManagement/UpdateSlot';
+import RequestRoom from './pages/admin/RequestRoom';
+import DetailRequestRoom from './pages/admin/DetailRequestRoom';
+import SlotRequest from './pages/admin/SlotRequest';
+import DetailSlotRequest from './pages/admin/DetailSlotRequest';
+import Login from './pages/auth/Login';
+import NewsPage from './pages/roomBooking/NewsPage';
+import ProfilePage from './pages/student/ProfilePage';
+import BookingDetailPage from './pages/roomBooking/BookingDetail';
+import StudentList from './pages/user/StudentList';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import ResetPasswordPage from './pages/auth/ResetPasswordPage';
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
+
+import RulesPage from './pages/rule/RulesPage';
+import ReportsPage from './pages/report/ReportsPage';
+import AddRulePage from './pages/rule/AddRulePage';
+import EditRulePage from './pages/rule/EditRulePage';
+import AddReportPage from './pages/report/AddReportPage';
+import ReportDetailPage from './pages/report/ReportDetailPage';
+import StudentInfoPage from './pages/report/StudentInfoPage';
+import HistoryReportPage from './pages/report/HistoryReportPage';
+import ReportTypeDetailsPage from './pages/report/ReportTypeDetailsPage';
+import Unauthorized from './pages/auth/Unauthorized';
+import './App.css';
+
 
 // Tạo Auth Context
 const AuthContext = createContext(null);

@@ -16,9 +16,9 @@ import AdbIcon from '@mui/icons-material/Adb';
 import Badge from '@mui/material/Badge';
 import { useAuth } from '../App';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../App';
 
 const pages = [
+  { label: 'Home', path: '/home', roles: [1, 2, 3] },
   { label: 'Booking Room', path: '/booking', roles: [1, 2, 3] },
   { label: 'News', path: '/news', roles: [1, 2] },
   { label: 'Rules', path: '/rules', roles: [2] },
