@@ -6,6 +6,13 @@ export async function fetchStudents(keyword = '', page = 1) {
   return res.json();
 }
 
+export const getStudentList = (keyword = '', page = 1) => {
+  return axios.get('/api/user/students', {
+    params: { keyword, page },
+    withCredentials: true
+  });
+};
+
 export const getUserReputation = async (userId) => {
   const res = await axios.get(`https://localhost:7238/api/user/${userId}/reputation`);
   return res.data;

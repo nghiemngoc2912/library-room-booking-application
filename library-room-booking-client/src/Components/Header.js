@@ -76,6 +76,9 @@ function Header() {
     if (page === 'Home') {
       navigate('/home');
     }
+    if (page === 'News') {
+      navigate('/student/news');
+    }
     handleCloseNavMenu();
   };
 

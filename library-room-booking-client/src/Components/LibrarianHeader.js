@@ -18,7 +18,7 @@ import { useAuth } from '../App'
 import { useNavigate } from 'react-router-dom';
 
 const pages = ['Home', 'Room', 'Slot', 'Students', 'Report', 'Setting', 'News', 'Rules'];
-const settings = ['Profile','Logout'];
+const settings = ['Profile', 'Logout'];
 
 function LibrarianHeader() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -61,15 +61,11 @@ function LibrarianHeader() {
 
   const handlePageNavigation = (page) => {
     handleCloseNavMenu();
-    if (page === 'Home') {
-      navigate('/home');
-    } else if (page === 'Room') {
-      navigate('/room_management');
-    } else if (page === 'Slot') {
-      navigate('/slot_management');
-    } else {
-      navigate(`/${page.toLowerCase()}`);
-    }
+    if (page === 'Home') navigate('/home');
+    else if (page === 'Room') navigate('/room_management');
+    else if (page === 'Slot') navigate('/slot_management');
+    else if (page === 'Students') navigate('/students'); // THÊM DÒNG NÀY
+    else navigate(`/${page.toLowerCase()}`);
   };
 
   return (

@@ -8,8 +8,8 @@ import AdminLayout from './layouts/AdminLayout';
 
 // Import các Page Components
 import RoomBooking from './pages/roomBooking/RoomBooking';
-import Home from './pages/roomBooking/Home'; 
-import ListRoom from './pages/roomManagement/ListRoom'; 
+import Home from './pages/roomBooking/Home';
+import ListRoom from './pages/roomManagement/ListRoom';
 import UpdateRoom from './pages/roomManagement/UpdateRoom';
 import CreateRoom from './pages/roomManagement/CreateRoom';
 import ListSlot from './pages/slotManagement/ListSlot';
@@ -24,7 +24,6 @@ import Unauthorized from './pages/auth/Unauthorized'
 import NewsPage from './pages/roomBooking/NewsPage';
 import ProfilePage from './pages/student/ProfilePage';
 import BookingDetailPage from './pages/roomBooking/BookingDetail';
-import StudentList from './pages/user/StudentList';
 import AdminDashboard from './pages/admin/AdminDashboard';
 
 import { BrowserRouter as Router, Link, useNavigate } from 'react-router-dom';
@@ -37,6 +36,9 @@ import ReportDetailPage from './pages/report/ReportDetailPage';
 import StudentInfoPage from './pages/report/StudentInfoPage';
 import HistoryReportPage from './pages/report/HistoryReportPage';
 import ReportTypeDetailsPage from './pages/report/ReportTypeDetailsPage';
+import StudentListPage from './pages/student/StudentListPage';
+import StudentNewsPage from './pages/student/StudentNewsPage';
+
 import './App.css';
 
 // Không cần import HomeLayoutWrapper nữa
@@ -163,7 +165,7 @@ const App = () => {
           path="/room_management"
           element={
             <ProtectedRoute allowedRoles={[2]}>
-              <LibrarianLayout><ListRoom/></LibrarianLayout>
+              <LibrarianLayout><ListRoom /></LibrarianLayout>
             </ProtectedRoute>
           }
         />
@@ -276,9 +278,24 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/students"
+          element={
+            <ProtectedRoute allowedRoles={[2]}>
+              <LibrarianLayout><StudentListPage /></LibrarianLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/news"
+          element={
+            <ProtectedRoute allowedRoles={[1]}>
+              <DefaultLayout><StudentNewsPage /></DefaultLayout>
+            </ProtectedRoute>
+          }
+        />
 
         <Route path="/booking/detail/:id" element={<DefaultLayout><BookingDetailPage role={role} /></DefaultLayout>} />
-        <Route path="/user/students" element={<DefaultLayout><StudentList /></DefaultLayout>} />
 
         <Route path="/rules" element={<RulesPage />} />
         <Route path="/reports" element={<ReportsPage />} />
