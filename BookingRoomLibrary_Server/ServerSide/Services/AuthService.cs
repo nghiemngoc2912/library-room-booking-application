@@ -5,6 +5,7 @@ using ServerSide.Repositories;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Options;
+using ServerSide.Constants;
 
 namespace ServerSide.Services
 {
@@ -125,7 +126,7 @@ namespace ServerSide.Services
             if (dto.NewPassword != dto.ConfirmPassword)
                 throw new ArgumentException("Passwords do not match");
 
-            var otp = await _otpRepository.GetValidOtpAsync(dto.Token, 1);
+            var otp = await _otpRepository.GetValidOtpAsync(dto.Token, (int)OtpType.ForgotPassword);
             if (otp == null) throw new Exception("Invalid or expired token");
 
             var account = _authRepository.GetAccountByUsername(otp.Username);

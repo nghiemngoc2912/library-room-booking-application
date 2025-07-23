@@ -1,6 +1,6 @@
 ﻿namespace ServerSide.Constants
 {
-    public enum OtpType
+    enum OtpType
     {
         Register = 0,
         ForgotPassword = 1,
