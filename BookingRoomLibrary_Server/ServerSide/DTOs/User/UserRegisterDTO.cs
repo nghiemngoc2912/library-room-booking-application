@@ -10,13 +10,13 @@ namespace ServerSide.DTOs.User
         public string FullName { get; set; } = null!;
         public DateOnly? Dob { get; set; }
         public string? Email { get; set; }
-        public Account ToAccount(string passwordHash)
+        public Account ToAccount(string passwordHash, byte role)
         {
             return new Account
             {
                 Username = Username,
                 PasswordHash = passwordHash,
-                Role = (byte)Roles.Student,       // 1 = Student
+                Role = (byte) role,       // 1 = Student
                 Status = 1      // 1 = Active
             };
         }

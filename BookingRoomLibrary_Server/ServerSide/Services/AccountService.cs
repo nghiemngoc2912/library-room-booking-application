@@ -18,7 +18,7 @@ namespace ServerSide.Services
             _userRepo = userRepo;
         }
 
-        async Task IAccountService.RegisterAsync(UserRegisterDTO dto)
+        async Task IAccountService.RegisterAsync(UserRegisterDTO dto,byte role)
         {
             if (string.IsNullOrWhiteSpace(dto.Username) || dto.Username.Length < 4)
                 throw new Exception("Username must have at least 4 chars");
@@ -57,7 +57,7 @@ namespace ServerSide.Services
 
             var passwordHash = ComputeHash(dto.Password);
 
-            var account = dto.ToAccount(passwordHash);
+            var account = dto.ToAccount(passwordHash, role);
             await _accountRepo.AddAsync(account);
             await _accountRepo.SaveChangesAsync();
 
@@ -77,6 +77,6 @@ namespace ServerSide.Services
     }
     public interface IAccountService
     {
-        Task RegisterAsync(UserRegisterDTO dto);
+        Task RegisterAsync(UserRegisterDTO dto, byte role);
     }
 }

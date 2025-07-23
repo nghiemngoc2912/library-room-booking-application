@@ -17,10 +17,12 @@ namespace ServerSide.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService userService;
+        private readonly IAccountService _accountService;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, IAccountService accountService)
         {
             this.userService = userService;
+            _accountService = accountService;
         }
 
         // GET: api/user/search?code=SE123
@@ -61,6 +63,19 @@ namespace ServerSide.Controllers
 
             return Ok(updatedUser);
         }
-        
+        [RoleFilter((int)Roles.Admin)]
+        [HttpPut("create")]
+        public async Task<IActionResult> CreateStaff(UserRegisterDTO createUserDTO)
+        {
+            try
+            {
+                await _accountService.RegisterAsync(createUserDTO,(byte)Roles.Staff);
+                return Ok("Register successfully");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

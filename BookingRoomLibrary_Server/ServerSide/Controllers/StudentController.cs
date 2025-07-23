@@ -46,7 +46,7 @@ namespace ServerSide.Controllers
         {
             try
             {
-                await _accountService.RegisterAsync(createUserDTO);
+                await _accountService.RegisterAsync(createUserDTO,(byte)Roles.Student);
                 return Ok("Register successfully");
             }
             catch (Exception ex)
