@@ -44,12 +44,14 @@ namespace ServerSide.Controllers
             var result = userService.GetAllStudents(keyword, page, Pagination.DefaultPageSize);
             return Ok(result);
         }
+        [RoleFilter((int)Roles.Admin)]
         [HttpGet("staffs")]
         public IActionResult GetStaffLists([FromQuery] string? keyword, [FromQuery] int page = 1)
         {
             var result = userService.GetAllStaffs(keyword, page, Pagination.DefaultPageSize);
             return Ok(result);
         }
+        [RoleFilter((int)Roles.Admin)]
         [HttpPatch("{id}/status")]
         public IActionResult UpdateUserStatus(int id, [FromQuery] byte status)
         {
@@ -59,5 +61,6 @@ namespace ServerSide.Controllers
 
             return Ok(updatedUser);
         }
+        
     }
 }

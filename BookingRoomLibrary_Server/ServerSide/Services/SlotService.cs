@@ -2,6 +2,7 @@
 using ServerSide.DTOs;
 using ServerSide.Models;
 using ServerSide.Repositories;
+using ServerSide.Constants;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,19 +38,22 @@ namespace ServerSide.Services
         {
             var slots = slotRepository.GetAll().AsQueryable();
 
+            // Tìm theo Order nếu search là số nguyên
             if (!string.IsNullOrWhiteSpace(search) && int.TryParse(search, out int order))
             {
                 slots = slots.Where(s => s.Order == order);
             }
 
+            // Lọc theo status (nếu có)
             if (status.HasValue)
             {
-                byte statusByte = status.Value switch
+                // Kiểm tra nếu status là một giá trị hợp lệ trong SlotStatus enum
+                if (!Enum.IsDefined(typeof(SlotStatus), (byte)status.Value))
                 {
-                    -2 => 254,
-                    -1 => 255,
-                    _ => (byte)status.Value
-                };
+                    throw new ArgumentException("Trạng thái không hợp lệ. Chỉ chấp nhận: Pending (0), Active (1), Inactive (3).");
+                }
+
+                byte statusByte = (byte)status.Value;
                 slots = slots.Where(s => s.Status == statusByte);
             }
 
@@ -79,9 +83,11 @@ namespace ServerSide.Services
                 throw new ArgumentException("FromTime phải nhỏ hơn ToTime.");
             }
 
-            if (!(slotDTO.Status == 0 || slotDTO.Status == 1 || slotDTO.Status == 254 || slotDTO.Status == 255))
+            // Check hợp lệ theo SlotStatus enum
+            if (!Enum.IsDefined(typeof(SlotStatus), (byte)slotDTO.Status))
             {
-                throw new ArgumentException("Trạng thái không hợp lệ. Giá trị hợp lệ: -2 (Maintenance), -1 (Inactive), 0 (Pending), 1 (Active).");
+                var validStatuses = string.Join(", ", Enum.GetValues(typeof(SlotStatus)).Cast<byte>());
+                throw new ArgumentException($"Trạng thái không hợp lệ. Giá trị hợp lệ: {validStatuses}.");
             }
 
             var slot = new Slot
@@ -89,11 +95,12 @@ namespace ServerSide.Services
                 Order = slotDTO.Order,
                 FromTime = fromTime,
                 ToTime = toTime,
-                Status = slotDTO.Status
+                Status = (byte)slotDTO.Status
             };
 
             return slotRepository.Create(slot);
         }
+
 
         public bool UpdateSlot(SlotDTO slotDTO)
         {
@@ -118,9 +125,11 @@ namespace ServerSide.Services
                 throw new ArgumentException("FromTime phải nhỏ hơn ToTime.");
             }
 
-            if (!(slotDTO.Status == 0 || slotDTO.Status == 1 || slotDTO.Status == 254 || slotDTO.Status == 255))
+            // Kiểm tra trạng thái hợp lệ
+            if (!Enum.IsDefined(typeof(SlotStatus), (byte)slotDTO.Status))
             {
-                throw new ArgumentException("Trạng thái không hợp lệ. Giá trị hợp lệ: -2 (Maintenance), -1 (Inactive), 0 (Pending), 1 (Active).");
+                var validStatuses = string.Join(", ", Enum.GetValues(typeof(SlotStatus)).Cast<byte>());
+                throw new ArgumentException($"Trạng thái không hợp lệ. Giá trị hợp lệ: {validStatuses}.");
             }
 
             var slot = slotRepository.GetById(slotDTO.Id);
@@ -132,38 +141,39 @@ namespace ServerSide.Services
             slot.Order = slotDTO.Order;
             slot.FromTime = fromTime;
             slot.ToTime = toTime;
-            slot.Status = slotDTO.Status;
+            slot.Status = (byte)slotDTO.Status;
 
             return slotRepository.Update(slot);
         }
 
+
         public bool DeactivateSlot(int id)
         {
             var slot = slotRepository.GetById(id);
-            if (slot == null || slot.Status != 1) // Only deactivate Active slots
+            if (slot == null || slot.Status != (byte)SlotStatus.Active) // only deactivate Active slots
             {
                 return false;
             }
 
-            slot.Status = 255; // Inactive
+            slot.Status = (byte)SlotStatus.Inactive;
             return slotRepository.Update(slot);
         }
 
         public bool ActivateSlot(int id)
         {
             var slot = slotRepository.GetById(id);
-            if (slot == null || slot.Status != 255) // Only activate Inactive slots
+            if (slot == null || slot.Status != (byte)SlotStatus.Inactive) // Only activate Inactive slots
             {
                 return false;
             }
 
-            slot.Status = 1; // Active
+            slot.Status = (byte)SlotStatus.Active; 
             return slotRepository.Update(slot);
         }
 
         public IEnumerable<SlotRequestDTO> GetPendingSlots(string search = null)
         {
-            var slots = slotRepository.GetAll().Where(s => s.Status == 0).AsQueryable();
+            var slots = slotRepository.GetAll().Where(s => s.Status == (byte)SlotStatus.Pending).AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(search))
             {
@@ -176,7 +186,7 @@ namespace ServerSide.Services
         public SlotRequestDTO GetPendingSlotById(int id)
         {
             var slot = slotRepository.GetById(id);
-            if (slot == null || slot.Status != 0)
+            if (slot == null || slot.Status != (byte)SlotStatus.Pending)
             {
                 return null;
             }
@@ -186,18 +196,18 @@ namespace ServerSide.Services
         public bool AcceptSlot(int id)
         {
             var slot = slotRepository.GetById(id);
-            if (slot == null || slot.Status != 0)
+            if (slot == null || slot.Status != (byte)SlotStatus.Pending)
             {
                 return false;
             }
-            slot.Status = 1; // Active
+            slot.Status = (byte)SlotStatus.Active; 
             return slotRepository.Update(slot);
         }
 
         public bool RejectSlot(int id)
         {
             var slot = slotRepository.GetById(id);
-            if (slot == null || slot.Status != 0)
+            if (slot == null || slot.Status != (byte)SlotStatus.Pending)
             {
                 return false;
             }

@@ -23,6 +23,8 @@ public partial class LibraryRoomBookingContext : DbContext
 
     public virtual DbSet<Notification> Notifications { get; set; }
 
+    public virtual DbSet<OtpCode> OtpCodes { get; set; }
+
     public virtual DbSet<Rating> Ratings { get; set; }
 
     public virtual DbSet<Report> Reports { get; set; }
@@ -36,13 +38,7 @@ public partial class LibraryRoomBookingContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        var builder = new ConfigurationBuilder();
-        builder.SetBasePath(Directory.GetCurrentDirectory());
-        builder.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-        var configuration = builder.Build();
-        optionsBuilder.UseSqlServer(configuration.GetConnectionString("MyCnn"));
-    }
+        => optionsBuilder.UseSqlServer("Name=ConnectionStrings:MyCnn");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -56,7 +52,7 @@ public partial class LibraryRoomBookingContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.PasswordHash).HasMaxLength(255);
-            entity.Property(e => e.Role).HasMaxLength(50);
+            entity.Property(e => e.Role).HasDefaultValue((byte)1);
             entity.Property(e => e.Status).HasDefaultValue((byte)1);
             entity.Property(e => e.Username).HasMaxLength(100);
         });
@@ -147,6 +143,16 @@ public partial class LibraryRoomBookingContext : DbContext
                 .HasConstraintName("FK__Notificat__UserI__5629CD9C");
         });
 
+        modelBuilder.Entity<OtpCode>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__OtpCodes__3214EC07450C3372");
+
+            entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+            entity.Property(e => e.Code).HasMaxLength(10);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.Username).HasMaxLength(255);
+        });
+
         modelBuilder.Entity<Rating>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Rating__3214EC272AEBF224");
@@ -216,7 +222,6 @@ public partial class LibraryRoomBookingContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.RoomName).HasMaxLength(100);
-            entity.Property(e => e.Status);
         });
 
         modelBuilder.Entity<Rule>(entity =>
@@ -246,7 +251,9 @@ public partial class LibraryRoomBookingContext : DbContext
             entity.ToTable("Slot");
 
             entity.Property(e => e.Id).HasColumnName("ID");
-            entity.Property(e => e.Status);
+            entity.Property(e => e.Status)
+                .HasDefaultValue((byte)1)
+                .HasColumnName("status");
         });
 
         modelBuilder.Entity<User>(entity =>
@@ -259,6 +266,7 @@ public partial class LibraryRoomBookingContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.AccountId).HasColumnName("AccountID");
+            entity.Property(e => e.Code).HasMaxLength(10);
             entity.Property(e => e.Email).HasMaxLength(255);
             entity.Property(e => e.FullName).HasMaxLength(255);
             entity.Property(e => e.Reputation).HasDefaultValue(0);

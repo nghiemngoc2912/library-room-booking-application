@@ -14,14 +14,16 @@ public partial class Booking
     public int RoomId { get; set; }
 
     public int SlotId { get; set; }
-    public string Reason { get; set; }
-    public byte Status { get; set; }
 
     public DateTime? CreatedDate { get; set; }
 
     public DateTime? CheckInAt { get; set; }
 
     public DateTime? CheckOutAt { get; set; }
+
+    public byte Status { get; set; }
+
+    public string? Reason { get; set; }
 
     public virtual User CreatedByNavigation { get; set; } = null!;
 

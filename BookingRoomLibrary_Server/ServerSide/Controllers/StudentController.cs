@@ -1,30 +1,33 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ServerSide.Constants;
 using ServerSide.DTOs.Student;
+using ServerSide.DTOs.User;
 using ServerSide.Filters;
 using ServerSide.Services;
 
 namespace ServerSide.Controllers
 {
-    [RoleFilter((int)Roles.Student, (int)Roles.Staff, (int)Roles.Admin)]
+    
     [Route("api/[controller]")]
     [ApiController]
     public class StudentController : ControllerBase
     {
         private readonly IStudentService _studentService;
+        private readonly IAccountService _accountService;
 
-        public StudentController(IStudentService studentService)
+        public StudentController(IStudentService studentService, IAccountService accountService)
         {
             _studentService = studentService ?? throw new ArgumentNullException(nameof(studentService));
+            _accountService = accountService;
         }
-
+        [RoleFilter((int)Roles.Staff)]
         [HttpGet("{userId}/related")]
         public async Task<IActionResult> GetRelatedStudents(int userId)
         {
             var students = await _studentService.GetRelatedStudentsAsync(userId);
             return Ok(students);
         }
-
+        [RoleFilter((int)Roles.Staff)]
         [HttpPost("{studentId}/subtract-reputation")]
         public async Task<IActionResult> SubtractReputation(int studentId, [FromBody] ReputationAdjustmentRequest request)
         {
@@ -32,6 +35,19 @@ namespace ServerSide.Controllers
             {
                 await _studentService.SubtractReputationAsync(studentId, request.Change, request.Reason);
                 return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPut("register")]
+        public async Task<IActionResult> Register(UserRegisterDTO createUserDTO)
+        {
+            try
+            {
+                await _accountService.RegisterAsync(createUserDTO);
+                return Ok("Register successfully");
             }
             catch (Exception ex)
             {

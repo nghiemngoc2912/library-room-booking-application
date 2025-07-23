@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ServerSide.Constants;
+using ServerSide.DTOs;
 using ServerSide.Helpers;
 using ServerSide.Middlewares;
 using ServerSide.Models;
@@ -34,6 +35,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
+
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // DB context
 builder.Services.AddDbContext<LibraryRoomBookingContext>(options =>
@@ -45,6 +50,7 @@ builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<ISlotRepository, SlotRepository>();
 builder.Services.AddScoped<INewsRepository, NewsRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
 
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
@@ -71,6 +77,7 @@ builder.Services.AddScoped<IRuleService, RuleService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IRatingService, RatingService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 
 builder.Services.AddScoped<CreateBookingValidation>();
 builder.Services.AddHostedService<BookingCleanupJob>();
@@ -81,7 +88,6 @@ var bookingRulesConfig = new ConfigurationBuilder()
     .Build();
 
 builder.Services.Configure<BookingRules>(bookingRulesConfig);
-
 
 var app = builder.Build();
 

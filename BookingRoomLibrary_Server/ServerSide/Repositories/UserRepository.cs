@@ -57,6 +57,12 @@ namespace ServerSide.Repositories
             context.Accounts.Update(account);
             context.SaveChanges();
         }
+
+        public async Task AddAsync(User user)
+        {
+            await context.Users.AddAsync(user);
+            await context.SaveChangesAsync();
+        }
     }
 
     public interface IUserRepository
@@ -67,5 +73,6 @@ namespace ServerSide.Repositories
         IEnumerable<User> SearchUserByCode(string code);
         Task<User?> GetUserWithReports(int userId);
         void UpdateAccount(Account account);
+        Task AddAsync(User user);
     }
 }
