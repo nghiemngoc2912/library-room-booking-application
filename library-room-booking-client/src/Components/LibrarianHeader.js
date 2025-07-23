@@ -16,7 +16,7 @@ import AdbIcon from '@mui/icons-material/Adb';
 import Badge from '@mui/material/Badge';
 import { useNavigate } from 'react-router-dom';
 
-const pages = ['Home', 'Room', 'Slot', 'Students', 'Report', 'Setting', 'News', 'Rules'];
+const pages = ['Home', 'Room', 'Slot', 'Students', 'Reports', 'Setting', 'News', 'Rules']; // Sửa "Report" thành "Reports"
 const settings = ['Profile', 'Logout'];
 
 function LibrarianHeader() {
@@ -64,6 +64,8 @@ function LibrarianHeader() {
       navigate('/room_management');
     } else if (page === 'Slot') {
       navigate('/slot_management');
+    } else if (page === 'Reports') { 
+      navigate('/reports');
     } else {
       navigate(`/${page.toLowerCase()}`);
     }

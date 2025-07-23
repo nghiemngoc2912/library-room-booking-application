@@ -1,3 +1,4 @@
+import { useSearchParams } from "react-router-dom";
 import { useState, useEffect } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { getReportsList } from "../../api/Reports"
@@ -21,8 +22,9 @@ import DescriptionIcon from "@mui/icons-material/Description"
 
 const ReportTypeDetailsPage = () => {
   const navigate = useNavigate()
-  const location = useLocation()
-  const { userId, reportType } = location.state || {}
+  const [searchParams] = useSearchParams();
+  const userId = parseInt(searchParams.get("userId"));
+  const reportType = searchParams.get("reportType");
   const [reports, setReports] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)

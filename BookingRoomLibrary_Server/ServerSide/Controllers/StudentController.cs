@@ -12,7 +12,7 @@ namespace ServerSide.Controllers
 
         public StudentController(IStudentService studentService)
         {
-            _studentService = studentService ?? throw new ArgumentNullException(nameof(studentService));
+            _studentService = studentService;
         }
 
         [HttpGet("{userId}/related")]
@@ -35,11 +35,25 @@ namespace ServerSide.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost("{reporterId}/subtract-related")]
+        public async Task<IActionResult> SubtractReputationFromRelated(int reporterId, [FromBody] ReputationAdjustmentRequest request)
+        {
+            try
+            {
+                await _studentService.SubtractReputationFromRelatedStudentsAsync(reporterId, request.Change, request.Reason);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 
     public class ReputationAdjustmentRequest
     {
-        public int Change { get; set; } // Số điểm trừ
-        public string Reason { get; set; }
+        public int Change { get; set; }  // Ví dụ: -10 để trừ điểm
+        public string Reason { get; set; } = string.Empty;
     }
 }
