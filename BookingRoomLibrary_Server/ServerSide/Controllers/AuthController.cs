@@ -48,15 +48,18 @@ namespace ServerSide.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-
         [HttpGet("current-user")]
         public IActionResult GetCurrentUser()
         {
             var userId = HttpContext.Session.GetString("UserId");
+
             if (string.IsNullOrEmpty(userId))
             {
+                Console.WriteLine("SESSION NOT FOUND");
                 return Unauthorized(new { message = "Not logged in" });
             }
+
+            Console.WriteLine("SESSION FOUND: " + userId);
 
             return Ok(new
             {

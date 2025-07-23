@@ -104,6 +104,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRouting();
+
+// Order matters: UseCors before UseSession and UseAuthorization
 app.UseCors("FrontendPolicy");
 app.UseSession();
 app.UseAuthentication(); // nếu dùng JWT thì cần middleware xử lý trước
