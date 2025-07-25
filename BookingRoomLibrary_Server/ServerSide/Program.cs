@@ -1,7 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Hangfire;
+using Microsoft.EntityFrameworkCore;
 using ServerSide.Constants;
 using ServerSide.DTOs;
-using ServerSide.Helpers;
+using ServerSide.Jobs;
 using ServerSide.Middlewares;
 using ServerSide.Models;
 using ServerSide.Repositories;
@@ -43,6 +44,11 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 // DB context
 builder.Services.AddDbContext<LibraryRoomBookingContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MyCnn")));
+//Hangfire
+builder.Services.AddHangfire(x =>
+    x.UseSqlServerStorage(builder.Configuration.GetConnectionString("MyCnn")));
+builder.Services.AddHangfireServer();
+
 
 // DI Repositories
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
@@ -82,12 +88,21 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<CreateBookingValidation>();
 builder.Services.AddHostedService<BookingCleanupJob>();
 
+//DI Job
+builder.Services.AddScoped<ReputationJob>();
+
 var bookingRulesConfig = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("Config/bookingrules.json", optional: false, reloadOnChange: true)
     .Build();
 
+var reputationConfig = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("Config/reputation-config.json", optional: false, reloadOnChange: true)
+    .Build();
+
 builder.Services.Configure<BookingRules>(bookingRulesConfig);
+builder.Services.Configure<ReputationConfig>(reputationConfig);
 
 var app = builder.Build();
 
@@ -98,6 +113,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+using (var scope = app.Services.CreateScope())
+{
+    var recurringJobs = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
+    recurringJobs.AddOrUpdate<ReputationJob>(
+        "update-reputation",
+        job => job.UpdateReputation(),
+        "0 0 * * 1" // Cron: 00:00 Monday "* * * * *" - 1 minute for each scheduled job
+    );
+}
 app.UseHttpsRedirection();
 
 // Order matters: UseCors before UseSession and UseAuthorization

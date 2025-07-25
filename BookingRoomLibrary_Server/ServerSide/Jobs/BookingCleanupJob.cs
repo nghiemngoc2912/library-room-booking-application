@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 using ServerSide.Constants;
 using ServerSide.Services;
 
-namespace ServerSide.Helpers
+namespace ServerSide.Jobs
 {
     public class BookingCleanupJob : BackgroundService
     {

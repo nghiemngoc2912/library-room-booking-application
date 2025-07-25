@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ServerSide.Constants;
 using ServerSide.DTOs.Student;
 using ServerSide.Models;
 
@@ -45,12 +46,35 @@ namespace ServerSide.Repositories
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
         }
+
+        List<User> IStudentRepository.GetStudentsListByReputation(int min, int max)
+        {
+            return 
+                _context.Users
+                .Include(u=>u.Account)
+                .Where(
+                    u=>u.Account.Role==(byte)Roles.Student
+                    &&u.Reputation>=min
+                    &&u.Reputation<=max)
+                .ToList();
+        }
+        public void Update(User student)
+        {
+            _context.Users.Update(student);
+        }
+        public void Save()
+        {
+            _context.SaveChanges();
+        }
     }
 
     public interface IStudentRepository
     {
         Task<IEnumerable<User>> GetRelatedStudentsAsync(int userId);
+        List<User> GetStudentsListByReputation(int min, int max);
         Task<User> GetUserByIdAsync(int id);
+        void Save();
+        void Update(User student);
         Task UpdateUserAsync(User user);
     }
 }

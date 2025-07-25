@@ -1,4 +1,6 @@
-﻿using ServerSide.DTOs.Student;
+﻿using Microsoft.Extensions.Options;
+using ServerSide.Constants;
+using ServerSide.DTOs.Student;
 using ServerSide.Models;
 using ServerSide.Repositories;
 
@@ -7,10 +9,12 @@ namespace ServerSide.Services
     public class StudentService : IStudentService
     {
         private readonly IStudentRepository _studentRepository;
+        private readonly ReputationConfig config;
 
-        public StudentService(IStudentRepository studentRepository)
+        public StudentService(IStudentRepository studentRepository,IOptions<ReputationConfig> options)
         {
             _studentRepository = studentRepository ?? throw new ArgumentNullException(nameof(studentRepository));
+            config = options.Value;
         }
 
         public async Task<IEnumerable<StudentDTO>> GetRelatedStudentsAsync(int userId)
@@ -32,7 +36,19 @@ namespace ServerSide.Services
             if (newReputation < 0) newReputation = 0; // Ngăn reputation âm
             user.Reputation = newReputation;
             await _studentRepository.UpdateUserAsync(user);
-            // Có thể thêm log lý do nếu cần
+        }
+
+        public void UpdateReputation()
+        {
+            Console.WriteLine($"Reputation job is running at {DateTime.Now}");
+            //get list student reputation <100 >50
+            var students = _studentRepository.GetStudentsListByReputation(config.MinReputationToAdd,config.MaxReputationToAdd);
+            foreach (var student in students)
+            {
+                student.Reputation += config.AddReputation;
+                _studentRepository.Update(student);
+            }
+            _studentRepository.Save();
         }
     }
 
@@ -40,5 +56,6 @@ namespace ServerSide.Services
     {
         Task<IEnumerable<StudentDTO>> GetRelatedStudentsAsync(int userId);
         Task SubtractReputationAsync(int userId, int change, string reason);
+        void UpdateReputation();
     }
 }

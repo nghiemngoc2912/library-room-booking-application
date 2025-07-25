@@ -1,0 +1,5 @@
+{
+  "MinReputationToAdd": 50,
+  "MaxReputationToAdd": 99,
+  "AddReputation": 10
+}
