@@ -1,46 +1,44 @@
-import React, { useState, useContext } from 'react'; // Thêm useContext
-import { useNavigate } from 'react-router-dom';
-import { login } from '../../api/AuthAPI';
-import { useAuth } from '../../App';
+import React, { useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { resetPassword } from '../../api/AuthAPI';
 
-function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+function ResetPasswordPage() {
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token');
+
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
   const navigate = useNavigate();
-  const { setRole } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
+    setSuccessMsg('');
+    console.log(token);
+    if (!token) {
+      setErrorMsg('Token không hợp lệ. Vui lòng kiểm tra liên kết.');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setErrorMsg('Mật khẩu mới và xác nhận mật khẩu không khớp.');
+      return;
+    }
 
     try {
-      const response = await login(email, password);
-      const { role, token, id } = response.data;
-      if (role != null) {
-        setRole(role); // Cập nhật role ngay lập tức
-        const parsedRole = parseInt(role, 10);
-        setRole(parsedRole);
-        localStorage.setItem('role', parsedRole);
-        if (token) {
-          localStorage.setItem('authToken', token);
-        }
-        if (id) {
-          localStorage.setItem('userId', id);
-        }
-        console.log('Login successful, role:', parsedRole);
-        navigate('/home', { replace: true }); // Sử dụng replace để tránh thêm lịch sử trình duyệt
+      const response = await resetPassword(token, newPassword, confirmPassword);
+      if (response.ok) {
+        setSuccessMsg('Mật khẩu đã được đặt lại thành công. Chuyển hướng đến trang đăng nhập...');
+        setTimeout(() => navigate('/login'), 3000); // Quay lại login sau 3 giây
       } else {
-        setErrorMsg('Role không hợp lệ. Vui lòng liên hệ quản trị viên.');
+        setErrorMsg('Token hết hạn hoặc không hợp lệ. Vui lòng thử lại.');
       }
     } catch (err) {
-      console.error('Login error:', err);
-      setErrorMsg('Tài khoản hoặc mật khẩu không đúng.');
+      setErrorMsg('Lỗi mạng. Vui lòng thử lại sau.');
+      console.error('Reset password error:', err);
     }
-  };
-
-  const handleForgotPassword = () => {
-    navigate('/forgot-password');
   };
 
   return (
@@ -57,7 +55,7 @@ function Login() {
     >
       <h1 style={{ marginBottom: '1rem', fontSize: '1.8rem' }}>Booking Room Library</h1>
       <h2 style={{ marginBottom: '1.5rem', fontSize: '1.2rem', color: '#555' }}>
-        Login to Your Account
+        Đặt Lại Mật Khẩu
       </h2>
 
       <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '1rem' }}>
@@ -66,12 +64,17 @@ function Login() {
             {errorMsg}
           </p>
         )}
+        {successMsg && (
+          <p style={{ color: 'green', marginBottom: '0.5rem', fontWeight: 'bold' }}>
+            {successMsg}
+          </p>
+        )}
 
         <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="password"
+          placeholder="Mật khẩu mới"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
           required
           style={{
             padding: '0.75rem',
@@ -84,9 +87,9 @@ function Login() {
         />
         <input
           type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Xác nhận mật khẩu mới"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
           required
           style={{
             padding: '0.75rem',
@@ -110,11 +113,11 @@ function Login() {
             width: '100%',
           }}
         >
-          Login
+          Đặt Lại Mật Khẩu
         </button>
         <button
           type="button"
-          onClick={handleForgotPassword}
+          onClick={() => navigate('/login')}
           style={{
             background: 'none',
             border: 'none',
@@ -125,11 +128,11 @@ function Login() {
             marginTop: '0.5rem',
           }}
         >
-          Forgot Password?
+          Quay lại Đăng Nhập
         </button>
       </form>
     </div>
   );
 }
 
-export default Login;
+export default ResetPasswordPage;

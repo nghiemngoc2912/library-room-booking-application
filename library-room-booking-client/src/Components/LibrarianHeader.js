@@ -17,8 +17,8 @@ import Badge from '@mui/material/Badge';
 import { useAuth } from '../App'
 import { useNavigate } from 'react-router-dom';
 
-const pages = ['Home', 'Room', 'Slot', 'Students', 'Report', 'Setting', 'News', 'Rules'];
-const settings = ['Profile','Logout'];
+const pages = ['Home', 'Room', 'Slot', 'Students', 'Reports', 'Setting', 'News', 'Rules']; 
+const settings = ['Profile', 'Logout'];
 
 function LibrarianHeader() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);

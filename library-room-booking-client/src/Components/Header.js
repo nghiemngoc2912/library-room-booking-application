@@ -16,32 +16,31 @@ import AdbIcon from '@mui/icons-material/Adb';
 import Badge from '@mui/material/Badge';
 import { useAuth } from '../App';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../App';
 
-const pages = ['Home', 'Booking Room', 'News', 'Rules', 'Reports'];
+const pages = [
+  { label: 'Home', path: '/home', roles: [1, 2, 3] },
+  { label: 'Booking Room', path: '/booking', roles: [1, 2, 3] },
+  { label: 'News', path: '/news', roles: [1, 2] },
+  { label: 'Rules', path: '/rules', roles: [2] },
+  { label: 'Reports', path: '/reports', roles: [2] }, 
+  { label: 'Report History', path: '/history-report', roles: [1] },
+  { label: 'Add Report', path: '/add-report', roles: [1] },
+];
+
 const settings = ['Profile', 'Logout'];
 
 function Header() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const navigate = useNavigate();
-  const { setRole } = useAuth();
+  const { role, setRole } = useAuth();
 
-  const handleOpenNavMenu = (event) => {
-    setAnchorElNav(event.currentTarget);
-  };
+  console.log('Header - Role:', role);
 
-  const handleOpenUserMenu = (event) => {
-    setAnchorElUser(event.currentTarget);
-  };
-
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
-  };
-
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
-  };
+  const handleOpenNavMenu = (event) => setAnchorElNav(event.currentTarget);
+  const handleOpenUserMenu = (event) => setAnchorElUser(event.currentTarget);
+  const handleCloseNavMenu = () => setAnchorElNav(null);
+  const handleCloseUserMenu = () => setAnchorElUser(null);
 
   const handleLogout = async () => {
     try {
@@ -49,12 +48,12 @@ function Header() {
         method: 'POST',
         credentials: 'include',
       });
-      console.log("Đăng xuất thành công");
     } catch (err) {
       console.error('Logout failed', err);
     }
 
     localStorage.removeItem('authToken');
+    localStorage.removeItem('role');
     sessionStorage.clear();
     setRole(null);
 
@@ -132,9 +131,16 @@ function Header() {
               onClose={handleCloseNavMenu}
               sx={{ display: { xs: 'block', md: 'none' } }}
             >
-              {pages.map((page) => (
-                <MenuItem key={page} onClick={() => handleNavMenuClick(page)}>
-                  <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
+              {pages.filter(p => p.roles.includes(role)).map((page) => (
+                <MenuItem
+                  key={page.label}
+                  onClick={() => {
+                    console.log('Navigating to:', page.path);
+                    navigate(page.path);
+                    handleCloseNavMenu();
+                  }}
+                >
+                  <Typography textAlign="center">{page.label}</Typography>
                 </MenuItem>
               ))}
             </Menu>
@@ -163,8 +169,11 @@ function Header() {
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.filter(p => p.roles.includes(role)).map((page) => (
               <Button
-                key={page}
-                onClick={() => handleNavMenuClick(page)}
+                key={page.label}
+                onClick={() => {
+                  console.log('Navigating to:', page.path);
+                  navigate(page.path);
+                }}
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
                 {page.label}
@@ -192,8 +201,8 @@ function Header() {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={() => handleMenuItemClick(setting)}>
-                  <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
+                <MenuItem key={setting} onClick={() => handleSettingClick(setting)}>
+                  <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>
               ))}
             </Menu>

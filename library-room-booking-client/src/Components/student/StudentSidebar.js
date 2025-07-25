@@ -9,7 +9,7 @@ export default function StudentSidebar({ activeTab, onTabChange }) {
         height: '100vh',
         bgcolor: '#f5f5f5',
         borderRight: '1px solid #ddd',
-        pt: 10, // Đẩy nội dung xuống sâu hơn (tăng từ 4 → 10)
+        pt: 10,
         boxSizing: 'border-box',
       }}
     >
@@ -32,6 +32,13 @@ export default function StudentSidebar({ activeTab, onTabChange }) {
             onClick={() => onTabChange('history')}
           >
             Booking History
+          </Button>
+          <Button
+            variant={activeTab === 'change-password' ? 'contained' : 'outlined'}
+            fullWidth
+            onClick={() => onTabChange('change-password')}
+          >
+            Change Password
           </Button>
         </Stack>
       </Box>
