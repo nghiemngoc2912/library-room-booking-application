@@ -112,11 +112,6 @@ builder.Services.AddHostedService<BookingCleanupJob>();
 //DI Job
 builder.Services.AddScoped<ReputationJob>();
 
-var bookingRulesConfig = new ConfigurationBuilder()
-    .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("Config/bookingrules.json", optional: false, reloadOnChange: true)
-    .Build();
-
 var reputationConfig = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("Config/reputation-config.json", optional: false, reloadOnChange: true)
