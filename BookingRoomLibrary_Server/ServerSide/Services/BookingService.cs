@@ -1,14 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Glimpse.Core.Extensibility;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using ServerSide.Constants;
 using ServerSide.DTOs.Booking;
-using ServerSide.DTOs.Room;
 using ServerSide.DTOs.Rating;
+using ServerSide.DTOs.Room;
 using ServerSide.Exceptions;
 using ServerSide.Models;
 using ServerSide.Repositories;
 using ServerSide.Validations;
-using Microsoft.Extensions.Options;
+using System.Text.Json;
+
 
 namespace ServerSide.Services
 {
@@ -117,12 +120,15 @@ namespace ServerSide.Services
         }
 
         public async Task<(int total, List<BookingHistoryDTO> data)> GetBookingHistoryAsync(
-            int userId, DateTime? from, DateTime? to, int page, int pageSize)
+    int userId, DateTime? from, DateTime? to, int page, int pageSize)
         {
             DateOnly? fromDate = from.HasValue ? DateOnly.FromDateTime(from.Value) : null;
             DateOnly? toDate = to.HasValue ? DateOnly.FromDateTime(to.Value) : null;
 
+            // Đếm tổng số booking của userId (dựa trên CreatedBy)
             var total = await repository.CountBookingsByUser(userId, fromDate, toDate);
+
+            // Lấy danh sách booking
             var bookings = await repository.GetBookingsByUser(userId, fromDate, toDate, page, pageSize);
 
             var result = new List<BookingHistoryDTO>();
@@ -142,6 +148,7 @@ namespace ServerSide.Services
 
             return (total, result);
         }
+
 
         public BookingDetailDTO GetDetailBookingById(int id)
         {

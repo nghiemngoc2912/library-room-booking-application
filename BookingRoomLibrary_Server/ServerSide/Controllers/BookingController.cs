@@ -6,11 +6,12 @@ using ServerSide.Exceptions;
 using ServerSide.Filters;
 using ServerSide.Models;
 using ServerSide.Services;
+using System.Text.Json;
 
 
 namespace ServerSide.Controllers
 {
-    [RoleFilter((int)Roles.Student, (int)Roles.Staff)]
+    //[RoleFilter((int)Roles.Student, (int)Roles.Staff)]
     [Route("api/[controller]")]
     [ApiController]
     public class BookingController : ControllerBase
@@ -105,7 +106,9 @@ namespace ServerSide.Controllers
             int userId, DateTime? from = null, DateTime? to = null,
             int page = 1, int pageSize = 5)
         {
+            Console.WriteLine($"đã gọi vào api history với userId = {userId}");
             var (total, data) = await _bookingService.GetBookingHistoryAsync(userId, from, to, page, pageSize);
+
             return Ok(new { total, data });
         }
 

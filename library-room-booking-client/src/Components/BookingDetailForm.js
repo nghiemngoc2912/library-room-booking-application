@@ -87,8 +87,8 @@ export default function BookingDetailForm({
       </div>
 
       <div style={{ marginBottom: 16 }}>
-        <strong>Checkin:</strong> {booking.checkinAt || 'None'}<br />
-        <strong>Checkout:</strong> {booking.checkoutAt || 'None'}
+        <strong>Checkin:</strong> {booking.checkInAt || 'None'}<br />
+        <strong>Checkout:</strong> {booking.checkOutAt || 'None'}
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>

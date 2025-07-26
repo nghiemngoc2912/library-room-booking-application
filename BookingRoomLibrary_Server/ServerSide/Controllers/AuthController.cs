@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ServerSide.DTOs;
 using ServerSide.DTOs.Auth;
+using ServerSide.DTOs.Account;
 using ServerSide.Services;
 using System.Security.Cryptography;
 using System.Text;
@@ -40,11 +42,10 @@ namespace ServerSide.Controllers
                         status = account.Status
                     });
                 }
+                var userId = _authService.GetUserIdByAccountId(account.Id);
 
-
-
-                // Store user information in session
-                HttpContext.Session.SetString("UserId", account.Id.ToString());
+                HttpContext.Session.SetString("AccountId", account.Id.ToString());
+                HttpContext.Session.SetString("UserId", userId.ToString());
                 HttpContext.Session.SetString("Username", account.Username);
                 HttpContext.Session.SetInt32("Role", account.Role);
 
@@ -85,6 +86,35 @@ namespace ServerSide.Controllers
                 username = HttpContext.Session.GetString("Username"),
                 role = HttpContext.Session.GetInt32("Role")
             });
+        }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] CreateAccountStudentDTO dto)
+        {
+            try
+            {
+                var otpCode = await _authService.RegisterStudentAsync(dto); 
+                await _emailService.SendOtpEmail(dto.Username, otpCode);
+                return Ok(new { success = true, message = "Registration initiated. Please check your email for OTP." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost("verify-otp")]
+        public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpDTO dto)
+        {
+            try
+            {
+                await _authService.VerifyOtpAsync(dto.Username, dto.OtpCode);
+                return Ok(new { success = true, message = "Account verified successfully." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
         }
 
         [HttpPost("logout")]

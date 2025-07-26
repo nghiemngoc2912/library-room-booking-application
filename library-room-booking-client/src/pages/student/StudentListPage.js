@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { fetchStudents } from '../../api/UserAPI';
 
 const StudentListPage = () => {
@@ -30,7 +31,7 @@ const StudentListPage = () => {
       borderRadius: '10px',
       boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
     }}>
-      <h1 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>🎓 Student List</h1>
+      <h1 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>Student List</h1>
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.5rem' }}>
         <input
@@ -62,13 +63,28 @@ const StudentListPage = () => {
           </tr>
         </thead>
         <tbody>
-          {students.map((student, index) => (
-            <tr key={index}>
+          {students.map((student) => (
+            <tr key={student.id}>
               <td style={td}>{student.fullName}</td>
               <td style={td}>{student.code}</td>
               <td style={td}>{student.email}</td>
               <td style={td}>{student.status === 1 ? 'Active' : 'Inactive'}</td>
               <td style={td}>
+                <Link to={`/student/profile?userId=${student.id}`}>
+                  <button
+                    style={{
+                      backgroundColor: '#28a745',
+                      color: 'white',
+                      border: 'none',
+                      padding: '5px 10px',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      marginRight: '5px'
+                    }}
+                  >
+                    Detail
+                  </button>
+                </Link>
                 <button
                   style={{
                     backgroundColor: '#007bff',

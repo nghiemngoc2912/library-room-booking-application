@@ -10,24 +10,46 @@ export const login = async (username, password) => {
   );
 };
 
-export async function forgotPassword(email) {
-  return await fetch(`${API_BASE_URL}/auth/forgot-password`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email }),
-    credentials: 'include',
-  });
-}
+export const forgotPassword = async (email) => {
+  return await axios.post(
+    `${API_BASE_URL}/auth/forgot-password`,
+    { email },
+    { withCredentials: true }
+  );
+};
 
-export async function resetPassword(token, newPassword, confirmPassword) {
-  return await fetch(`${API_BASE_URL}/auth/reset-password`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
+export const resetPassword = async (token, newPassword, confirmPassword) => {
+  return await axios.post(
+    `${API_BASE_URL}/auth/reset-password`,
+    {
       token,
       newPassword,
-      confirmPassword, 
-    }),
-    credentials: 'include',
-  });
-}
+      confirmPassword,
+    },
+    { withCredentials: true }
+  );
+};
+
+export const register = async (data) => {
+  return await axios.post(
+    `${API_BASE_URL}/auth/register`,
+    {
+      username: data.username,
+      password: data.password,
+      fullName: data.fullName,
+      dob: data.dob ? data.dob.split('T')[0] : null, 
+      code: '',
+    },
+    { withCredentials: true }
+  );
+};
+
+
+
+export const verifyOtp = async (username, otpCode) => {
+  return await axios.post(
+    `${API_BASE_URL}/auth/verify-otp`,
+    { username, otpCode },
+    { withCredentials: true }
+  );
+};

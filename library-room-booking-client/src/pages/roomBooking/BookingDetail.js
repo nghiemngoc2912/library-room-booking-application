@@ -57,7 +57,7 @@ const handleCheckin = async () => {
 
 const handleCheckout = async () => {
   try {
-    const result = await checkinBooking(id);
+    const result = await checkoutBooking(id);
     alert('✅ Check-out successfully: ' + result.checkOutAt);
     // gọi lại API hoặc reload chi tiết booking nếu cần
   } catch (error) {

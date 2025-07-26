@@ -20,6 +20,7 @@ import DetailRequestRoom from './pages/admin/DetailRequestRoom';
 import SlotRequest from './pages/admin/SlotRequest';
 import DetailSlotRequest from './pages/admin/DetailSlotRequest';
 import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
 import Unauthorized from './pages/auth/Unauthorized'
 import NewsPage from './pages/roomBooking/NewsPage';
 import ProfilePage from './pages/student/ProfilePage';
@@ -151,6 +152,15 @@ const App = () => {
     return <DefaultLayout><NewsPage /></DefaultLayout>; 
   };
 
+  const getProfileLayout = () => {
+    if (role === 1) {
+      return <DefaultLayout><ProfilePage loggedInUserId={userId} role={role} /></DefaultLayout>;
+    } else if (role === 2) {
+      return <LibrarianLayout><ProfilePage loggedInUserId={userId} role={role} /></LibrarianLayout>;
+    }
+    return <DefaultLayout><ProfilePage loggedInUserId={userId} role={role} /></DefaultLayout>;
+  };
+
   return (
     // AuthContext.Provider bao bọc toàn bộ Routes để cung cấp role và loading state
     <AuthContext.Provider value={{ role, loading, setRole, userId }}>
@@ -159,6 +169,12 @@ const App = () => {
         <Route path="/login" element={
           <PublicRoute>
             <Login />
+          </PublicRoute>
+        } />
+
+        <Route path="/register" element={
+          <PublicRoute>
+            <Register />
           </PublicRoute>
         } />
 
@@ -276,13 +292,13 @@ const App = () => {
           }
         />
         <Route
-          path="/student/profile"
-          element={
-            <ProtectedRoute allowedRoles={[1, 2]}>
-              <DefaultLayout><ProfilePage userId={userId} /></DefaultLayout>
-            </ProtectedRoute>
-          }
-        />
+        path="/student/profile"
+        element={
+          <ProtectedRoute allowedRoles={[1, 2]}>
+            {getProfileLayout()}
+          </ProtectedRoute>
+        }
+      />
         <Route
           path="/profile/change-password"
           element={
@@ -333,14 +349,6 @@ const App = () => {
           element={
             <ProtectedRoute allowedRoles={[1, 2, 3]}>
               <DefaultLayout><BookingDetailPage role={role} /></DefaultLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/user/students"
-          element={
-            <ProtectedRoute allowedRoles={[1, 2, 3]}>
-              <DefaultLayout><StudentList /></DefaultLayout>
             </ProtectedRoute>
           }
         />

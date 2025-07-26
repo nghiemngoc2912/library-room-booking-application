@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'; // Thêm useContext
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../../api/AuthAPI';
 import { useAuth } from '../../App';
@@ -11,41 +11,44 @@ function Login() {
   const { setRole } = useAuth();
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setErrorMsg('');
+    e.preventDefault();
+    setErrorMsg('');
 
-  try {
-    const response = await login(email, password);
-    const data = response.data;
+    try {
+      const response = await login(email, password);
+      const data = response.data;
 
-    // Nếu backend trả về { success: false, message: "...", status: 0 }
-    if (data.success === false && data.status === 0) {
-      setErrorMsg(data.message); // "Tài khoản bị khóa"
-      return; // Ngắt luôn, không xử lý gì thêm
+      if (data.success === false && data.status === 0) {
+        setErrorMsg(data.message);
+        return;
+      }
+
+      const { role, token, id } = data;
+
+      if (role != null) {
+        const parsedRole = parseInt(role, 10);
+        setRole(parsedRole);
+        localStorage.setItem('role', parsedRole);
+        if (token) localStorage.setItem('authToken', token);
+        if (id) localStorage.setItem('userId', id);
+
+        console.log('Login successful, role:', parsedRole);
+        navigate('/home', { replace: true });
+      } else {
+        setErrorMsg('Role không hợp lệ. Vui lòng liên hệ quản trị viên.');
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      setErrorMsg('Tài khoản hoặc mật khẩu không đúng.');
     }
-
-    const { role, token, id } = data;
-
-    if (role != null) {
-      const parsedRole = parseInt(role, 10);
-      setRole(parsedRole);
-      localStorage.setItem('role', parsedRole);
-      if (token) localStorage.setItem('authToken', token);
-      if (id) localStorage.setItem('userId', id);
-
-      console.log('Login successful, role:', parsedRole);
-      navigate('/home', { replace: true });
-    } else {
-      setErrorMsg('Role không hợp lệ. Vui lòng liên hệ quản trị viên.');
-    }
-  } catch (err) {
-    console.error('Login error:', err);
-    setErrorMsg('Tài khoản hoặc mật khẩu không đúng.');
-  }
-};
+  };
 
   const handleForgotPassword = () => {
     navigate('/forgot-password');
+  };
+
+  const handleRegister = () => {
+    navigate('/register');
   };
 
   return (
@@ -117,21 +120,36 @@ function Login() {
         >
           Login
         </button>
-        <button
-          type="button"
-          onClick={handleForgotPassword}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: '#007BFF',
-            fontSize: '0.9rem',
-            cursor: 'pointer',
-            textDecoration: 'underline',
-            marginTop: '0.5rem',
-          }}
-        >
-          Forgot Password?
-        </button>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem' }}>
+          <button
+            type="button"
+            onClick={handleForgotPassword}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#007BFF',
+              fontSize: '0.9rem',
+              cursor: 'pointer',
+              textDecoration: 'underline',
+            }}
+          >
+            Forgot Password?
+          </button>
+          <button
+            type="button"
+            onClick={handleRegister}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#007BFF',
+              fontSize: '0.9rem',
+              cursor: 'pointer',
+              textDecoration: 'underline',
+            }}
+          >
+            Register
+          </button>
+        </div>
       </form>
     </div>
   );

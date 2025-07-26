@@ -19,7 +19,7 @@ import { useNavigate } from 'react-router-dom';
 
 const pages = [
   { label: 'Booking Room', path: '/home', roles: [1, 2, 3] },
-  { label: 'News', path: '/news', roles: [1, 2] },
+  { label: 'News', path: '/student/news', roles: [1, 2] },
   { label: 'Rules', path: '/rules', roles: [2] },
   { label: 'Reports', path: '/reports', roles: [2] }, 
   { label: 'Report History', path: '/history-report', roles: [1] },
