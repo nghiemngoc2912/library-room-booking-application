@@ -8,8 +8,8 @@ import AdminLayout from './layouts/AdminLayout';
 
 // Import các Page Components
 import RoomBooking from './pages/roomBooking/RoomBooking';
-import Home from './pages/roomBooking/Home'; 
-import ListRoom from './pages/roomManagement/ListRoom'; 
+import Home from './pages/roomBooking/Home';
+import ListRoom from './pages/roomManagement/ListRoom';
 import UpdateRoom from './pages/roomManagement/UpdateRoom';
 import CreateRoom from './pages/roomManagement/CreateRoom';
 import ListSlot from './pages/slotManagement/ListSlot';
@@ -24,7 +24,6 @@ import Unauthorized from './pages/auth/Unauthorized'
 import NewsPage from './pages/roomBooking/NewsPage';
 import ProfilePage from './pages/student/ProfilePage';
 import BookingDetailPage from './pages/roomBooking/BookingDetail';
-import StudentList from './pages/user/StudentList';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
@@ -40,6 +39,9 @@ import ReportDetailPage from './pages/report/ReportDetailPage';
 import StudentInfoPage from './pages/report/StudentInfoPage';
 import HistoryReportPage from './pages/report/HistoryReportPage';
 import ReportTypeDetailsPage from './pages/report/ReportTypeDetailsPage';
+import StudentListPage from './pages/student/StudentListPage';
+import StudentNewsPage from './pages/student/StudentNewsPage';
+
 import './App.css';
 import { Dashboard } from '@mui/icons-material';
 
@@ -176,7 +178,7 @@ const App = () => {
           path="/room_management"
           element={
             <ProtectedRoute allowedRoles={[2]}>
-              <LibrarianLayout><ListRoom/></LibrarianLayout>
+              <LibrarianLayout><ListRoom /></LibrarianLayout>
             </ProtectedRoute>
           }
         />
@@ -306,6 +308,22 @@ const App = () => {
           element={
             <ProtectedRoute allowedRoles={[3]}>
               <AdminLayout><AdminDashboard /></AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/students"
+          element={
+            <ProtectedRoute allowedRoles={[2]}>
+              <LibrarianLayout><StudentListPage /></LibrarianLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/news"
+          element={
+            <ProtectedRoute allowedRoles={[1]}>
+              <DefaultLayout><StudentNewsPage /></DefaultLayout>
             </ProtectedRoute>
           }
         />

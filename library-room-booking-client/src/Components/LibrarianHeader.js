@@ -69,7 +69,9 @@ function LibrarianHeader() {
       navigate('/slot_management');
     } else if (page === 'Reports') { 
       navigate('/reports');
-    } else {
+    } 
+    else if (page === 'Students') navigate('/students');
+    else {
       navigate(`/${page.toLowerCase()}`);
     }
   };
