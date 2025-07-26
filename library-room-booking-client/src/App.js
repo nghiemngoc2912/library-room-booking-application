@@ -140,6 +140,15 @@ const App = () => {
     return <DefaultLayout><Home /></DefaultLayout>; // Mặc định về DefaultLayout
   };
 
+  const getNewsLayout = () => {
+    if (role === 1) {
+      return <DefaultLayout><NewsPage /></DefaultLayout>;
+    } else if (role === 2) {
+      return <LibrarianLayout><NewsPage /></LibrarianLayout>;
+    } 
+    return <DefaultLayout><NewsPage /></DefaultLayout>; 
+  };
+
   return (
     // AuthContext.Provider bao bọc toàn bộ Routes để cung cấp role và loading state
     <AuthContext.Provider value={{ role, loading, setRole, userId }}>
@@ -260,7 +269,7 @@ const App = () => {
           path="/news"
           element={
             <ProtectedRoute allowedRoles={[1, 2]}>
-              <DefaultLayout><NewsPage /></DefaultLayout>
+              {getNewsLayout()} {/* Gọi hàm để render layout phù hợp */}
             </ProtectedRoute>
           }
         />
