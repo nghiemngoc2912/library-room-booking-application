@@ -18,8 +18,7 @@ import { useAuth } from '../App';
 import { useNavigate } from 'react-router-dom';
 
 const pages = [
-  { label: 'Home', path: '/home', roles: [1, 2, 3] },
-  { label: 'Booking Room', path: '/booking', roles: [1, 2, 3] },
+  { label: 'Booking Room', path: '/home', roles: [1, 2, 3] },
   { label: 'News', path: '/news', roles: [1, 2] },
   { label: 'Rules', path: '/rules', roles: [2] },
   { label: 'Reports', path: '/reports', roles: [2] }, 
@@ -182,9 +181,7 @@ function Header() {
           </Box>
 
           <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Badge badgeContent={3} color="error" overlap="circular">
-              <NotificationsIcon />
-            </Badge>
+            
             <Tooltip title="Account settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <AccountCircle fontSize="large" />

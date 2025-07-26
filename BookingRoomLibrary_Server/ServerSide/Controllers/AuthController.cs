@@ -43,11 +43,16 @@ namespace ServerSide.Controllers
                     role = account.Role
                 });
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = "An error occurred during login.", error = ex.Message });
             }
         }
+
         [HttpGet("current-user")]
         public IActionResult GetCurrentUser()
         {

@@ -1,13 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ServerSide.Constants;
 using ServerSide.DTOs.Booking;
+using ServerSide.DTOs.Rating;
 using ServerSide.Exceptions;
+using ServerSide.Filters;
 using ServerSide.Models;
 using ServerSide.Services;
-using ServerSide.DTOs.Rating;
 
 
 namespace ServerSide.Controllers
 {
+    [RoleFilter((int)Roles.Student, (int)Roles.Staff)]
     [Route("api/[controller]")]
     [ApiController]
     public class BookingController : ControllerBase

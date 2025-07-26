@@ -28,6 +28,7 @@ import StudentList from './pages/user/StudentList';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
+import LibrarianManagement from './pages/librarianManagement/LibrarianManagement'
 
 import { BrowserRouter as Router, Link, useNavigate } from 'react-router-dom';
 import RulesPage from './pages/rule/RulesPage';
@@ -385,6 +386,16 @@ const App = () => {
           element={
             <ProtectedRoute allowedRoles={[1]}>
               <DefaultLayout><ReportTypeDetailsPage /></DefaultLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/manage_librarians"
+          element={
+            <ProtectedRoute allowedRoles={[3]}> 
+              <AdminLayout>
+                <LibrarianManagement />
+              </AdminLayout>
             </ProtectedRoute>
           }
         />

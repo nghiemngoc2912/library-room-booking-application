@@ -72,6 +72,7 @@ builder.Services.AddScoped<IRuleRepository, RuleRepository>();
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<IRatingRepository, RatingRepository>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
 // ==================== SERVICES ====================
 builder.Services.AddScoped<IBookingService, BookingService>();
@@ -86,6 +87,7 @@ builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IRatingService, RatingService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 
 // ==================== VALIDATIONS ====================
 builder.Services.AddScoped<CreateBookingValidation>();

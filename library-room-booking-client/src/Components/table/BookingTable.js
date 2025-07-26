@@ -61,7 +61,7 @@ export default function BookingTable({ date, status}) {
                 {room.roomName}
               </TableCell>
               {slots.map((slot) => {
-                const isRoomInactive = room.status === 0;
+                const isRoomInactive = room.status === 2;
                 const booking = getBooking(room.id, slot.id);
                 const cellText = isRoomInactive
                   ? '-'

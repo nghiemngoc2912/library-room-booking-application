@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ServerSide.Constants;
 using ServerSide.DTOs;
+using ServerSide.Filters;
 using ServerSide.Models;
 using ServerSide.Services;
 
 namespace ServerSide.Controllers
 {
+    //[RoleFilter((int)Roles.Student, (int)Roles.Staff)]
     [Route("api/[controller]")]
     [ApiController]
     public class SlotController : ControllerBase

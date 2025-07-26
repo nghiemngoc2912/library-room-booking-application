@@ -5,7 +5,6 @@ using ServerSide.Repositories;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Options;
-using ServerSide.Constants;
 
 namespace ServerSide.Services
 {
@@ -24,19 +23,25 @@ namespace ServerSide.Services
             _otpRuleOptions = otpOptions.Value;
         }
 
-        public Account Authenticate(LoginDTO loginDto)
+       public Account Authenticate(LoginDTO loginDto)
         {
             var account = _authRepository.GetAccountByUsername(loginDto.Username);
             if (account == null)
             {
-                return null;
+                return null; // Invalid username
+            }
+
+            // Check if account is inactive
+            if (account.Status == 0)
+            {
+                throw new UnauthorizedAccessException("Account is locked and cannot log in.");
             }
 
             // Verify password
             var inputPasswordHash = ComputeHash(loginDto.Password);
             if (inputPasswordHash != account.PasswordHash)
             {
-                return null;
+                return null; // Invalid password
             }
 
             return account;
@@ -137,6 +142,10 @@ namespace ServerSide.Services
             await _otpRepository.MarkOtpAsUsedAsync(otp);
         }
 
+        string IAuthService.ComputeHash(string input)
+        {
+            return ComputeHash(input);
+        }
     }
 
     public interface IAuthService
@@ -145,6 +154,7 @@ namespace ServerSide.Services
         Task ChangePasswordAsync(int userId, ChangePasswordDTO changePasswordDto);
         Task ForgotPasswordAsync(string email);
         Task ResetPasswordAsync(ResetPasswordDTO dto);
+        string ComputeHash(string input);
 
     }
 }
