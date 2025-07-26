@@ -41,6 +41,7 @@ import StudentInfoPage from './pages/report/StudentInfoPage';
 import HistoryReportPage from './pages/report/HistoryReportPage';
 import ReportTypeDetailsPage from './pages/report/ReportTypeDetailsPage';
 import './App.css';
+import { Dashboard } from '@mui/icons-material';
 
 // Không cần import HomeLayoutWrapper nữa
 
@@ -134,7 +135,7 @@ const App = () => {
     } else if (role === 2) {
       return <LibrarianLayout><Home /></LibrarianLayout>;
     } else if (role === 3) {
-      return <AdminLayout><Home /></AdminLayout>;
+      return <AdminLayout><AdminDashboard /></AdminLayout>;
     }
     return <DefaultLayout><Home /></DefaultLayout>; // Mặc định về DefaultLayout
   };
