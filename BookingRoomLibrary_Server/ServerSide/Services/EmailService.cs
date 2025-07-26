@@ -1,9 +1,7 @@
-﻿using MailKit.Security;
-using Microsoft.Extensions.Options;
-using MimeKit;
+﻿using Microsoft.Extensions.Options;
 using ServerSide.DTOs;
-using MailKit.Net.Smtp;
-
+using System.Net.Mail;
+using System.Net;
 
 namespace ServerSide.Services
 {
@@ -18,17 +16,31 @@ namespace ServerSide.Services
 
         public async Task SendEmailAsync(string to, string subject, string htmlContent)
         {
-            var email = new MimeMessage();
-            email.From.Add(new MailboxAddress(_settings.SenderName, _settings.SenderEmail));
-            email.To.Add(MailboxAddress.Parse(to));
-            email.Subject = subject;
-            email.Body = new TextPart("html") { Text = htmlContent };
+            var mailMessage = new MailMessage
+            {
+                From = new MailAddress(_settings.FromEmail, _settings.FromName),
+                Subject = subject,
+                Body = htmlContent,
+                IsBodyHtml = true
+            };
+            mailMessage.To.Add(to);
 
-            using var smtp = new SmtpClient();
-            await smtp.ConnectAsync(_settings.SmtpServer, _settings.SmtpPort, SecureSocketOptions.StartTls);
-            await smtp.AuthenticateAsync(_settings.SenderEmail, _settings.SenderPassword);
-            await smtp.SendAsync(email);
-            await smtp.DisconnectAsync(true);
+            using var smtpClient = new SmtpClient(_settings.SmtpServer, _settings.SmtpPort)
+            {
+                Credentials = new NetworkCredential(_settings.SmtpUsername, _settings.SmtpPassword),
+                EnableSsl = true
+            };
+
+            try
+            {
+                await smtpClient.SendMailAsync(mailMessage);
+            }
+            catch (Exception ex)
+            {
+                // Ghi log lỗi để debug (nếu bạn đã bật logging)
+                Console.WriteLine($"Lỗi gửi email: {ex.Message}");
+                throw; // Ném lỗi để ứng dụng xử lý
+            }
         }
 
         public async Task SendOtpEmail(string toUsername, string otpCode)
@@ -42,11 +54,24 @@ namespace ServerSide.Services
 
             await SendEmailAsync(toUsername, subject, body);
         }
+
+        public async Task SendForgotPasswordEmail(string toEmail, string resetLink)
+        {
+            string subject = "Reset your password";
+            string body = $@"
+        <p>You requested to reset your password.</p>
+        <p>Click <a href='{resetLink}'>here</a> to reset your password.</p>
+        <p>This link will expire in 15 minutes.</p>";
+
+            await SendEmailAsync(toEmail, subject, body);
+        }
+
     }
 
     public interface IEmailService
     {
         Task SendEmailAsync(string to, string subject, string htmlContent);
         Task SendOtpEmail(string toUsername, string otpCode);
+        Task SendForgotPasswordEmail(string toEmail, string resetLink);
     }
 }

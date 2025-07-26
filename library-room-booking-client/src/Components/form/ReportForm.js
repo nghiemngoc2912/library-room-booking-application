@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   Button,
@@ -10,32 +10,49 @@ import {
   InputLabel,
   Select,
   FormHelperText,
-  Card,
-  CardContent,
-  Typography,
   Chip,
   LinearProgress,
-} from "@mui/material"
-import SaveIcon from "@mui/icons-material/Save"
-import AddIcon from "@mui/icons-material/Add"
+} from "@mui/material";
+import SaveIcon from "@mui/icons-material/Save";
+import AddIcon from "@mui/icons-material/Add";
+import { useEffect, useState } from "react";
+import { fetchRooms } from "../../api/RoomAPI";
 
 const ReportForm = ({ report, onChange, onSubmit, loading = false, isEdit = false }) => {
+  const [rooms, setRooms] = useState([]);
+  const [loadingRooms, setLoadingRooms] = useState(true);
+
+  useEffect(() => {
+    const loadRooms = async () => {
+      try {
+        const data = await fetchRooms();
+        setRooms(data);
+      } catch (error) {
+        console.error("Failed to fetch rooms:", error);
+      } finally {
+        setLoadingRooms(false);
+      }
+    };
+
+    loadRooms();
+  }, []);
+
   const handleSubmit = (e) => {
-    e.preventDefault()
-    onSubmit()
-  }
+    e.preventDefault();
+    onSubmit();
+  };
 
   const getCharacterCount = () => {
-    return report.description ? report.description.length : 0
-  }
+    return report.description ? report.description.length : 0;
+  };
 
   const isDescriptionTooLong = () => {
-    return getCharacterCount() > 1000
-  }
+    return getCharacterCount() > 1000;
+  };
 
   const isFormValid = () => {
-    return report.reportType.trim().length >= 3 && !isDescriptionTooLong()
-  }
+    return report.reportType.trim().length >= 3 && !isDescriptionTooLong();
+  };
 
   const reportTypes = [
     "Noise Complaint",
@@ -44,7 +61,7 @@ const ReportForm = ({ report, onChange, onSubmit, loading = false, isEdit = fals
     "Maintenance Issue",
     "Behavioral Issue",
     "Other",
-  ]
+  ];
 
   return (
     <Container maxWidth="sm" sx={{ p: 0 }}>
@@ -73,20 +90,29 @@ const ReportForm = ({ report, onChange, onSubmit, loading = false, isEdit = fals
             </FormHelperText>
           </FormControl>
 
-          {/* Room ID Field */}
-          <TextField
-            label="Choose Room Number"
-            name="roomId"
-            type="number"
-            value={report.roomId || ""}
-            onChange={onChange}
-            fullWidth
-            disabled={loading}
-            helperText="Enter the room number where the incident occurred"
-            InputProps={{
-              endAdornment: report.roomId && <Chip label="✓" color="success" size="small" />,
-            }}
-          />
+          {/* Room Selection */}
+          <FormControl fullWidth required disabled={loadingRooms || loading}>
+            <InputLabel>Room</InputLabel>
+            <Select
+              name="roomId"
+              value={report.roomId || ""}
+              onChange={onChange}
+              label="Room"
+            >
+              {loadingRooms ? (
+                <MenuItem value="">
+                  <em>Loading rooms...</em>
+                </MenuItem>
+              ) : (
+                rooms.map((room) => (
+                  <MenuItem key={room.id} value={room.id}>
+                    {room.roomName}
+                  </MenuItem>
+                ))
+              )}
+            </Select>
+            <FormHelperText>Select the room where the incident occurred</FormHelperText>
+          </FormControl>
 
           {/* Description Field */}
           <Box>
@@ -160,7 +186,7 @@ const ReportForm = ({ report, onChange, onSubmit, loading = false, isEdit = fals
         </Box>
       </form>
     </Container>
-  )
-}
+  );
+};
 
-export default ReportForm
+export default ReportForm;

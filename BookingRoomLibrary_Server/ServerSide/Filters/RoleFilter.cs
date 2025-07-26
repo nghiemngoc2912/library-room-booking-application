@@ -21,13 +21,15 @@ namespace ServerSide.Filters
             // Kiểm tra nếu chưa đăng nhập
             if (role == null)
             {
-                throw new AuthorizeException("Not loggin");
+                context.Result = new UnauthorizedResult(); // 401 Unauthorized
+                return;
             }
 
             // Kiểm tra nếu Role không nằm trong danh sách Role cho phép
             if (!_allowedRoles.Contains(role.Value))
             {
-                throw new AuthorizeException("Dont have permission for this api");
+                context.Result = new ForbidResult(); // 403 Forbidden
+                return;
             }
         }
     }

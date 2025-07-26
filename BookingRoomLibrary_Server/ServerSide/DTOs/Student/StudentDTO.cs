@@ -2,8 +2,9 @@
 {
     public class StudentDTO
     {
-        public int StudentId { get; set; }
-        public string FullName { get; set; }
-        public int Reputation { get; set; }
+        public int Id { get; set; }
+        public string FullName { get; set; } = string.Empty;
+        public int? Reputation { get; set; }
     }
+
 }

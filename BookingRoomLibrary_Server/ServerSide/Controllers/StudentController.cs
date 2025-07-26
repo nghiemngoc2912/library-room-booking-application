@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ServerSide.DTOs.Auth;
 using ServerSide.Constants;
 using ServerSide.DTOs.Student;
 using ServerSide.DTOs.User;
@@ -13,11 +14,13 @@ namespace ServerSide.Controllers
     public class StudentController : ControllerBase
     {
         private readonly IStudentService _studentService;
+        private readonly IAuthService _authService;
         private readonly IAccountService _accountService;
 
-        public StudentController(IStudentService studentService, IAccountService accountService)
+        public StudentController(IStudentService studentService, IAuthService authService, IAccountService accountService)
         {
             _studentService = studentService ?? throw new ArgumentNullException(nameof(studentService));
+            _authService = authService ?? throw new ArgumentNullException(nameof(authService));
             _accountService = accountService;
         }
         [RoleFilter((int)Roles.Staff)]
@@ -41,6 +44,47 @@ namespace ServerSide.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost("{userId}/change-password")]
+        public async Task<IActionResult> ChangePassword(int userId, [FromBody] ChangePasswordDTO changePasswordDto)
+        {
+            try
+            {
+                await _authService.ChangePasswordAsync(userId, changePasswordDto);
+                return Ok("Password changed successfully.");
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return BadRequest(ex.Message); // "Current password is incorrect."
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message); // "New password must be at least 8 characters long." hoặc "New password and confirm password do not match."
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message); // "Account with UserId {userId} not found."
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
+        [HttpPost("{reporterId}/subtract-related")]
+        public async Task<IActionResult> SubtractReputationFromRelated(int reporterId, [FromBody] ReputationAdjustmentRequest request)
+        {
+            try
+            {
+                await _studentService.SubtractReputationFromRelatedStudentsAsync(reporterId, request.Change, request.Reason);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+    }
         [HttpPut("register")]
         public async Task<IActionResult> Register(UserRegisterDTO createUserDTO)
         {
@@ -58,7 +102,7 @@ namespace ServerSide.Controllers
 
     public class ReputationAdjustmentRequest
     {
-        public int Change { get; set; } // Số điểm trừ
-        public string Reason { get; set; }
+        public int Change { get; set; }  // Ví dụ: -10 để trừ điểm
+        public string Reason { get; set; } = string.Empty;
     }
 }

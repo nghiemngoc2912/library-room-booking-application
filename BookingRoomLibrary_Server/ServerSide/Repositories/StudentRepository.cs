@@ -11,25 +11,36 @@ namespace ServerSide.Repositories
 
         public StudentRepository(LibraryRoomBookingContext context)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _context = context;
         }
 
         public async Task<IEnumerable<User>> GetRelatedStudentsAsync(int userId)
         {
-            var reports = await _context.Reports
+            // Lấy report gần nhất của sinh viên
+            var report = await _context.Reports
                 .Where(r => r.UserId == userId)
-                .Include(r => r.Room)
+                .OrderByDescending(r => r.CreateAt)
+                .FirstOrDefaultAsync();
+
+            if (report == null || report.CreateAt == null)
+                throw new Exception("No report found for the given user.");
+
+            // Lấy danh sách studentId có mặt tại phòng đó vào thời điểm report
+            var relatedStudentIds = await _context.Bookings
+                .Where(b => b.RoomId == report.RoomId &&
+                            b.CheckInAt <= report.CreateAt &&
+                            b.CheckOutAt >= report.CreateAt &&
+                            b.Status == 2)
+                .SelectMany(b => b.Students.Select(s => s.Id))
+                .Distinct()
                 .ToListAsync();
 
-            var relatedUserIds = reports
-                .SelectMany(r => _context.Reports
-                    .Where(rr => rr.RoomId == r.RoomId && rr.UserId != userId)
-                    .Select(rr => rr.UserId))
-                .Distinct();
-
-            return await _context.Users
-                .Where(u => relatedUserIds.Contains(u.Id) || u.Id == userId)
+            // Truy vấn người dùng từ bảng Users bằng Id
+            var users = await _context.Users
+                .Where(u => relatedStudentIds.Contains(u.Id))
                 .ToListAsync();
+
+            return users;
         }
 
         public async Task<User> GetUserByIdAsync(int id)
@@ -41,8 +52,9 @@ namespace ServerSide.Repositories
 
         public async Task UpdateUserAsync(User user)
         {
-            if (user.Reputation.HasValue && user.Reputation < 0) 
+            if (user.Reputation.HasValue && user.Reputation < 0)
                 user.Reputation = 0;
+
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
         }

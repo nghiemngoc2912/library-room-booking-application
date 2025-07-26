@@ -1,8 +1,6 @@
-"use client"
-
-import { useState, useEffect } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
-import axios from "axios"
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 import {
   Container,
   Typography,
@@ -19,139 +17,129 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
+  TextField,
+  CircularProgress,
   Alert,
   Snackbar,
-  CircularProgress,
   Breadcrumbs,
   Link,
   Card,
   CardContent,
   Grid,
   Chip,
-} from "@mui/material"
-import ArrowBackIcon from "@mui/icons-material/ArrowBack"
-import StarIcon from "@mui/icons-material/Star"
-import StarBorderIcon from "@mui/icons-material/StarBorder"
-import HomeIcon from "@mui/icons-material/Home"
-import PersonIcon from "@mui/icons-material/Person"
-import RemoveIcon from "@mui/icons-material/Remove"
-import WarningIcon from "@mui/icons-material/Warning"
-
-// Định nghĩa số điểm trừ tương ứng với mỗi hành vi
-const violationPoints = {
-  "Minor Violation": -1,
-  Violation: -2,
-  "Serious Violation": -3,
-  Other: -1,
-}
+} from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import StarIcon from "@mui/icons-material/Star";
+import StarBorderIcon from "@mui/icons-material/StarBorder";
+import HomeIcon from "@mui/icons-material/Home";
+import PersonIcon from "@mui/icons-material/Person";
+import RemoveIcon from "@mui/icons-material/Remove";
+import WarningIcon from "@mui/icons-material/Warning";
 
 const StudentInfoPage = () => {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const userId = location.state?.userId
-  const report = location.state?.report
-  const [students, setStudents] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [openDialog, setOpenDialog] = useState(false)
-  const [selectedStudentId, setSelectedStudentId] = useState(null)
-  const [selectedReason, setSelectedReason] = useState("")
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" })
-  const [error, setError] = useState(null)
+  const location = useLocation();
+  const navigate = useNavigate();
+  const userId = location.state?.userId;
+  const report = location.state?.report;
+
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [reputationChange, setReputationChange] = useState(-5);
+  const [reason, setReason] = useState("");
+  const [bulkMode, setBulkMode] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchRelatedStudents = async () => {
-      try {
-        setLoading(true)
-        setError(null)
-        const response = await axios.get(`https://localhost:7238/api/student/${userId}/related`)
-        console.log("API Response:", response.data)
-        setStudents(response.data)
-      } catch (error) {
-        console.error("Error fetching related students:", error)
-        setError("Failed to load student information. Please try again.")
-        setSnackbar({
-          open: true,
-          message: "Failed to load student information",
-          severity: "error",
-        })
-      } finally {
-        setLoading(false)
-      }
-    }
+    fetchStudents();
+  }, [userId]);
 
-    if (userId) {
-      fetchRelatedStudents()
-    } else {
-      setError("No user ID provided")
-      setLoading(false)
-    }
-  }, [userId])
-
-  const handleSubtractReputation = async (studentId, change) => {
+  const fetchStudents = async () => {
     try {
-      const response = await axios.post(`https://localhost:7238/api/student/${studentId}/subtract-reputation`, {
-        change: change,
-        reason: selectedReason,
-      })
-      const updatedStudents = await axios.get(`https://localhost:7238/api/student/${userId}/related`)
-      setStudents(updatedStudents.data)
-      
-      // Sử dụng change gửi đi để hiển thị thông báo (giả định backend xử lý đúng)
+      setLoading(true);
+      setError(null);
+      const response = await axios.get(`https://localhost:7238/api/Student/${userId}/related`);
+      setStudents(response.data);
+    } catch (error) {
+      console.error("Lỗi khi lấy danh sách sinh viên:", error);
+      setError("Failed to load student information. Please try again.");
       setSnackbar({
         open: true,
-        message: `Successfully subtracted ${Math.abs(change)} point(s) from student's reputation`,
-        severity: "success",
-      })
+        message: "Failed to load student information",
+        severity: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOpenDialog = (student = null) => {
+    setSelectedStudent(student);
+    setReputationChange(-5);
+    setReason("");
+    setBulkMode(student === null);
+    setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setSelectedStudent(null);
+    setReason("");
+  };
+
+  const handleSubmit = async () => {
+    try {
+      if (bulkMode) {
+        await axios.post(`https://localhost:7238/api/Student/${userId}/subtract-related`, {
+          change: reputationChange,
+          reason: reason,
+        });
+        setSnackbar({
+          open: true,
+          message: `Successfully subtracted ${Math.abs(reputationChange)} point(s) from all students' reputation`,
+          severity: "success",
+        });
+      } else {
+        await axios.post(`https://localhost:7238/api/Student/${selectedStudent.id}/subtract-reputation`, {
+          change: reputationChange,
+          reason: reason,
+        });
+        setSnackbar({
+          open: true,
+          message: `Successfully subtracted ${Math.abs(reputationChange)} point(s) from ${selectedStudent.fullName}'s reputation`,
+          severity: "success",
+        });
+      }
+      await fetchStudents();
+      handleCloseDialog();
     } catch (error) {
-      console.error("Error subtracting reputation:", error)
+      console.error("Lỗi khi trừ uy tín:", error);
       setSnackbar({
         open: true,
         message: "Failed to subtract reputation. Please try again.",
         severity: "error",
-      })
+      });
     }
-  }
-
-  const handleOpenDialog = (studentId) => {
-    setSelectedStudentId(studentId)
-    setSelectedReason("")
-    setOpenDialog(true)
-  }
-
-  const handleCloseDialog = () => {
-    setOpenDialog(false)
-    setSelectedStudentId(null)
-    setSelectedReason("")
-  }
-
-  const handleConfirmSubtract = async () => {
-    if (selectedStudentId && selectedReason) {
-      const change = violationPoints[selectedReason] || -1
-      await handleSubtractReputation(selectedStudentId, change)
-      handleCloseDialog()
-    }
-  }
+  };
 
   const handleBack = () => {
     if (report) {
-      navigate("/report-detail", { state: { report } })
+      navigate("/report-detail", { state: { report } });
     } else {
-      navigate("/reports")
+      navigate("/reports");
     }
-  }
+  };
 
   const handleSnackbarClose = () => {
-    setSnackbar({ ...snackbar, open: false })
-  }
+    setSnackbar({ ...snackbar, open: false });
+  };
 
   const renderStars = (reputation) => {
-    const stars = []
-    const maxStars = 5
-    const currentReputation = reputation ?? 0
+    const stars = [];
+    const maxStars = 5;
+    const currentReputation = reputation ?? 0;
 
     for (let i = 0; i < maxStars; i++) {
       stars.push(
@@ -159,11 +147,11 @@ const StudentInfoPage = () => {
           <StarIcon key={i} color="warning" sx={{ mx: 0.25 }} />
         ) : (
           <StarBorderIcon key={i} color="disabled" sx={{ mx: 0.25 }} />
-        ),
-      )
+        )
+      );
     }
-    return stars
-  }
+    return stars;
+  };
 
   if (loading) {
     return (
@@ -178,7 +166,7 @@ const StudentInfoPage = () => {
           </Typography>
         </Box>
       </Container>
-    )
+    );
   }
 
   if (error && students.length === 0) {
@@ -195,12 +183,11 @@ const StudentInfoPage = () => {
           {error}
         </Alert>
       </Container>
-    )
+    );
   }
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      {/* Breadcrumbs */}
       <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 3 }}>
         <Link
           underline="hover"
@@ -240,9 +227,17 @@ const StudentInfoPage = () => {
         <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={handleBack}>
           {report ? "Back to Report Details" : "Back to Reports"}
         </Button>
+        <Button
+          variant="contained"
+          color="error"
+          startIcon={<RemoveIcon />}
+          onClick={() => handleOpenDialog()}
+          sx={{ ml: 2 }}
+        >
+          Subtract All
+        </Button>
       </Box>
 
-      {/* Summary Card */}
       <Grid container spacing={3} sx={{ mb: 3 }}>
         <Grid item xs={12} md={4}>
           <Card>
@@ -322,10 +317,10 @@ const StudentInfoPage = () => {
               </TableRow>
             ) : (
               students.map((student) => {
-                const reputation = student.reputation ?? 0
+                const reputation = student.reputation ?? 0;
                 return (
                   <TableRow
-                    key={student.studentId}
+                    key={student.id}
                     sx={{
                       "&:nth-of-type(odd)": { backgroundColor: "#f9f9f9" },
                       "&:hover": { backgroundColor: "#f0f0f0" },
@@ -334,7 +329,7 @@ const StudentInfoPage = () => {
                   >
                     <TableCell sx={{ py: 2 }}>
                       <Typography variant="subtitle2" sx={{ fontWeight: "medium" }}>
-                        #{student.studentId}
+                        #{student.id}
                       </Typography>
                     </TableCell>
                     <TableCell sx={{ py: 2 }}>
@@ -354,7 +349,7 @@ const StudentInfoPage = () => {
                         color="error"
                         size="small"
                         startIcon={<RemoveIcon />}
-                        onClick={() => handleOpenDialog(student.studentId)}
+                        onClick={() => handleOpenDialog(student)}
                         disabled={reputation === 0}
                         sx={{ textTransform: "none", borderRadius: 1, px: 2 }}
                       >
@@ -362,82 +357,61 @@ const StudentInfoPage = () => {
                       </Button>
                     </TableCell>
                   </TableRow>
-                )
+                );
               })
             )}
           </TableBody>
         </Table>
       </Paper>
 
-      {/* Confirmation Dialog */}
-      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+      <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ backgroundColor: "error.light", color: "white", p: 3 }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <WarningIcon />
-            Confirm Reputation Deduction
+            {bulkMode
+              ? "Subtract Reputation for All Students"
+              : `Subtract Reputation for ${selectedStudent?.fullName}`}
           </Box>
         </DialogTitle>
         <DialogContent sx={{ p: 3 }}>
           <DialogContentText sx={{ mb: 3, color: "text.secondary", fontSize: "1rem" }}>
-            Please select the reason for subtracting reputation points. This action will deduct{" "}
-            {selectedReason ? `${Math.abs(violationPoints[selectedReason] || 1)} point(s)` : "points"} from the
-            student's reputation.
+            Enter the number of reputation points to subtract and the reason.
           </DialogContentText>
-          <FormControl fullWidth>
-            <InputLabel id="reason-select-label" sx={{ color: "grey.700" }}>
-              Violation Reason
-            </InputLabel>
-            <Select
-              labelId="reason-select-label"
-              value={selectedReason}
-              onChange={(e) => setSelectedReason(e.target.value)}
-              label="Violation Reason"
-              sx={{ mt: 1, "& .MuiSelect-select": { py: 1.5 } }}
-            >
-              <MenuItem value="Minor Violation">
-                <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
-                  <span>Minor Violation</span>
-                  <Chip label="-1 point" color="warning" size="small" />
-                </Box>
-              </MenuItem>
-              <MenuItem value="Violation">
-                <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
-                  <span>Violation</span>
-                  <Chip label="-2 points" color="error" size="small" />
-                </Box>
-              </MenuItem>
-              <MenuItem value="Serious Violation">
-                <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
-                  <span>Serious Violation</span>
-                  <Chip label="-3 points" color="error" size="small" />
-                </Box>
-              </MenuItem>
-              <MenuItem value="Other">
-                <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
-                  <span>Other</span>
-                  <Chip label="-1 point" color="warning" size="small" />
-                </Box>
-              </MenuItem>
-            </Select>
-          </FormControl>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Points to Subtract"
+            type="number"
+            fullWidth
+            value={reputationChange}
+            onChange={(e) => setReputationChange(parseInt(e.target.value))}
+            sx={{ mt: 1 }}
+          />
+          <TextField
+            margin="dense"
+            label="Reason"
+            fullWidth
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            sx={{ mt: 2 }}
+          />
         </DialogContent>
         <DialogActions sx={{ p: 3, backgroundColor: "#f5f5f5" }}>
           <Button onClick={handleCloseDialog} color="inherit" sx={{ textTransform: "none" }}>
             Cancel
           </Button>
           <Button
-            onClick={handleConfirmSubtract}
+            onClick={handleSubmit}
             color="error"
             variant="contained"
-            disabled={!selectedReason}
+            disabled={!reason}
             sx={{ textTransform: "none", borderRadius: 1, px: 3 }}
           >
-            Confirm 
+            Confirm
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Snackbar for notifications */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
@@ -449,7 +423,7 @@ const StudentInfoPage = () => {
         </Alert>
       </Snackbar>
     </Container>
-  )
-}
+  );
+};
 
-export default StudentInfoPage
+export default StudentInfoPage;

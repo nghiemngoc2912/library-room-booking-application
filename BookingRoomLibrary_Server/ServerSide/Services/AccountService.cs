@@ -1,5 +1,9 @@
-﻿using Org.BouncyCastle.Crypto.Generators;
-using ServerSide.DTOs.User;
+﻿using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Crypto.Generators;
+using ServerSide.Constants;
+using ServerSide.DTOs;
+using ServerSide.DTOs.Account;
+using ServerSide.Models;
 using ServerSide.Repositories;
 using System.Security.Cryptography;
 using System.Text;
@@ -9,74 +13,206 @@ namespace ServerSide.Services
 {
     public class AccountService : IAccountService
     {
-        private readonly IAccountRepository _accountRepo;
-        private readonly IUserRepository _userRepo;
+        private readonly IAccountRepository repository;
+        private readonly IAuthService authService; 
 
-        public AccountService(IAccountRepository accountRepo, IUserRepository userRepo)
+        public AccountService(IAccountRepository repository, IAuthService authService)
         {
-            _accountRepo = accountRepo;
-            _userRepo = userRepo;
+            this.repository = repository;
+            this.authService = authService;
         }
 
-        async Task IAccountService.RegisterAsync(UserRegisterDTO dto,byte role)
+        public async Task<AccountDTO> CreateLibrarianAsync(CreateAccountDTO dto)
         {
-            if (string.IsNullOrWhiteSpace(dto.Username) || dto.Username.Length < 4)
-                throw new Exception("Username must have at least 4 chars");
-
-            if (string.IsNullOrWhiteSpace(dto.Password) || dto.Password.Length < 6)
-                throw new Exception("Password must have at least 6 chars");
-
-            if (string.IsNullOrWhiteSpace(dto.FullName))
-                throw new Exception("Full name cannot be empty");
-
-            if (!string.IsNullOrWhiteSpace(dto.Email))
+            // Validate username is email format
+            var emailRegex = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+            if (!emailRegex.IsMatch(dto.Username))
             {
-                var emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
-                if (!Regex.IsMatch(dto.Email, emailPattern))
-                    throw new Exception("Email invalid");
+                throw new ArgumentException("Username phải là một địa chỉ email hợp lệ.");
             }
-            if (dto.Dob != null)
+
+            // Validate password length
+            if (dto.Password.Length < 8)
             {
-                var dob = dto.Dob.Value;
+                throw new ArgumentException("Mật khẩu phải có ít nhất 8 ký tự.");
+            }
 
-                if (dob > DateOnly.FromDateTime(DateTime.Today))
-                    throw new Exception("Dob In the future");
+            // Validate username doesn't exist
+            var existingAccount = await repository.GetAccountByUsernameAsync(dto.Username);
+            if (existingAccount != null)
+            {
+                throw new ArgumentException("Username đã tồn tại.");
+            }
 
-                if (dob < new DateOnly(1990, 1, 1))
-                    throw new Exception("Dob before 1990");
+            // Validate email doesn't exist
+            var existingUser = await repository.GetUserByEmailAsync(dto.Email);
+            if (existingUser != null)
+            {
+                throw new ArgumentException("Email đã tồn tại.");
+            }
 
-                var today = DateOnly.FromDateTime(DateTime.Today);
-                int age = today.Year - dob.Year;
-                if (dob > today.AddYears(-age)) age--; // điều chỉnh nếu chưa đến sinh nhật
+            var account = new Account
+            {
+                Username = dto.Username,
+                PasswordHash = authService.ComputeHash(dto.Password),
+                Role = (byte)Roles.Staff,
+                Status = (byte)AccountStatus.Active
+            };
 
-                if (age < 16)
-                    throw new Exception("You need to be above 16.");
+            var user = new User
+            {
+                FullName = dto.FullName,
+                Email = dto.Email,
+                Dob = dto.Dob,
+                Code = dto.Code,
+                Reputation = 0
+            };
+
+            var createdAccount = await repository.CreateLibrarianAsync(account, user);
+
+            return new AccountDTO
+            {
+                Id = createdAccount.Id,
+                Username = createdAccount.Username,
+                FullName = user.FullName,
+                Email = user.Email,
+                Dob = user.Dob,
+                Code = user.Code,
+                Status = createdAccount.Status == 1 ? "Active" : "Inactive"
+            };
+        }
+
+        // ServerSide/Services/AccountService.cs (partial, focusing on UpdateLibrarianAsync)
+        public async Task<AccountDTO> UpdateLibrarianAsync(int id, CreateAccountDTO dto)
+        {
+            var emailRegex = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+            if (!emailRegex.IsMatch(dto.Username))
+            {
+                throw new ArgumentException("Username must be a valid email address.");
             }
             if (await _accountRepo.ExistsByUsernameAsync(dto.Username))
                 throw new Exception("Username exists");
 
-            var passwordHash = ComputeHash(dto.Password);
+            if (!string.IsNullOrEmpty(dto.Password) && dto.Password.Length < 8)
+            {
+                throw new ArgumentException("Password must be at least 8 characters long.");
+            }
 
-            var account = dto.ToAccount(passwordHash, role);
-            await _accountRepo.AddAsync(account);
-            await _accountRepo.SaveChangesAsync();
+            var existingAccount = await repository.GetAccountByIdAsync(id);
+            if (existingAccount == null)
+            {
+                throw new ArgumentException("Staff member not found.");
+            }
 
-            var user = dto.ToUser(account.Id);
-            await _userRepo.AddAsync(user);
+            var accountByUsername = await repository.GetAccountByUsernameAsync(dto.Username);
+            if (accountByUsername != null && accountByUsername.Id != id)
+            {
+                throw new ArgumentException("Username already exists.");
+            }
+
+            var userByEmail = await repository.GetUserByEmailAsync(dto.Email);
+            if (userByEmail != null && userByEmail.AccountId != id)
+            {
+                throw new ArgumentException("Email already exists.");
+            }
+
+            existingAccount.Username = dto.Username;
+            if (!string.IsNullOrEmpty(dto.Password))
+            {
+                existingAccount.PasswordHash = authService.ComputeHash(dto.Password);
+            }
+
+            var user = await repository.GetUserByAccountIdAsync(id);
+            if (user == null)
+            {
+                throw new ArgumentException("User data not found.");
+            }
+
+            user.FullName = dto.FullName;
+            user.Email = dto.Email;
+            user.Dob = dto.Dob;
+            user.Code = dto.Code;
+
+            await repository.UpdateLibrarianAsync(existingAccount, user);
+
+            return new AccountDTO
+            {
+                Id = existingAccount.Id,
+                Username = existingAccount.Username,
+                FullName = user.FullName,
+                Email = user.Email,
+                Dob = user.Dob,
+                Code = user.Code,
+                Status = existingAccount.Status == 1 ? "Active" : "Inactive"
+            };
         }
 
-        private string ComputeHash(string input)
+        public async Task<AccountDTO?> GetLibrarianByIdAsync(int id)
         {
-            using (var sha256 = SHA256.Create())
+            var account = await repository.GetAccountByIdAsync(id);
+            if (account == null) return null;
+
+            var user = account.Users.FirstOrDefault();
+            return new AccountDTO
             {
-                var bytes = Encoding.UTF8.GetBytes(input);
-                var hash = sha256.ComputeHash(bytes);
-                return Convert.ToBase64String(hash);
-            }
+                Id = account.Id,
+                Username = account.Username,
+                FullName = user?.FullName,
+                Email = user?.Email,
+                Dob = user?.Dob,
+                Code = user?.Code,
+                Status = account.Status == 1 ? "Active" : "Inactive"
+            };
+        }
+
+        public async Task UpdateLibrarianStatusAsync(UpdateAccountStatusDTO dto)
+        {
+            await repository.UpdateAccountStatusAsync(dto.Id, dto.Status);
+        }
+
+        public async Task DeleteLibrarianAsync(int id)
+        {
+            await repository.DeleteAccountAsync(id);
+        }
+
+        public PageResultDTO<AccountDTO> GetAllLibrarians(string? keyword, byte? status, int page, int pageSize)
+        {
+            var query = repository.GetLibrarians(keyword, status);
+            int totalItems = query.Count();
+
+            var accounts = query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var accountDtos = accounts.Select(a => new AccountDTO
+            {
+                Id = a.Id,
+                Username = a.Username,
+                FullName = a.Users.FirstOrDefault()?.FullName,
+                Email = a.Users.FirstOrDefault()?.Email,
+                Dob = a.Users.FirstOrDefault()?.Dob,
+                Code = a.Users.FirstOrDefault()?.Code,
+                Status = a.Status == 1 ? "Active" : "Inactive"
+            }).ToList();
+
+            return new PageResultDTO<AccountDTO>
+            {
+                Items = accountDtos,
+                TotalItems = totalItems,
+                Page = page,
+                PageSize = pageSize
+            };
         }
     }
+
     public interface IAccountService
     {
-        Task RegisterAsync(UserRegisterDTO dto, byte role);
+        Task<AccountDTO> CreateLibrarianAsync(CreateAccountDTO dto);
+        Task<AccountDTO?> GetLibrarianByIdAsync(int id);
+        Task UpdateLibrarianStatusAsync(UpdateAccountStatusDTO dto);
+        Task DeleteLibrarianAsync(int id);
+        PageResultDTO<AccountDTO> GetAllLibrarians(string? keyword, byte? status, int page, int pageSize);
+        Task<AccountDTO> UpdateLibrarianAsync(int id, CreateAccountDTO dto);
     }
 }

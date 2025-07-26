@@ -11,35 +11,55 @@ using ServerSide.Validations;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// CORS: Chỉ định rõ frontend domain và cho phép credentials (cookie/session)
+// ==================== CORS ====================
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontendPolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:3000") // React app domain
+        policy.WithOrigins("http://localhost:3000") // ← React client
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials(); // Cho phép gửi cookie/session
+              .AllowCredentials();
     });
 });
+
+// ==================== SESSION ====================
 builder.Services.AddDistributedMemoryCache();
-// Session configuration
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
-    options.Cookie.SameSite = SameSiteMode.None; // ← ADD THIS
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // ← ADD THIS if using HTTPS
+    options.Cookie.SameSite = SameSiteMode.None;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 });
+
+// ==================== CONTROLLERS & SWAGGER ====================
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// ==================== DB CONTEXT ====================
+builder.Services.AddDbContext<LibraryRoomBookingContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("MyCnn")));
+
+// ==================== CONFIGURATION BINDINGS ====================
 builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("EmailSettings"));
 
-builder.Services.AddScoped<IEmailService, EmailService>();
+// Read bookingrules.json
+var bookingRulesConfig = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("Config/bookingrules.json", optional: false, reloadOnChange: true)
+    .Build();
+builder.Services.Configure<BookingRules>(bookingRulesConfig);
+
+// Read otprules.json
+var otpRulesConfig = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("Config/otprules.json", optional: false, reloadOnChange: true)
+    .Build();
+builder.Services.Configure<OtpRuleOptions>(otpRulesConfig);
 
 // DB context
 builder.Services.AddDbContext<LibraryRoomBookingContext>(options =>
@@ -59,33 +79,34 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
 
+builder.Services.AddScoped<IOtpRepository, OtpRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
-
-builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IRuleRepository, RuleRepository>();
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<IRatingRepository, RatingRepository>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
-
-// DI Services
+// ==================== SERVICES ====================
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<ISlotService, SlotService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<INewsService, NewsService>();
 builder.Services.AddScoped<IUserService, UserService>();
-
-
 builder.Services.AddScoped<IAdminService, AdminService>();
-builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IRuleService, RuleService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IRatingService, RatingService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 
+// ==================== VALIDATIONS ====================
 builder.Services.AddScoped<CreateBookingValidation>();
+
+// ==================== BACKGROUND JOBS ====================
 builder.Services.AddHostedService<BookingCleanupJob>();
 
 //DI Job
@@ -106,7 +127,7 @@ builder.Services.Configure<ReputationConfig>(reputationConfig);
 
 var app = builder.Build();
 
-// Middleware pipeline
+// ==================== MIDDLEWARE ====================
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -123,13 +144,12 @@ using (var scope = app.Services.CreateScope())
     );
 }
 app.UseHttpsRedirection();
+app.UseRouting();
 
 // Order matters: UseCors before UseSession and UseAuthorization
 app.UseCors("FrontendPolicy");
-
 app.UseSession();
-
-app.UseAuthentication();
+app.UseAuthentication(); // nếu dùng JWT thì cần middleware xử lý trước
 app.UseAuthorization();
 
 app.MapControllers();

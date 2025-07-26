@@ -45,9 +45,13 @@ namespace ServerSide.Controllers
                     role = account.Role
                 });
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = "An error occurred during login.", error = ex.Message });
             }
         }
         [RoleFilter((int)Roles.Student, (int)Roles.Staff,(int)Roles.Admin)]
@@ -55,10 +59,14 @@ namespace ServerSide.Controllers
         public IActionResult GetCurrentUser()
         {
             var userId = HttpContext.Session.GetString("UserId");
+
             if (string.IsNullOrEmpty(userId))
             {
+                Console.WriteLine("SESSION NOT FOUND");
                 return Unauthorized(new { message = "Not logged in" });
             }
+
+            Console.WriteLine("SESSION FOUND: " + userId);
 
             return Ok(new
             {
@@ -99,7 +107,42 @@ namespace ServerSide.Controllers
             await _emailService.SendOtpEmail(decodedUsername, otp);
             return Ok("OTP sent");
         }
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDTO dto)
+        {
+            Console.WriteLine("[DEBUG] DTO nhận được:");
+            Console.WriteLine($"Email: {dto.Email}");
 
+            try
+            {
+                await _authService.ForgotPasswordAsync(dto.Email);
+                return Ok("Reset password email sent.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO dto)
+        {
+            try
+            {
+                Console.WriteLine($"[DEBUG] DTO nhận được:");
+                Console.WriteLine($"Token: {dto.Token}");
+                Console.WriteLine($"NewPassword: {dto.NewPassword}");
+                Console.WriteLine($"ConfirmPassword: {dto.ConfirmPassword}");
+
+                await _authService.ResetPasswordAsync(dto);
+                return Ok("Password reset successful.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] {ex.Message}");
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }
 

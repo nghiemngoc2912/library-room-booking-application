@@ -9,8 +9,7 @@ export default function BookingDetailForm({
   onChange,
   onCheckin,
   onCheckout,
-  onCancel,
-  onBack
+  onCancel
 }) {
   if (!booking) return <div>Loading...</div>;
 
@@ -21,8 +20,8 @@ export default function BookingDetailForm({
           type="date"
           label="Date"
           value={booking.bookingDate+""}
-          onChange={e => onChange('date', e.target.value)}
           fullWidth
+          readOnly
         />
       </div>
 
@@ -31,7 +30,7 @@ export default function BookingDetailForm({
           <InputLabel>Slot</InputLabel>
           <Select
             value={booking.slotId}
-            onChange={e => onChange('slotId', e.target.value)}
+            readOnly
             label="Slot"
           >
             {slots.map(slot => (
@@ -45,7 +44,7 @@ export default function BookingDetailForm({
           <InputLabel>Room</InputLabel>
           <Select
             value={booking.roomId}
-            onChange={e => onChange('roomId', e.target.value)}
+            readOnly
             label="Room"
           >
             {rooms.map(room => (
@@ -62,7 +61,7 @@ export default function BookingDetailForm({
         label="Reason"
         fullWidth
         value={booking.reason}
-        onChange={e => onChange('reason', e.target.value)}
+        readOnly
         style={{ marginBottom: 16 }}
       />
 
@@ -93,7 +92,6 @@ export default function BookingDetailForm({
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Button variant="contained" onClick={onBack}>Back to booking history</Button>
         <div>
           {role === 1 && booking.status === 0 && (
             <Button variant="contained" color="warning" onClick={onCancel}>Cancel</Button>
