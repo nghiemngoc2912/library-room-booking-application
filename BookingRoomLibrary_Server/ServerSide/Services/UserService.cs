@@ -84,6 +84,35 @@ namespace ServerSide.Services
                 Violations = violations
             };
         }
+
+        PageResultDTO<User> IUserService.GetAllStaffs(string? keyword, int page, int defaultPageSize)
+        {
+            var query = repository.GetUsersByRole((int)Roles.Staff, keyword);
+            int totalItems = query.Count();
+            var staffs = query
+                .Skip((page - 1) * defaultPageSize)
+                .Take(defaultPageSize)
+                .Include(u => u.Account)
+                .ToList();
+            return new PageResultDTO<User>
+            {
+                Items = staffs,
+                TotalItems = totalItems,
+                Page = page,
+                PageSize = defaultPageSize
+            };
+        }
+
+        User IUserService.UpdateStatus(int id, byte status)
+        {
+            var user = repository.GetUserById(id);
+            if (user == null)
+                return null;
+
+            user.Account.Status = status;
+            repository.UpdateAccount(user.Account);
+            return user;
+        }
     }
 
     public interface IUserService
@@ -93,5 +122,7 @@ namespace ServerSide.Services
         IEnumerable<UserBookingDTO> SearchUserByCode(string code);
         User GetUserById(int id);
         PageResultDTO<StudentListDTO> GetAllStudents(string? keyword, int page, int pageSize);
+        PageResultDTO<User> GetAllStaffs(string? keyword, int page, int defaultPageSize);
+        User UpdateStatus(int id, byte status);
     }
 }

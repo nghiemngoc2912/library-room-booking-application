@@ -8,7 +8,7 @@ using ServerSide.Services;
 
 namespace ServerSide.Controllers
 {
-    //[RoleFilter((int)Roles.Student, (int)Roles.Staff)]
+    [RoleFilter((int)Roles.Student, (int)Roles.Staff, (int)Roles.Admin)]
     [Route("api/[controller]")]
     [ApiController]
     public class SlotController : ControllerBase
@@ -52,7 +52,7 @@ namespace ServerSide.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
-
+        [RoleFilter((int)Roles.Staff,(int)Roles.Admin)]
         [HttpGet("update/{id}")]
         public IActionResult GetSlotByIdForUpdate(int id)
         {
@@ -77,7 +77,6 @@ namespace ServerSide.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
-
         [HttpPost]
         public IActionResult CreateSlot([FromBody] SlotDTO slotDTO)
         {
@@ -99,7 +98,6 @@ namespace ServerSide.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
-
         [HttpPut("update/{id}")]
         public IActionResult UpdateSlot(int id, [FromBody] SlotDTO slotDTO)
         {
@@ -126,7 +124,6 @@ namespace ServerSide.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
-
         [HttpPut("deactivate/{id}")]
         public IActionResult DeactivateSlot(int id)
         {
@@ -144,7 +141,6 @@ namespace ServerSide.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
-
         [HttpPut("activate/{id}")]
         public IActionResult ActivateSlot(int id)
         {

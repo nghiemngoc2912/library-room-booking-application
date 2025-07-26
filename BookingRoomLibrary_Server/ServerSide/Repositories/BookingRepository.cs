@@ -45,7 +45,9 @@ namespace ServerSide.Repositories
                 .Where(b =>
                     b.BookingDate >= fromDate &&
                     b.BookingDate <= toDate &&
-                    b.Students.Any(s => s.Id == user.Id))
+                    b.Students.Any(s => s.Id == user.Id) &&
+                    b.Status!=(byte)BookingRoomStatus.CanceledForMaintainance
+                    )
                 .Count();
         }
         public Booking GetBookingById(int id)

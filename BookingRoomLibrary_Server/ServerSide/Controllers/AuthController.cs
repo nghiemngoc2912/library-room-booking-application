@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ServerSide.Constants;
 using ServerSide.DTOs.Auth;
+using ServerSide.Filters;
 using ServerSide.Services;
 using System.Security.Cryptography;
 using System.Text;
@@ -52,7 +54,7 @@ namespace ServerSide.Controllers
                 return BadRequest(new { message = "An error occurred during login.", error = ex.Message });
             }
         }
-
+        [RoleFilter((int)Roles.Student, (int)Roles.Staff,(int)Roles.Admin)]
         [HttpGet("current-user")]
         public IActionResult GetCurrentUser()
         {
@@ -73,7 +75,7 @@ namespace ServerSide.Controllers
                 role = HttpContext.Session.GetInt32("Role")
             });
         }
-
+        [RoleFilter((int)Roles.Student, (int)Roles.Staff,(int)Roles.Admin)]
         [HttpPost("logout")]
         public IActionResult Logout()
         {

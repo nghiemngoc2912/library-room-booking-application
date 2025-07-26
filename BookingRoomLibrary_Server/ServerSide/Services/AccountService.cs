@@ -5,6 +5,8 @@ using ServerSide.DTOs;
 using ServerSide.DTOs.Account;
 using ServerSide.Models;
 using ServerSide.Repositories;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace ServerSide.Services

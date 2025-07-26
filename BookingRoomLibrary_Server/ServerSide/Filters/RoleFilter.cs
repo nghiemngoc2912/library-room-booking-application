@@ -25,6 +25,7 @@ namespace ServerSide.Filters
                 return;
             }
 
+            // Kiểm tra nếu Role không nằm trong danh sách Role cho phép
             if (!_allowedRoles.Contains(role.Value))
             {
                 context.Result = new ForbidResult(); // 403 Forbidden
