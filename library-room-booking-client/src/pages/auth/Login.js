@@ -11,33 +11,38 @@ function Login() {
   const { setRole } = useAuth();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setErrorMsg('');
+  e.preventDefault();
+  setErrorMsg('');
 
-    try {
-      const response = await login(email, password);
-      const { role, token, id } = response.data;
-      if (role != null) {
-        setRole(role); // Cập nhật role ngay lập tức
-        const parsedRole = parseInt(role, 10);
-        setRole(parsedRole);
-        localStorage.setItem('role', parsedRole);
-        if (token) {
-          localStorage.setItem('authToken', token);
-        }
-        if (id) {
-          localStorage.setItem('userId', id);
-        }
-        console.log('Login successful, role:', parsedRole);
-        navigate('/home', { replace: true }); // Sử dụng replace để tránh thêm lịch sử trình duyệt
-      } else {
-        setErrorMsg('Role không hợp lệ. Vui lòng liên hệ quản trị viên.');
-      }
-    } catch (err) {
-      console.error('Login error:', err);
-      setErrorMsg('Tài khoản hoặc mật khẩu không đúng.');
+  try {
+    const response = await login(email, password);
+    const data = response.data;
+
+    // Nếu backend trả về { success: false, message: "...", status: 0 }
+    if (data.success === false && data.status === 0) {
+      setErrorMsg(data.message); // "Tài khoản bị khóa"
+      return; // Ngắt luôn, không xử lý gì thêm
     }
-  };
+
+    const { role, token, id } = data;
+
+    if (role != null) {
+      const parsedRole = parseInt(role, 10);
+      setRole(parsedRole);
+      localStorage.setItem('role', parsedRole);
+      if (token) localStorage.setItem('authToken', token);
+      if (id) localStorage.setItem('userId', id);
+
+      console.log('Login successful, role:', parsedRole);
+      navigate('/home', { replace: true });
+    } else {
+      setErrorMsg('Role không hợp lệ. Vui lòng liên hệ quản trị viên.');
+    }
+  } catch (err) {
+    console.error('Login error:', err);
+    setErrorMsg('Tài khoản hoặc mật khẩu không đúng.');
+  }
+};
 
   const handleForgotPassword = () => {
     navigate('/forgot-password');

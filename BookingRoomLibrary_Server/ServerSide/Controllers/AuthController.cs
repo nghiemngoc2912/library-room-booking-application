@@ -23,13 +23,30 @@ namespace ServerSide.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginDTO loginDto)
         {
+            Console.WriteLine("vào line 26");
             try
             {
+                Console.WriteLine("vào line 29");
                 var account = _authService.Authenticate(loginDto);
+                Console.WriteLine("vào line 31");
                 if (account == null)
                 {
+                    Console.WriteLine("❌ Đăng nhập thất bại - Sai username hoặc password");
                     return Unauthorized(new { message = "Invalid username or password" });
                 }
+
+                if (account.Status == (int)Constants.AccountStatus.Inactive)
+                {
+                    Console.WriteLine("❌ Đăng nhập huhuhuhuhuh");
+                    return Ok(new
+                    {
+                        success = false,
+                        message = "Tài khoản bị khóa",
+                        status = account.Status
+                    });
+                }
+
+
 
                 // Store user information in session
                 HttpContext.Session.SetString("UserId", account.Id.ToString());
@@ -38,6 +55,7 @@ namespace ServerSide.Controllers
 
                 return Ok(new
                 {
+                    success = true,
                     id = account.Id,
                     username = account.Username,
                     role = account.Role

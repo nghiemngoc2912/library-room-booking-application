@@ -31,12 +31,6 @@ namespace ServerSide.Services
                 return null; // Invalid username
             }
 
-            // Check if account is inactive
-            if (account.Status == 0)
-            {
-                throw new UnauthorizedAccessException("Account is locked and cannot log in.");
-            }
-
             // Verify password
             var inputPasswordHash = ComputeHash(loginDto.Password);
             if (inputPasswordHash != account.PasswordHash)

@@ -18,7 +18,7 @@ namespace ServerSide.Repositories
             Console.WriteLine($"GetAccountByUsername: {username}");
 
             return _context.Accounts
-                .FirstOrDefault(a => a.Username == username && a.Status == 1);
+                .FirstOrDefault(a => a.Username == username);
         }
 
         public async Task<Account> GetAccountByUserIdAsync(int userId)
