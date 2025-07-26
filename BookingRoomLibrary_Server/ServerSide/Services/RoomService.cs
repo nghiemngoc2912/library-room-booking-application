@@ -21,7 +21,9 @@ namespace ServerSide.Services
 
         public IEnumerable<HomeRoomDTO> GetAllRoomsForHome()
         {
-            return roomRepository.GetAll().Select(r => new HomeRoomDTO(r)).ToList();
+            return roomRepository.GetAll().Select(r => new HomeRoomDTO(r))
+                .Where(r=>r.Status==(byte)RoomStatus.Active||r.Status== (byte)RoomStatus.Maintenance)
+                .ToList();
         }
 
         public IEnumerable<RoomLibrarian> GetAllRoomsForStaffManagement()
