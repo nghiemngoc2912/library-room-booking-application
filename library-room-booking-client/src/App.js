@@ -8,8 +8,8 @@ import AdminLayout from './layouts/AdminLayout';
 
 // Import các Page Components
 import RoomBooking from './pages/roomBooking/RoomBooking';
-import Home from './pages/roomBooking/Home'; 
-import ListRoom from './pages/roomManagement/ListRoom'; 
+import Home from './pages/roomBooking/Home';
+import ListRoom from './pages/roomManagement/ListRoom';
 import UpdateRoom from './pages/roomManagement/UpdateRoom';
 import CreateRoom from './pages/roomManagement/CreateRoom';
 import ListSlot from './pages/slotManagement/ListSlot';
@@ -20,11 +20,11 @@ import DetailRequestRoom from './pages/admin/DetailRequestRoom';
 import SlotRequest from './pages/admin/SlotRequest';
 import DetailSlotRequest from './pages/admin/DetailSlotRequest';
 import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
 import Unauthorized from './pages/auth/Unauthorized'
 import NewsPage from './pages/roomBooking/NewsPage';
 import ProfilePage from './pages/student/ProfilePage';
 import BookingDetailPage from './pages/roomBooking/BookingDetail';
-import StudentList from './pages/user/StudentList';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
@@ -40,7 +40,11 @@ import ReportDetailPage from './pages/report/ReportDetailPage';
 import StudentInfoPage from './pages/report/StudentInfoPage';
 import HistoryReportPage from './pages/report/HistoryReportPage';
 import ReportTypeDetailsPage from './pages/report/ReportTypeDetailsPage';
+import StudentListPage from './pages/student/StudentListPage';
+import StudentNewsPage from './pages/student/StudentNewsPage';
+
 import './App.css';
+import { Dashboard } from '@mui/icons-material';
 
 // Không cần import HomeLayoutWrapper nữa
 
@@ -134,9 +138,27 @@ const App = () => {
     } else if (role === 2) {
       return <LibrarianLayout><Home /></LibrarianLayout>;
     } else if (role === 3) {
-      return <AdminLayout><Home /></AdminLayout>;
+      return <AdminLayout><AdminDashboard /></AdminLayout>;
     }
     return <DefaultLayout><Home /></DefaultLayout>; // Mặc định về DefaultLayout
+  };
+
+  const getNewsLayout = () => {
+    if (role === 1) {
+      return <DefaultLayout><NewsPage /></DefaultLayout>;
+    } else if (role === 2) {
+      return <LibrarianLayout><NewsPage /></LibrarianLayout>;
+    } 
+    return <DefaultLayout><NewsPage /></DefaultLayout>; 
+  };
+
+  const getProfileLayout = () => {
+    if (role === 1) {
+      return <DefaultLayout><ProfilePage loggedInUserId={userId} role={role} /></DefaultLayout>;
+    } else if (role === 2) {
+      return <LibrarianLayout><ProfilePage loggedInUserId={userId} role={role} /></LibrarianLayout>;
+    }
+    return <DefaultLayout><ProfilePage loggedInUserId={userId} role={role} /></DefaultLayout>;
   };
 
   return (
@@ -147,6 +169,12 @@ const App = () => {
         <Route path="/login" element={
           <PublicRoute>
             <Login />
+          </PublicRoute>
+        } />
+
+        <Route path="/register" element={
+          <PublicRoute>
+            <Register />
           </PublicRoute>
         } />
 
@@ -166,7 +194,7 @@ const App = () => {
           path="/room_management"
           element={
             <ProtectedRoute allowedRoles={[2]}>
-              <LibrarianLayout><ListRoom/></LibrarianLayout>
+              <LibrarianLayout><ListRoom /></LibrarianLayout>
             </ProtectedRoute>
           }
         />
@@ -259,18 +287,18 @@ const App = () => {
           path="/news"
           element={
             <ProtectedRoute allowedRoles={[1, 2]}>
-              <DefaultLayout><NewsPage /></DefaultLayout>
+              {getNewsLayout()} {/* Gọi hàm để render layout phù hợp */}
             </ProtectedRoute>
           }
         />
         <Route
-          path="/student/profile"
-          element={
-            <ProtectedRoute allowedRoles={[1, 2]}>
-              <DefaultLayout><ProfilePage userId={userId} /></DefaultLayout>
-            </ProtectedRoute>
-          }
-        />
+        path="/student/profile"
+        element={
+          <ProtectedRoute allowedRoles={[1, 2]}>
+            {getProfileLayout()}
+          </ProtectedRoute>
+        }
+      />
         <Route
           path="/profile/change-password"
           element={
@@ -299,20 +327,28 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/students"
+          element={
+            <ProtectedRoute allowedRoles={[2]}>
+              <LibrarianLayout><StudentListPage /></LibrarianLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/news"
+          element={
+            <ProtectedRoute allowedRoles={[1]}>
+              <DefaultLayout><StudentNewsPage /></DefaultLayout>
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/booking/detail/:id"
           element={
             <ProtectedRoute allowedRoles={[1, 2, 3]}>
               <DefaultLayout><BookingDetailPage role={role} /></DefaultLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/user/students"
-          element={
-            <ProtectedRoute allowedRoles={[1, 2, 3]}>
-              <DefaultLayout><StudentList /></DefaultLayout>
             </ProtectedRoute>
           }
         />

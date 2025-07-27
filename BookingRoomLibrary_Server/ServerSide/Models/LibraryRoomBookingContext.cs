@@ -21,8 +21,6 @@ public partial class LibraryRoomBookingContext : DbContext
 
     public virtual DbSet<News> News { get; set; }
 
-    public virtual DbSet<Notification> Notifications { get; set; }
-
     public virtual DbSet<OtpCode> OtpCodes { get; set; }
 
     public virtual DbSet<Rating> Ratings { get; set; }
@@ -121,26 +119,6 @@ public partial class LibraryRoomBookingContext : DbContext
                 .HasForeignKey(d => d.CreatedBy)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__News__CreatedBy__59FA5E80");
-        });
-
-        modelBuilder.Entity<Notification>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__Notifica__3214EC2777A2B611");
-
-            entity.ToTable("Notification");
-
-            entity.Property(e => e.Id).HasColumnName("ID");
-            entity.Property(e => e.CreatedDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.IsRead).HasDefaultValue(false);
-            entity.Property(e => e.Title).HasMaxLength(255);
-            entity.Property(e => e.UserId).HasColumnName("UserID");
-
-            entity.HasOne(d => d.User).WithMany(p => p.Notifications)
-                .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Notificat__UserI__5629CD9C");
         });
 
         modelBuilder.Entity<OtpCode>(entity =>
@@ -252,7 +230,6 @@ public partial class LibraryRoomBookingContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.Status)
-                .HasDefaultValue((byte)1)
                 .HasColumnName("status");
         });
 
@@ -262,12 +239,9 @@ public partial class LibraryRoomBookingContext : DbContext
 
             entity.ToTable("User");
 
-            entity.HasIndex(e => e.Email, "UQ__User__A9D1053431D75E65").IsUnique();
-
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.AccountId).HasColumnName("AccountID");
             entity.Property(e => e.Code).HasMaxLength(10);
-            entity.Property(e => e.Email).HasMaxLength(255);
             entity.Property(e => e.FullName).HasMaxLength(255);
             entity.Property(e => e.Reputation).HasDefaultValue(0);
 

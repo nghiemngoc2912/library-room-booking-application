@@ -1,10 +1,15 @@
 export async function fetchRooms() {
-  const res = await fetch('https://localhost:7238/api/Room');
+  const res = await fetch('https://localhost:7238/api/Room', {
+    credentials: 'include'
+  });
   if (!res.ok) throw new Error('Failed to fetch rooms');
   return res.json();
 }
+
 export async function fetchRoomById(roomId) {
-  const res = await fetch(`https://localhost:7238/api/Room/${roomId}`);
+  const res = await fetch(`https://localhost:7238/api/Room/${roomId}`, {
+    credentials: 'include'
+  });
   if (!res.ok) throw new Error('Failed to fetch room');
   return res.json();
 }

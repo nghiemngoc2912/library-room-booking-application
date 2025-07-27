@@ -55,7 +55,9 @@ const RoomBooking = () => {
     setStudentInput(value);
 
     if (value.length >= 2) {
-      fetch(`https://localhost:7238/api/User/Search?code=${value}`)
+      fetch(`https://localhost:7238/api/User/Search?code=${value}`, {
+        credentials: 'include'
+      })
         .then((res) => res.json())
         .then((data) => setSuggestedStudents(data))
         .catch((err) => console.error(err));

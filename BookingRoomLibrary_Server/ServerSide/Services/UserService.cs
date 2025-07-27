@@ -46,7 +46,7 @@ namespace ServerSide.Services
                 Id = u.Id,
                 FullName = u.FullName,
                 Code = u.Code,
-                Email = u.Email,
+                Email = u.Account.Username,
                 Status = u.Account.Status == 1 ? "Active" : "Inactive"
             }).ToList();
             return new PageResultDTO<StudentListDTO>

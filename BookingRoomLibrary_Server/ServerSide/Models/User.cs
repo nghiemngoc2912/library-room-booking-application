@@ -13,8 +13,6 @@ public partial class User
 
     public int AccountId { get; set; }
 
-    public string? Email { get; set; }
-
     public int? Reputation { get; set; }
 
     public string? Code { get; set; }
@@ -24,8 +22,6 @@ public partial class User
     public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 
     public virtual ICollection<News> News { get; set; } = new List<News>();
-
-    public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 
     public virtual ICollection<Rating> Ratings { get; set; } = new List<Rating>();
 

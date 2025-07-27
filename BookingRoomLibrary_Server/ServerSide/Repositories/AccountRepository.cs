@@ -6,32 +6,32 @@ namespace ServerSide.Repositories
 {
     public class AccountRepository : IAccountRepository
     {
-        private readonly LibraryRoomBookingContext context;
+        private readonly LibraryRoomBookingContext _context;
 
         public AccountRepository(LibraryRoomBookingContext context)
         {
-            this.context = context;
+            this._context = context;
         }
 
         public async Task<Account> UpdateLibrarianAsync(Account account, User user)
         {
-            context.Accounts.Update(account);
-            context.Users.Update(user);
-            await context.SaveChangesAsync();
+            _context.Accounts.Update(account);
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
             return account;
         }
 
         public async Task<Account> CreateLibrarianAsync(Account account, User user)
         {
-            using var transaction = await context.Database.BeginTransactionAsync();
+            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                context.Accounts.Add(account);
-                await context.SaveChangesAsync();
+                _context.Accounts.Add(account);
+                await _context.SaveChangesAsync();
 
                 user.AccountId = account.Id;
-                context.Users.Add(user);
-                await context.SaveChangesAsync();
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
 
                 await transaction.CommitAsync();
                 return account;
@@ -45,60 +45,63 @@ namespace ServerSide.Repositories
 
         public async Task<Account?> GetAccountByIdAsync(int id)
         {
-            return await context.Accounts
+            return await _context.Accounts
                 .Include(a => a.Users)
                 .FirstOrDefaultAsync(a => a.Id == id && a.Role == (byte)Roles.Staff);
         }
 
         public async Task<Account?> GetAccountByUsernameAsync(string username)
         {
-            return await context.Accounts
+            return await _context.Accounts
                 .FirstOrDefaultAsync(a => a.Username == username);
         }
 
         public async Task<User?> GetUserByEmailAsync(string email)
         {
-            return await context.Users
-                .FirstOrDefaultAsync(u => u.Email == email);
+            return await _context.Users
+                .Include(u => u.Account)
+                .FirstOrDefaultAsync(u => u.Account.Username == email);
         }
+
 
         public async Task UpdateAccountStatusAsync(int id, byte status)
         {
-            var account = await context.Accounts.FindAsync(id);
+            var account = await _context.Accounts.FindAsync(id);
             if (account == null || account.Role != (byte)Roles.Staff)
                 throw new Exception("Librarian not found");
 
             account.Status = status;
-            await context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAccountAsync(int id)
         {
-            var account = await context.Accounts
+            var account = await _context.Accounts
                 .Include(a => a.Users)
                 .FirstOrDefaultAsync(a => a.Id == id && a.Role == (byte)Roles.Staff);
 
             if (account == null)
                 throw new Exception("Librarian not found");
 
-            context.Users.RemoveRange(account.Users);
-            context.Accounts.Remove(account);
-            await context.SaveChangesAsync();
+            _context.Users.RemoveRange(account.Users);
+            _context.Accounts.Remove(account);
+            await _context.SaveChangesAsync();
         }
 
-        // ServerSide/Repositories/AccountRepository.cs
         public IQueryable<Account> GetLibrarians(string? keyword, byte? status)
         {
-            var query = context.Accounts
-                .Include(a => a.Users) // Include Users first
-                .Where(a => a.Role == (byte)Roles.Staff); // Filter by Staff role
+            var query = _context.Accounts
+                .Include(a => a.Users)
+                .Where(a => a.Role == (byte)Roles.Staff);
 
             if (!string.IsNullOrWhiteSpace(keyword))
             {
                 query = query.Where(a =>
-                    a.Users.Any(u => u.FullName.Contains(keyword) ||
-                                     u.Email.Contains(keyword) ||
-                                     u.Code.Contains(keyword)));
+                    a.Users.Any(u =>
+                        u.FullName.Contains(keyword) ||
+                        u.Code.Contains(keyword)) ||
+                    a.Username.Contains(keyword) 
+                );
             }
 
             if (status.HasValue)
@@ -109,12 +112,27 @@ namespace ServerSide.Repositories
             return query;
         }
 
+
         public async Task<User> GetUserByAccountIdAsync(int accountId)
         {
-            return await context.Users.FirstOrDefaultAsync(u => u.AccountId == accountId);
+            return await _context.Users.FirstOrDefaultAsync(u => u.AccountId == accountId);
+        }
+
+        public async Task<User> GetLatestStudentAsync()
+        {
+            return await _context.Users
+                .Where(u => u.Code != null && u.Code.StartsWith("ST"))
+                .OrderByDescending(u => u.Code)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<List<User>> GetStudentsWithSTCodeAsync()
+        {
+            return await _context.Users
+                .Where(u => u.Code != null && u.Code.StartsWith("ST"))
+                .ToListAsync();
         }
     }
-
 
     public interface IAccountRepository
     {
@@ -127,5 +145,7 @@ namespace ServerSide.Repositories
         IQueryable<Account> GetLibrarians(string? keyword, byte? status);
         Task<Account> UpdateLibrarianAsync(Account account, User user);
         Task<User> GetUserByAccountIdAsync(int accountId);
+        Task<User?> GetLatestStudentAsync();
+        Task<List<User>> GetStudentsWithSTCodeAsync();
     }
 }

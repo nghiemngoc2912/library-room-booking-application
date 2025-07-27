@@ -59,7 +59,10 @@ var otpRulesConfig = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("Config/otprules.json", optional: false, reloadOnChange: true)
     .Build();
-builder.Services.Configure<OtpRuleOptions>(otpRulesConfig);
+builder.Services.Configure<OtpRuleOptions>(
+    otpRulesConfig.GetSection("OtpRules")
+);
+
 
 // DB context
 builder.Services.AddDbContext<LibraryRoomBookingContext>(options =>

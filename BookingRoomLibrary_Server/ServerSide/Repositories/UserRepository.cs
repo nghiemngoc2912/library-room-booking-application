@@ -1,5 +1,6 @@
 ﻿using Glimpse.Core.Extensibility;
 using Microsoft.EntityFrameworkCore;
+using ServerSide.Constants;
 using ServerSide.Models;
 
 namespace ServerSide.Repositories
@@ -15,7 +16,7 @@ namespace ServerSide.Repositories
 
         public IEnumerable<User> SearchUserByCode(string code)
         {
-            return context.Users.Where(x => x.Code.Contains(code));
+            return context.Users.Include(x=>x.Account).Where(x =>( x.Code.Contains(code)||x.FullName.Contains(code))&&x.Account.Role==(byte)Roles.Student);
         }
 
         public User GetUserByCode(string code)
@@ -46,7 +47,7 @@ namespace ServerSide.Repositories
                 query = query.Where(u =>
                     u.FullName.Contains(keyword) ||
                     u.Code.Contains(keyword) ||
-                    u.Email.Contains(keyword));
+                    u.Account.Username.Contains(keyword));
             }
 
             return query;

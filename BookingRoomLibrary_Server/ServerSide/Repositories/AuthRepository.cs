@@ -18,7 +18,7 @@ namespace ServerSide.Repositories
             Console.WriteLine($"GetAccountByUsername: {username}");
 
             return _context.Accounts
-                .FirstOrDefault(a => a.Username == username && a.Status == 1);
+                .FirstOrDefault(a => a.Username == username);
         }
 
         public async Task<Account> GetAccountByUserIdAsync(int userId)
@@ -32,12 +32,24 @@ namespace ServerSide.Repositories
             _context.Accounts.Update(account);
             await _context.SaveChangesAsync();
         }
+
+        public int GetUserIdByAccountId(int accountId)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.AccountId == accountId);
+
+            if (user == null)
+                throw new Exception("User not found for this account.");
+
+            return user.Id;
+        }
+
     }
 
     public interface IAuthRepository
     {
         Account GetAccountByUsername(string username);
         Task<Account> GetAccountByUserIdAsync(int userId); 
-        Task UpdateAccountAsync(Account account); 
+        Task UpdateAccountAsync(Account account);
+        int GetUserIdByAccountId(int accountId);
     }
 }

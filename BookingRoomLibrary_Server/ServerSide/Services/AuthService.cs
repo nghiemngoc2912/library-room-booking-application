@@ -1,10 +1,11 @@
-﻿using ServerSide.Constants;
+﻿using Microsoft.Extensions.Options;
+using ServerSide.Constants;
 using ServerSide.DTOs.Auth;
 using ServerSide.Models;
 using ServerSide.Repositories;
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.Extensions.Options;
+using System.Text.RegularExpressions;
 
 namespace ServerSide.Services
 {
@@ -12,80 +13,66 @@ namespace ServerSide.Services
     {
         private readonly IAuthRepository _authRepository;
         private readonly IOtpRepository _otpRepository;
+        private readonly IAccountRepository _accountRepository;
         private readonly IEmailService _emailService;
         private readonly OtpRuleOptions _otpRuleOptions;
+        private static readonly Dictionary<string, PendingRegistration> _pendingRegistrations = new();
 
-        public AuthService(IAuthRepository authRepository, IOtpRepository tpRepository, IEmailService emailService, IOptions<OtpRuleOptions> otpOptions)
+        public AuthService(
+            IAuthRepository authRepository,
+            IOtpRepository otpRepository,
+            IAccountRepository accountRepository,
+            IEmailService emailService,
+            IOptions<OtpRuleOptions> otpOptions)
         {
             _authRepository = authRepository;
-            _otpRepository = tpRepository;
+            _otpRepository = otpRepository;
+            _accountRepository = accountRepository;
             _emailService = emailService;
             _otpRuleOptions = otpOptions.Value;
         }
 
-       public Account Authenticate(LoginDTO loginDto)
+        public Account Authenticate(LoginDTO loginDto)
         {
             var account = _authRepository.GetAccountByUsername(loginDto.Username);
             if (account == null)
             {
-                return null; // Invalid username
+                return null;
             }
 
-            // Check if account is inactive
-            if (account.Status == 0)
-            {
-                throw new UnauthorizedAccessException("Account is locked and cannot log in.");
-            }
-
-            // Verify password
             var inputPasswordHash = ComputeHash(loginDto.Password);
             if (inputPasswordHash != account.PasswordHash)
             {
-                return null; // Invalid password
+                return null;
             }
 
             return account;
         }
 
-        private string ComputeHash(string input)
-        {
-            using (var sha256 = SHA256.Create())
-            {
-                var bytes = Encoding.UTF8.GetBytes(input);
-                var hash = sha256.ComputeHash(bytes);
-                return Convert.ToBase64String(hash);
-            }
-        }
-
         public async Task ChangePasswordAsync(int userId, ChangePasswordDTO changePasswordDto)
         {
-            // Lấy thông tin tài khoản từ repository
             var account = await _authRepository.GetAccountByUserIdAsync(userId);
             if (account == null)
             {
                 throw new KeyNotFoundException($"Account with UserId {userId} not found.");
             }
 
-            // Kiểm tra mật khẩu hiện tại
             var currentPasswordHash = ComputeHash(changePasswordDto.CurrentPassword);
             if (currentPasswordHash != account.PasswordHash)
             {
                 throw new UnauthorizedAccessException("Current password is incorrect.");
             }
 
-            // Kiểm tra độ dài mật khẩu mới
             if (changePasswordDto.NewPassword.Length < 8)
             {
                 throw new ArgumentException("New password must be at least 8 characters long.");
             }
 
-            // Kiểm tra confirm password
             if (changePasswordDto.NewPassword != changePasswordDto.ConfirmPassword)
             {
                 throw new ArgumentException("New password and confirm password do not match.");
             }
 
-            // Mã hóa mật khẩu mới và cập nhật
             var newPasswordHash = ComputeHash(changePasswordDto.NewPassword);
             account.PasswordHash = newPasswordHash;
             await _authRepository.UpdateAccountAsync(account);
@@ -104,15 +91,14 @@ namespace ServerSide.Services
                 throw new InvalidOperationException($"Mã OTP đã được gửi. Vui lòng đợi khoảng {Math.Ceiling(waitTime)} phút trước khi thử lại.");
             }
 
-
             var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
             var now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone);
 
-
             var otp = new OtpCode
             {
+                Id = Guid.NewGuid(),
                 Username = email,
-                Code = Guid.NewGuid().ToString(),
+                Code = GenerateOtpCode(),
                 OtpType = (int)OtpType.ForgotPassword,
                 IsUsed = false,
                 CreatedAt = now,
@@ -127,7 +113,6 @@ namespace ServerSide.Services
 
         public async Task ResetPasswordAsync(ResetPasswordDTO dto)
         {
-            
             if (dto.NewPassword != dto.ConfirmPassword)
                 throw new ArgumentException("Passwords do not match");
 
@@ -142,9 +127,167 @@ namespace ServerSide.Services
             await _otpRepository.MarkOtpAsUsedAsync(otp);
         }
 
-        string IAuthService.ComputeHash(string input)
+        public string ComputeHash(string input)
         {
-            return ComputeHash(input);
+            using (var sha256 = SHA256.Create())
+            {
+                var bytes = Encoding.UTF8.GetBytes(input);
+                var hash = sha256.ComputeHash(bytes);
+                return Convert.ToBase64String(hash);
+            }
+        }
+
+        public async Task<string> RegisterStudentAsync(CreateAccountStudentDTO dto)
+        {
+            var emailRegex = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+            if (!emailRegex.IsMatch(dto.Username))
+            {
+                throw new ArgumentException("Username phải là một địa chỉ email hợp lệ.");
+            }
+
+            if (dto.Password.Length < 8)
+            {
+                throw new ArgumentException("Mật khẩu phải có ít nhất 8 ký tự.");
+            }
+
+            // Lấy giờ Việt Nam hiện tại
+            var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            var nowVN = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone);
+
+            var existingOtp = await _otpRepository.GetActiveOtpByUsernameAsync(dto.Username, (int)OtpType.Registration);
+            if (existingOtp != null)
+            {
+                var waitTime = (existingOtp.ExpiredAt - nowVN).TotalMinutes;
+                if (waitTime > 0)
+                {
+                    throw new InvalidOperationException($"Mã OTP đã được gửi. Vui lòng đợi khoảng {Math.Ceiling(waitTime)} phút trước khi thử lại.");
+                }
+            }
+
+            var otpCode = GenerateOtpCode();
+            var otp = new OtpCode
+            {
+                Id = Guid.NewGuid(),
+                Username = dto.Username,
+                Code = otpCode,
+                OtpType = (int)OtpType.Registration,
+                IsUsed = false,
+                CreatedAt = nowVN,
+                ExpiredAt = nowVN.AddMinutes(_otpRuleOptions.TimeExpiredResetPasswordMinutes)
+            };
+
+            // Tạo code sinh viên và lưu vào pending registration
+            string studentCode = await GenerateStudentCodeAsync();
+
+            // Lưu tạm vào dictionary (chưa lưu DB)
+            _pendingRegistrations[dto.Username] = new PendingRegistration
+            {
+                Username = dto.Username,
+                Password = dto.Password,
+                FullName = dto.FullName,
+                Dob = dto.Dob.HasValue
+                    ? new DateTime(dto.Dob.Value.Year, dto.Dob.Value.Month, dto.Dob.Value.Day)
+                    : (DateTime?)null,
+                StudentCode = studentCode // Lưu mã sinh viên
+            };
+
+            await _otpRepository.CreateOtpAsync(otp);
+            return otpCode;
+        }
+
+        public async Task VerifyOtpAsync(string username, string otpCode)
+        {
+            var otp = await _otpRepository.GetValidOtpAsync(otpCode, (int)OtpType.Registration);
+            if (otp == null || otp.Username != username)
+                throw new Exception("Mã OTP không hợp lệ hoặc đã hết hạn.");
+
+            // Kiểm tra bổ sung thời gian hết hạn và trạng thái sử dụng
+            var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            var nowVN = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone);
+            if (otp.ExpiredAt <= nowVN)
+                throw new Exception("Mã OTP đã hết hạn. Vui lòng yêu cầu mã OTP mới.");
+            if (otp.IsUsed)
+                throw new Exception("Mã OTP đã được sử dụng.");
+
+            if (!_pendingRegistrations.TryGetValue(username, out var registrationData))
+                throw new Exception("Không tìm thấy thông tin đăng ký tạm.");
+
+            var account = new Account
+            {
+                Username = registrationData.Username,
+                PasswordHash = ComputeHash(registrationData.Password),
+                Role = (byte)Roles.Student,
+                Status = (byte)AccountStatus.Active
+            };
+
+            var user = new User
+            {
+                FullName = registrationData.FullName,
+                Dob = registrationData.Dob.HasValue ? DateOnly.FromDateTime(registrationData.Dob.Value) : null,
+                Code = registrationData.StudentCode,
+                Reputation = 100
+            };
+
+            await _accountRepository.CreateLibrarianAsync(account, user);
+            await _otpRepository.MarkOtpAsUsedAsync(otp);
+
+            _pendingRegistrations.Remove(username);
+        }
+
+        private async Task<string> GenerateStudentCodeAsync()
+        {
+            // Lấy tất cả sinh viên có mã bắt đầu bằng "ST"
+            var students = await _accountRepository.GetStudentsWithSTCodeAsync();
+            int maxNumber = 0;
+
+            foreach (var student in students)
+            {
+                if (student.Code != null && student.Code.StartsWith("ST") && student.Code.Length > 2)
+                {
+                    if (int.TryParse(student.Code.Substring(2), out int number))
+                    {
+                        maxNumber = Math.Max(maxNumber, number);
+                    }
+                }
+            }
+
+            int nextNumber = maxNumber + 1;
+            return $"ST{nextNumber:D3}"; // Đảm bảo định dạng ST001, ST002, v.v.
+        }
+
+        private string GenerateOtpCode()
+        {
+            return new Random().Next(100000, 999999).ToString();
+        }
+
+        public int GetUserIdByAccountId(int accountId)
+        {
+            return _authRepository.GetUserIdByAccountId(accountId);
+        }
+
+        public async Task<OtpCode> GetActiveOtpByUsernameAsync(string username, int otpType)
+        {
+            return await _otpRepository.GetActiveOtpByUsernameAsync(username, otpType);
+        }
+
+        public async Task<string> GenerateNewOtpAsync(string username, int otpType)
+        {
+            var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            var nowVN = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone);
+
+            var otp = new OtpCode
+            {
+                Id = Guid.NewGuid(),
+                Username = username,
+                Code = GenerateOtpCode(),
+                OtpType = otpType,
+                IsUsed = false,
+                CreatedAt = nowVN,
+                ExpiredAt = nowVN.AddMinutes(_otpRuleOptions.TimeExpiredResetPasswordMinutes)
+            };
+
+            await _otpRepository.CreateOtpAsync(otp);
+            return otp.Code;
         }
     }
 
@@ -155,6 +298,10 @@ namespace ServerSide.Services
         Task ForgotPasswordAsync(string email);
         Task ResetPasswordAsync(ResetPasswordDTO dto);
         string ComputeHash(string input);
-
+        Task<string> RegisterStudentAsync(CreateAccountStudentDTO dto);
+        Task VerifyOtpAsync(string username, string otpCode);
+        int GetUserIdByAccountId(int accountId);
+        Task<OtpCode> GetActiveOtpByUsernameAsync(string username, int otpType);
+        Task<string> GenerateNewOtpAsync(string username, int otpType);
     }
 }

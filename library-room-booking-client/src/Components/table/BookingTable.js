@@ -22,20 +22,34 @@ export default function BookingTable({ date, status}) {
   const isPastDate = date < today;
 
   useEffect(() => {
-    Promise.all([fetchSlots(), fetchRooms()])
-      .then(([slotsData, roomsData]) => {
-        setSlots(slotsData);
-        setRooms(roomsData);
-      })
-      .catch(err => console.error('Lỗi khi tải slots hoặc rooms:', err));
-    if (!isPastDate) {
+  Promise.all([fetchSlots(), fetchRooms()])
+    .then(([slotsData, roomsData]) => {
+      setSlots(slotsData);
+      setRooms(roomsData);
+    })
+    .catch(err => console.error('Lỗi khi tải slots hoặc rooms:', err));
+
+  if (!isPastDate) {
+    // Nếu status là mảng → fetch tất cả và gộp lại
+    if (Array.isArray(status)) {
+      Promise.all(status.map(s => fetchBookingsByDateAndStatus(date, s)))
+        .then(results => {
+          // Gộp tất cả kết quả bookings lại thành 1 mảng
+          const allBookings = results.flat();
+          setBookings(allBookings);
+        })
+        .catch(err => console.error('Lỗi khi tải bookings (multi-status):', err));
+    } else {
+      // Nếu chỉ là một giá trị đơn (ví dụ: 1)
       fetchBookingsByDateAndStatus(date, status)
         .then(setBookings)
         .catch(err => console.error('Lỗi khi tải bookings:', err));
-    } else {
-      setBookings([]);
     }
-  }, [date, status, isPastDate]);
+  } else {
+    setBookings([]);
+  }
+}, [date, status, isPastDate]);
+
 
   const getBooking = (roomId, slotId) => {
     return bookings.find(b => b.roomId === roomId && b.slotId === slotId);
