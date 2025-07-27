@@ -66,6 +66,28 @@ namespace ServerSide.Services
             await SendEmailAsync(toEmail, subject, body);
         }
 
+        public async Task SendReputationChangeEmailAsync(string email, string fullName, int newReputation, int change, string reason)
+        {
+            // Implementation would use an email provider (e.g., SMTP, SendGrid, etc.)
+            // For this example, we'll simulate sending an email
+            string subject = "Reputation Change Notification";
+            string body = $@"
+                Dear {fullName},
+
+                Your reputation score has been updated.
+                Change: {change} points
+                Reason: {reason}
+                New Reputation: {newReputation}
+
+                Please contact support if you have any questions.
+
+                Best regards,
+                Room Booking System
+                ";
+
+            await SendEmailAsync(email, subject, body);
+        }
+
     }
 
     public interface IEmailService
@@ -73,5 +95,6 @@ namespace ServerSide.Services
         Task SendEmailAsync(string to, string subject, string htmlContent);
         Task SendOtpEmail(string toUsername, string otpCode);
         Task SendForgotPasswordEmail(string toEmail, string resetLink);
+        Task SendReputationChangeEmailAsync(string email, string fullName, int newReputation, int change, string reason);
     }
 }

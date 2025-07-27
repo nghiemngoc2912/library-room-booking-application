@@ -8,7 +8,7 @@
   "MaxTimeToCheckout": 15,
   "SubstractReputation": -10,
   "TimeStart": 9,
-  "TimeEnd": 18,
-  "TimeJobInterval": 5,
+  "TimeEnd": 23,
+  "TimeJobInterval": 1,
   "CancelTimeInterval": 2
 }

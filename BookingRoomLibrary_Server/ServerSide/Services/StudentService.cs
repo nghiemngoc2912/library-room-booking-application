@@ -10,11 +10,13 @@ namespace ServerSide.Services
     {
         private readonly IStudentRepository _studentRepository;
         private readonly ReputationConfig config;
+        private readonly IEmailService _emailService;
 
-        public StudentService(IStudentRepository studentRepository,IOptions<ReputationConfig> options)
+        public StudentService(IStudentRepository studentRepository,IOptions<ReputationConfig> options, IEmailService emailService)
         {
             _studentRepository = studentRepository ?? throw new ArgumentNullException(nameof(studentRepository));
             config = options.Value;
+            _emailService = emailService;
         }
 
         public async Task<IEnumerable<StudentDTO>> GetRelatedStudentsAsync(int userId)
@@ -37,6 +39,15 @@ namespace ServerSide.Services
 
             user.Reputation = newReputation;
             await _studentRepository.UpdateUserAsync(user);
+
+            // Send email notification to the user
+            await _emailService.SendReputationChangeEmailAsync(
+                user.Account.Username,
+                user.FullName,
+                newReputation,
+                change,
+                reason
+            );
         }
 
         public async Task SubtractReputationFromRelatedStudentsAsync(int reporterUserId, int change, string reason)
@@ -53,6 +64,15 @@ namespace ServerSide.Services
 
                 student.Reputation = newReputation;
                 await _studentRepository.UpdateUserAsync(student);
+
+                // Send email notification to each related student
+                await _emailService.SendReputationChangeEmailAsync(
+                    student.Account.Username,
+                    student.FullName,
+                    newReputation,
+                    change,
+                    reason
+                );
             }
         }
 
