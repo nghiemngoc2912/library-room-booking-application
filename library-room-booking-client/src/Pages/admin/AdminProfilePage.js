@@ -3,7 +3,7 @@ import {
   Box, Typography, Container, Alert,
 } from '@mui/material';
 import axios from 'axios';
-import ChangePasswordPage from '../../pages/student/ChangePasswordPage';
+import ChangePasswordPage from '../../Pages/student/ChangePasswordPage';
 
 export default function AdminProfilePage({ userId }) {
   const [userInfo, setUserInfo] = useState(null);

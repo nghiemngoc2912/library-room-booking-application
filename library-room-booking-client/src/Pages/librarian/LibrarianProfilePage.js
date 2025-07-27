@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import ChangePasswordPage from '../../pages/student/ChangePasswordPage'; 
+import ChangePasswordPage from '../../Pages/student/ChangePasswordPage'; 
 
 export default function LibrarianProfilePage({ userId }) {
   const [bookings, setBookings] = useState([]);

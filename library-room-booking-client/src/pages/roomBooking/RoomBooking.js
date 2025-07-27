@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-
-import { fetchSlotById } from '../../api/SlotAPI';
-import { fetchRoomById } from '../../api/RoomAPI';
+import { getRulesList } from '../../api/Rules'; 
 import bookingReasons from '../../constants/BookingReasons';
+import { fetchRoomById } from '../../api/RoomAPI';
+import { fetchSlotById } from '../../api/SlotAPI';
 
 const RoomBooking = () => {
   const [searchParams] = useSearchParams();
@@ -23,23 +23,29 @@ const RoomBooking = () => {
 
   const [agree, setAgree] = useState(false);
   const [message, setMessage] = useState('');
+  const [rules, setRules] = useState([]); // State để lưu danh sách quy tắc từ API
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
+        // Fetch room và slot data
         const roomData = await fetchRoomById(roomId);
-        const slotInfo = await fetchSlotById(slotId);
+        const slotInfoData = await fetchSlotById(slotId);
 
         setRoomName(roomData?.roomName || 'Unknown room');
         setSlotInfo(
-          slotInfo
-            ? `${slotInfo.order} (${slotInfo.fromTime} - ${slotInfo.toTime})`
+          slotInfoData
+            ? `${slotInfoData.order} (${slotInfoData.fromTime} - ${slotInfoData.toTime})`
             : 'Unknown slot'
         );
+
+        // Fetch rules từ API
+        const rulesData = await getRulesList(); 
+        setRules(rulesData);
       } catch (err) {
         console.error(err);
-        setError('Unable to load room or slot data.');
+        setError('Unable to load room, slot, or rules data.');
       } finally {
         setLoading(false);
       }
@@ -254,11 +260,9 @@ const RoomBooking = () => {
             lineHeight: '1.6'
           }}>
             <ul style={{ paddingLeft: '1.25rem', margin: 0 }}>
-              <li>If plans change and the room is not needed, please cancel the booking before the scheduled time.</li>
-              <li>Rooms are only for study purposes. Misuse or booking without usage will result in a ban for one term.</li>
-              <li>Ensure the facilities in the room are intact. Damages will require compensation as per regulations.</li>
-              <li>Return the room to its original condition after use.</li>
-              <li>Do not remove any facilities from the room during usage.</li>
+              {rules.map((rule, index) => (
+                <li key={index}>{rule.ruleName}: {rule.description}</li> 
+              ))}
             </ul>
           </div>
 

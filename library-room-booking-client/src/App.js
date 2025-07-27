@@ -7,44 +7,44 @@ import LibrarianLayout from './layouts/LibrarianLayout';
 import AdminLayout from './layouts/AdminLayout';
 
 // Import các Page Components
-import RoomBooking from './pages/roomBooking/RoomBooking';
-import Home from './pages/roomBooking/Home';
-import ListRoom from './pages/roomManagement/ListRoom';
-import UpdateRoom from './pages/roomManagement/UpdateRoom';
-import CreateRoom from './pages/roomManagement/CreateRoom';
-import ListSlot from './pages/slotManagement/ListSlot';
-import CreateSlot from './pages/slotManagement/CreateSlot';
-import UpdateSlot from './pages/slotManagement/UpdateSlot';
-import RequestRoom from './pages/admin/RequestRoom';
-import DetailRequestRoom from './pages/admin/DetailRequestRoom';
-import SlotRequest from './pages/admin/SlotRequest';
-import DetailSlotRequest from './pages/admin/DetailSlotRequest';
-import Login from './pages/auth/Login';
-import Register from './pages/auth/Register';
-import Unauthorized from './pages/auth/Unauthorized'
-import NewsPage from './pages/roomBooking/NewsPage';
-import ProfilePage from './pages/student/ProfilePage';
-import BookingDetailPage from './pages/roomBooking/BookingDetail';
-import AdminDashboard from './pages/admin/AdminDashboard';
-import ResetPasswordPage from './pages/auth/ResetPasswordPage';
-import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
-import LibrarianManagement from './pages/librarianManagement/LibrarianManagement'
-import MaintenanceBooking from './pages/roomManagement/MaintenanceBooking'; 
-import LibrarianProfilePage from './pages/librarian/LibrarianProfilePage';
-import AdminProfilePage from './pages/admin/AdminProfilePage';
+import RoomBooking from './Pages/roomBooking/RoomBooking';
+import Home from './Pages/roomBooking/Home';
+import ListRoom from './Pages/roomManagement/ListRoom';
+import UpdateRoom from './Pages/roomManagement/UpdateRoom';
+import CreateRoom from './Pages/roomManagement/CreateRoom';
+import ListSlot from './Pages/slotManagement/ListSlot';
+import CreateSlot from './Pages/slotManagement/CreateSlot';
+import UpdateSlot from './Pages/slotManagement/UpdateSlot';
+import RequestRoom from './Pages/admin/RequestRoom';
+import DetailRequestRoom from './Pages/admin/DetailRequestRoom';
+import SlotRequest from './Pages/admin/SlotRequest';
+import DetailSlotRequest from './Pages/admin/DetailSlotRequest';
+import Login from './Pages/auth/Login';
+import Register from './Pages/auth/Register';
+import Unauthorized from './Pages/auth/Unauthorized'
+import NewsPage from './Pages/roomBooking/NewsPage';
+import ProfilePage from './Pages/student/ProfilePage';
+import BookingDetailPage from './Pages/roomBooking/BookingDetail';
+import AdminDashboard from './Pages/admin/AdminDashboard';
+import ResetPasswordPage from './Pages/auth/ResetPasswordPage';
+import ForgotPasswordPage from './Pages/auth/ForgotPasswordPage';
+import LibrarianManagement from './Pages/librarianManagement/LibrarianManagement'
+import MaintenanceBooking from './Pages/roomManagement/MaintenanceBooking'; 
+import LibrarianProfilePage from './Pages/librarian/LibrarianProfilePage';
+import AdminProfilePage from './Pages/admin/AdminProfilePage';
 
 import { BrowserRouter as Router, Link, useNavigate } from 'react-router-dom';
-import RulesPage from './pages/rule/RulesPage';
-import ReportsPage from './pages/report/ReportsPage';
-import AddRulePage from './pages/rule/AddRulePage';
-import EditRulePage from './pages/rule/EditRulePage';
-import AddReportPage from './pages/report/AddReportPage';
-import ReportDetailPage from './pages/report/ReportDetailPage';
-import StudentInfoPage from './pages/report/StudentInfoPage';
-import HistoryReportPage from './pages/report/HistoryReportPage';
-import ReportTypeDetailsPage from './pages/report/ReportTypeDetailsPage';
-import StudentListPage from './pages/student/StudentListPage';
-import StudentNewsPage from './pages/student/StudentNewsPage';
+import RulesPage from './Pages/rule/RulesPage';
+import ReportsPage from './Pages/report/ReportsPage';
+import AddRulePage from './Pages/rule/AddRulePage';
+import EditRulePage from './Pages/rule/EditRulePage';
+import AddReportPage from './Pages/report/AddReportPage';
+import ReportDetailPage from './Pages/report/ReportDetailPage';
+import StudentInfoPage from './Pages/report/StudentInfoPage';
+import HistoryReportPage from './Pages/report/HistoryReportPage';
+import ReportTypeDetailsPage from './Pages/report/ReportTypeDetailsPage';
+import StudentListPage from './Pages/student/StudentListPage';
+import StudentNewsPage from './Pages/student/StudentNewsPage';
 
 import './App.css';
 import { Dashboard } from '@mui/icons-material';
