@@ -230,7 +230,6 @@ public partial class LibraryRoomBookingContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.Status)
-                .HasDefaultValue((byte)1)
                 .HasColumnName("status");
         });
 

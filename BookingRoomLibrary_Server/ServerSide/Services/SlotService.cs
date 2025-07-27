@@ -95,7 +95,7 @@ namespace ServerSide.Services
                 Order = slotDTO.Order,
                 FromTime = fromTime,
                 ToTime = toTime,
-                Status = (byte)slotDTO.Status
+                Status = (byte)Constants.SlotStatus.Pending
             };
 
             return slotRepository.Create(slot);
