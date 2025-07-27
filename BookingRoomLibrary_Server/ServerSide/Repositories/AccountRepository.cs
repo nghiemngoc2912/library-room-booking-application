@@ -47,6 +47,13 @@ namespace ServerSide.Repositories
         {
             return await _context.Accounts
                 .Include(a => a.Users)
+                .FirstOrDefaultAsync(a => a.Id == id);
+        }
+
+        public async Task<Account?> GetAccountStaffByIdAsync(int id)
+        {
+            return await _context.Accounts
+                .Include(a => a.Users)
                 .FirstOrDefaultAsync(a => a.Id == id && a.Role == (byte)Roles.Staff);
         }
 
@@ -138,6 +145,7 @@ namespace ServerSide.Repositories
     {
         Task<Account> CreateLibrarianAsync(Account account, User user);
         Task<Account?> GetAccountByIdAsync(int id);
+        Task<Account?> GetAccountStaffByIdAsync(int id);
         Task<Account?> GetAccountByUsernameAsync(string username);
         Task<User?> GetUserByEmailAsync(string email);
         Task UpdateAccountStatusAsync(int id, byte status);

@@ -86,8 +86,8 @@ function Header() {
       handleLogout();
     } else if (setting === 'Profile') {
       if (role === 1) navigate('/student/profile');
-      else if (role === 2) navigate('/user/students');
-      else if (role === 3) navigate('/admin');
+      else if (role === 2) navigate('/librarian/profile');
+      else if (role === 3) navigate('/admin.profile');
       handleCloseUserMenu();
     }
   };

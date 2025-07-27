@@ -19,7 +19,7 @@ export default function Home() {
         />
       </div>
 
-      <BookingTable date={selectedDate} status={[1, 2, 0]} />
+      <BookingTable date={selectedDate} status={[1, 2, 0, 6]} />
       <div style={{ marginTop: 20, display: 'flex', justifyContent: 'center' }}>
           <div style={{ display: 'flex', gap: 30, alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>

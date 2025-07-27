@@ -12,7 +12,7 @@ import { fetchRooms } from '../../api/RoomAPI';
 import { fetchBookingsByDateAndStatus } from '../../api/BookingAPI';
 import { useAuth } from '../../App';
 
-export default function BookingTable({ date, status}) {
+export default function BookingTable({ date, status }) {
   const [slots, setSlots] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [bookings, setBookings] = useState([]);
@@ -22,34 +22,31 @@ export default function BookingTable({ date, status}) {
   const isPastDate = date < today;
 
   useEffect(() => {
-  Promise.all([fetchSlots(), fetchRooms()])
-    .then(([slotsData, roomsData]) => {
-      setSlots(slotsData);
-      setRooms(roomsData);
-    })
-    .catch(err => console.error('Lỗi khi tải slots hoặc rooms:', err));
+    Promise.all([fetchSlots(), fetchRooms()])
+      .then(([slotsData, roomsData]) => {
+        setSlots(slotsData);
+        setRooms(roomsData);
+      })
+      .catch(err => console.error('Lỗi khi tải slots hoặc rooms:', err));
 
-  if (!isPastDate) {
-    // Nếu status là mảng → fetch tất cả và gộp lại
-    if (Array.isArray(status)) {
-      Promise.all(status.map(s => fetchBookingsByDateAndStatus(date, s)))
-        .then(results => {
-          // Gộp tất cả kết quả bookings lại thành 1 mảng
-          const allBookings = results.flat();
-          setBookings(allBookings);
-        })
-        .catch(err => console.error('Lỗi khi tải bookings (multi-status):', err));
+    if (!isPastDate) {
+      if (Array.isArray(status)) {
+        Promise.all(status.map(s => fetchBookingsByDateAndStatus(date, s)))
+          .then(results => {
+            const allBookings = results.flat();
+            console.log('Bookings:', allBookings); // Debug
+            setBookings(allBookings);
+          })
+          .catch(err => console.error('Lỗi khi tải bookings (multi-status):', err));
+      } else {
+        fetchBookingsByDateAndStatus(date, status)
+          .then(setBookings)
+          .catch(err => console.error('Lỗi khi tải bookings:', err));
+      }
     } else {
-      // Nếu chỉ là một giá trị đơn (ví dụ: 1)
-      fetchBookingsByDateAndStatus(date, status)
-        .then(setBookings)
-        .catch(err => console.error('Lỗi khi tải bookings:', err));
+      setBookings([]);
     }
-  } else {
-    setBookings([]);
-  }
-}, [date, status, isPastDate]);
-
+  }, [date, status, isPastDate]);
 
   const getBooking = (roomId, slotId) => {
     return bookings.find(b => b.roomId === roomId && b.slotId === slotId);
@@ -75,9 +72,10 @@ export default function BookingTable({ date, status}) {
                 {room.roomName}
               </TableCell>
               {slots.map((slot) => {
-                const isRoomInactive = room.status === 2;
+                const isRoomInactive = room.status === 2; // Trạng thái Maintenance của room
                 const booking = getBooking(room.id, slot.id);
-                const cellText = isRoomInactive
+                const isMaintenanceBooking = booking && booking.status === 6; // Booking cho bảo trì
+                const cellText = isRoomInactive || isMaintenanceBooking
                   ? '-'
                   : booking
                   ? (role === 2 ? (
@@ -96,12 +94,12 @@ export default function BookingTable({ date, status}) {
                         +
                       </Link>
                     ) : null);
-                const bgColor = isRoomInactive
+                const bgColor = isRoomInactive || isMaintenanceBooking
                   ? '#e0e0e0'
                   : booking
                   ? '#f8d7da'
                   : '#d4edda';
-                const textColor = isRoomInactive
+                const textColor = isRoomInactive || isMaintenanceBooking
                   ? '#6c757d'
                   : booking
                   ? '#721c24'

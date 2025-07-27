@@ -87,7 +87,7 @@ namespace ServerSide.Services
                 throw new ArgumentException("Password must be at least 8 characters long.");
             }
 
-            var existingAccount = await repository.GetAccountByIdAsync(id);
+            var existingAccount = await repository.GetAccountStaffByIdAsync(id);
             if (existingAccount == null)
             {
                 throw new ArgumentException("Staff member not found.");
@@ -130,7 +130,7 @@ namespace ServerSide.Services
 
         public async Task<AccountDTO?> GetLibrarianByIdAsync(int id)
         {
-            var account = await repository.GetAccountByIdAsync(id);
+            var account = await repository.GetAccountStaffByIdAsync(id);
             if (account == null) return null;
 
             var user = account.Users.FirstOrDefault();

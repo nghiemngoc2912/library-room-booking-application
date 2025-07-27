@@ -158,5 +158,19 @@ namespace ServerSide.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
+
+        [HttpGet("slots_for_maintenance")]
+        public IActionResult GetSlotsForMaintenance()
+        {
+            try
+            {
+                var slots = slotService.GetSlotsForMaintenance();
+                return Ok(slots);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
     }
 }

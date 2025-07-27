@@ -213,6 +213,20 @@ namespace ServerSide.Services
             }
             return slotRepository.Delete(id);
         }
+
+        public IEnumerable<SlotDTO> GetSlotsForMaintenance()
+        {
+            return slotRepository.GetAll()
+                .Where(s => s.Status == (byte)SlotStatus.Active || s.Status == (byte)SlotStatus.OnlyForMaintain)
+                .Select(s => new SlotDTO
+                {
+                    Id = s.Id,
+                    FromTime = s.FromTime.ToString(@"hh\:mm"),
+                    ToTime = s.ToTime.ToString(@"hh\:mm"),
+                    Status = s.Status
+                })
+                .ToList();
+        }
     }
 
     public interface ISlotService
@@ -229,5 +243,6 @@ namespace ServerSide.Services
         SlotRequestDTO GetPendingSlotById(int id);
         bool AcceptSlot(int id);
         bool RejectSlot(int id);
+        IEnumerable<SlotDTO> GetSlotsForMaintenance();
     }
 }

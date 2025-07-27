@@ -145,5 +145,33 @@ namespace ServerSide.Controllers
             }
             
         }
+
+        [RoleFilter((int)Roles.Staff)]
+        [HttpPost("maintenance")]
+        public IActionResult CreateMaintenanceBooking([FromBody] MaintenanceBookingDTO maintenanceBookingDTO)
+        {
+            try
+            {
+                var userIdRaw = HttpContext.Session.GetString("UserId");
+                if (string.IsNullOrEmpty(userIdRaw))
+                {
+                    return Unauthorized(new { message = "Not logged in" });
+                }
+                int userId = int.Parse(userIdRaw);
+                Console.WriteLine($"Received payload: {Newtonsoft.Json.JsonConvert.SerializeObject(maintenanceBookingDTO)}");
+                _bookingService.CreateMaintenanceBooking(maintenanceBookingDTO, userId);
+                return Ok("Maintenance booking created successfully");
+            }
+            catch (BookingPolicyViolationException ex)
+            {
+                Console.WriteLine($"Policy violation: {ex.Message}");
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
     }
 }
