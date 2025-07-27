@@ -68,7 +68,7 @@ const StudentListPage = () => {
               <td style={td}>{student.fullName}</td>
               <td style={td}>{student.code}</td>
               <td style={td}>{student.email}</td>
-              <td style={td}>{student.status === 1 ? 'Active' : 'Inactive'}</td>
+              <td style={td}>{student.status }</td>
               <td style={td}>
                 <Link to={`/student/profile?userId=${student.id}`}>
                   <button
