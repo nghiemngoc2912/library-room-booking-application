@@ -10,6 +10,8 @@ namespace ServerSide.Constants
         Active = 1,
 
         [Description("Ngưng hoạt động")]
-        Inactive = 3
+        Inactive = 3,
+        [Description("Slot cho bảo trì ")]
+        OnlyForMaintain = 4
     }
 }

@@ -73,7 +73,7 @@ const UpdateSlot = () => {
     // Status validation only for non-pending slots
     if (!isPending) {
       const status = parseInt(slot.status);
-      if (![0, 1, -1, -2].includes(status)) {
+      if (![0, 1, 3, 4].includes(status)) {
         setError('Trạng thái không hợp lệ. Vui lòng chọn một giá trị hợp lệ.');
         return;
       }
@@ -216,10 +216,10 @@ const UpdateSlot = () => {
                 backgroundColor: isPending ? '#f8f9fa' : 'white',
               }}
             >
-              {/* <option value="0">Pending</option> */}
-              <option value="1">Active</option>
-              <option value="-1">Inactive</option>
-              {/* <option value="-2">Maintenance</option> */}
+              <option value="0">Đang chờ duyệt</option>
+              <option value="1">Hoạt động</option>
+              <option value="3">Ngưng hoạt động</option>
+              <option value="4">Slot cho bảo trì</option>
             </select>
             {isPending && (
               <p style={{ color: '#6c757d', fontSize: '0.9rem', marginTop: '0.5rem' }}>

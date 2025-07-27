@@ -5,7 +5,8 @@
         public int Id { get; set; }
         public string RoomName { get; set; } = null!;
         public int Capacity { get; set; }
-        public byte Status { get; set; }
+        public byte Status { get; set; } 
+
         public CreateBookingRoomDTO(Models.Room room)
         {
             RoomName = room.RoomName;

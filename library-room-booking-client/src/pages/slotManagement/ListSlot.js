@@ -68,7 +68,7 @@ const ListSlot = () => {
 
       if (response.ok) {
         setSlots(slots.map(slot => 
-          slot.id === slotId ? { ...slot, status: -1 } : slot
+          slot.id === slotId ? { ...slot, status: 3 } : slot
         ));
       } else {
         const errorText = await response.text();
@@ -142,10 +142,10 @@ const ListSlot = () => {
               }}
             >
               <option value="">All</option>
-              <option value="0">Pending</option>
-              <option value="1">Active</option>
-              <option value="-1">Inactive</option>
-              <option value="-2">Maintenance</option>
+              <option value="0">Đang chờ duyệt</option>
+              <option value="1">Hoạt động</option>
+              <option value="3">Ngưng hoạt động</option>
+              <option value="4">Slot cho bảo trì</option>
             </select>
           </div>
         </div>
@@ -192,7 +192,10 @@ const ListSlot = () => {
                   <td style={{ padding: '0.75rem', border: '1px solid #dee2e6' }}>{slot.fromTime}</td>
                   <td style={{ padding: '0.75rem', border: '1px solid #dee2e6' }}>{slot.toTime}</td>
                   <td style={{ padding: '0.75rem', border: '1px solid #dee2e6' }}>
-                    {slot.status === 1 ? 'Active' : slot.status === 0 ? 'Pending' : slot.status === -1 ? 'Inactive' : 'Maintenance'}
+                    {slot.status === 0 ? 'Đang chờ duyệt' : 
+                     slot.status === 1 ? 'Hoạt động' : 
+                     slot.status === 3 ? 'Ngưng hoạt động' : 
+                     'Slot cho bảo trì'}
                   </td>
                   <td style={{ padding: '0.75rem', border: '1px solid #dee2e6' }}>
                     <button
@@ -225,7 +228,7 @@ const ListSlot = () => {
                         Deactivate
                       </button>
                     )}
-                    {slot.status === -1 && (
+                    {(slot.status === 3 || slot.status === 4) && (
                       <button
                         onClick={() => handleActivate(slot.id)}
                         style={{

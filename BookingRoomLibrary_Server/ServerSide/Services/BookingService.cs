@@ -261,6 +261,68 @@ namespace ServerSide.Services
             }
             repository.UpdateBooking(booking);
         }
+
+        public void CreateMaintenanceBooking(MaintenanceBookingDTO maintenanceBookingDTO, int userId)
+        {
+            var slot = slotService.GetById(maintenanceBookingDTO.SlotId);
+            if (slot.Status != (byte)SlotStatus.Active && slot.Status != (byte)SlotStatus.OnlyForMaintain)
+                throw new BookingPolicyViolationException("Invalid slot for maintenance.");
+
+            var room = roomService.GetRoomByIdForBooking(maintenanceBookingDTO.RoomId);
+            if (room.Status != (byte)RoomStatus.Active)
+                throw new BookingPolicyViolationException("Room is not available for maintenance.");
+
+            if (maintenanceBookingDTO.DateRange == null)
+            {
+                // Single date booking
+                var bookingDate = DateOnly.Parse(maintenanceBookingDTO.BookingDate);
+                validation.ValidateBookingDate(new CreateBookingDTO { BookingDate = bookingDate, SlotId = maintenanceBookingDTO.SlotId }, slot);
+
+                var booking = new Booking
+                {
+                    BookingDate = bookingDate,
+                    RoomId = maintenanceBookingDTO.RoomId,
+                    SlotId = maintenanceBookingDTO.SlotId,
+                    Reason = maintenanceBookingDTO.Reason,
+                    CreatedBy = userId,
+                    Status = (byte)BookingRoomStatus.bookedForMainainace,
+                    CreatedDate = DateTime.Now
+                };
+
+                if (!CheckBookingAvailable(booking))
+                    throw new BookingPolicyViolationException($"Room {room.RoomName} is unavailable at slot {slot.Order} on {bookingDate}");
+
+                repository.Add(booking);
+            }
+            else
+            {
+                // Range of dates booking
+                var fromDate = DateOnly.Parse(maintenanceBookingDTO.DateRange.From);
+                var toDate = DateOnly.Parse(maintenanceBookingDTO.DateRange.To);
+
+                if (fromDate > toDate)
+                    throw new BookingPolicyViolationException("Invalid date range: 'From' date must be before 'To' date.");
+
+                for (var date = fromDate; date <= toDate; date = date.AddDays(1))
+                {
+                    var booking = new Booking
+                    {
+                        BookingDate = date,
+                        RoomId = maintenanceBookingDTO.RoomId,
+                        SlotId = maintenanceBookingDTO.SlotId,
+                        Reason = maintenanceBookingDTO.Reason,
+                        CreatedBy = userId,
+                        Status = (byte)BookingRoomStatus.bookedForMainainace,
+                        CreatedDate = DateTime.Now
+                    };
+
+                    if (!CheckBookingAvailable(booking))
+                        throw new BookingPolicyViolationException($"Room {room.RoomName} is unavailable at slot {slot.Order} on {date}");
+
+                    repository.Add(booking);
+                }
+            }
+        }
     }
 
     public interface IBookingService
@@ -275,5 +337,6 @@ namespace ServerSide.Services
         Task<(int total, List<BookingHistoryDTO> data)> GetBookingHistoryAsync(int userId, DateTime? from, DateTime? to, int page, int pageSize);
         Task CancelExpiredBookingsAsync();
         void CancelBooking(int id);
+        void CreateMaintenanceBooking(MaintenanceBookingDTO maintenanceBookingDTO, int userId);
     }
 }

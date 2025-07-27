@@ -46,5 +46,22 @@ namespace ServerSide.Controllers
             var result = userService.GetAllStudents(keyword, page, Pagination.DefaultPageSize);
             return Ok(result);
         }
+
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetUserDetails(int userId)
+        {
+            try
+            {
+                var user = await userService.GetUserDetailsAsync(userId);
+                if (user == null) return NotFound("User not found.");
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi hoặc return để debug
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+
     }
 }
