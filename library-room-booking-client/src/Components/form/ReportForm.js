@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Button,
   TextField,
@@ -16,26 +14,13 @@ import {
 import SaveIcon from "@mui/icons-material/Save";
 import AddIcon from "@mui/icons-material/Add";
 import { useEffect, useState } from "react";
-import { fetchRooms } from "../../api/RoomAPI";
 
-const ReportForm = ({ report, onChange, onSubmit, loading = false, isEdit = false }) => {
-  const [rooms, setRooms] = useState([]);
-  const [loadingRooms, setLoadingRooms] = useState(true);
+const ReportForm = ({ report, onChange, onSubmit, loading = false, isEdit = false, slots = [], rooms = [], loadingRooms = false }) => {
+  const [localRooms, setLocalRooms] = useState(rooms);
 
   useEffect(() => {
-    const loadRooms = async () => {
-      try {
-        const data = await fetchRooms();
-        setRooms(data);
-      } catch (error) {
-        console.error("Failed to fetch rooms:", error);
-      } finally {
-        setLoadingRooms(false);
-      }
-    };
-
-    loadRooms();
-  }, []);
+    setLocalRooms(rooms);
+  }, [rooms]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -51,7 +36,12 @@ const ReportForm = ({ report, onChange, onSubmit, loading = false, isEdit = fals
   };
 
   const isFormValid = () => {
-    return report.reportType.trim().length >= 3 && !isDescriptionTooLong();
+    return (
+      report.reportType.trim().length >= 3 &&
+      !isDescriptionTooLong() &&
+      rooms.some((room) => room.id === report.roomId) &&
+      slots.some((slot) => slot.id === report.slotId)
+    );
   };
 
   const reportTypes = [
@@ -91,17 +81,22 @@ const ReportForm = ({ report, onChange, onSubmit, loading = false, isEdit = fals
           </FormControl>
 
           {/* Room Selection */}
-          <FormControl fullWidth required disabled={loadingRooms || loading}>
+          <FormControl fullWidth required error={!rooms.some((room) => room.id === report.roomId)}>
             <InputLabel>Room</InputLabel>
             <Select
               name="roomId"
               value={report.roomId || ""}
               onChange={onChange}
               label="Room"
+              disabled={loadingRooms || loading || rooms.length === 0}
             >
               {loadingRooms ? (
                 <MenuItem value="">
                   <em>Loading rooms...</em>
+                </MenuItem>
+              ) : rooms.length === 0 ? (
+                <MenuItem value="" disabled>
+                  <em>No rooms available</em>
                 </MenuItem>
               ) : (
                 rooms.map((room) => (
@@ -111,7 +106,40 @@ const ReportForm = ({ report, onChange, onSubmit, loading = false, isEdit = fals
                 ))
               )}
             </Select>
-            <FormHelperText>Select the room where the incident occurred</FormHelperText>
+            <FormHelperText>
+              {!rooms.some((room) => room.id === report.roomId)
+                ? "A valid room is required"
+                : "Select the room where the incident occurred"}
+            </FormHelperText>
+          </FormControl>
+
+          {/* Slot Selection */}
+          <FormControl fullWidth required error={!slots.some((slot) => slot.id === report.slotId)}>
+            <InputLabel>Time Slot</InputLabel>
+            <Select
+              name="slotId"
+              value={report.slotId || ""}
+              onChange={onChange}
+              label="Time Slot"
+              disabled={loading || slots.length === 0}
+            >
+              {slots.length === 0 ? (
+                <MenuItem value="" disabled>
+                  <em>No slots available</em>
+                </MenuItem>
+              ) : (
+                slots.map((slot) => (
+                  <MenuItem key={slot.id} value={slot.id}>
+                    {`${slot.fromTime} - ${slot.toTime}`}
+                  </MenuItem>
+                ))
+              )}
+            </Select>
+            <FormHelperText>
+              {!slots.some((slot) => slot.id === report.slotId)
+                ? "A valid time slot is required"
+                : "Select the time slot for the incident"}
+            </FormHelperText>
           </FormControl>
 
           {/* Description Field */}
@@ -145,11 +173,7 @@ const ReportForm = ({ report, onChange, onSubmit, loading = false, isEdit = fals
               fullWidth
               disabled={loading || !isFormValid()}
               startIcon={loading ? null : isEdit ? <SaveIcon /> : <AddIcon />}
-              sx={{
-                py: 1.5,
-                fontSize: "1.1rem",
-                fontWeight: "bold",
-              }}
+              sx={{ py: 1.5, fontSize: "1.1rem", fontWeight: "bold" }}
             >
               {loading ? (
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>

@@ -19,6 +19,12 @@ namespace ServerSide.Repositories
                 ?? throw new KeyNotFoundException($"Rule with ID {id} not found.");
         }
 
+        public async Task<Rule> GetRuleByNameAsync(string ruleName)
+        {
+            return await _context.Rules
+                .FirstOrDefaultAsync(r => r.RuleName.ToLower() == ruleName.ToLower());
+        }
+
         public async Task<IEnumerable<Rule>> GetAllRulesAsync()
         {
             return await _context.Rules.ToListAsync();
@@ -59,6 +65,7 @@ namespace ServerSide.Repositories
     public interface IRuleRepository
     {
         Task<Rule> GetRuleByIdAsync(int id);
+        Task<Rule> GetRuleByNameAsync(string ruleName);
         Task<IEnumerable<Rule>> GetAllRulesAsync();
         Task CreateRuleAsync(Rule rule);
         Task UpdateRuleAsync(Rule rule);
