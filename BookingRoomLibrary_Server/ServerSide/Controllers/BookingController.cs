@@ -7,6 +7,7 @@ using ServerSide.Filters;
 using ServerSide.Models;
 using ServerSide.Services;
 using System.Text.Json;
+using ServerSide.DTOs.Rating;
 
 
 namespace ServerSide.Controllers
@@ -30,7 +31,7 @@ namespace ServerSide.Controllers
         {
             return _bookingService.GetBookingByDateAndStatus(date, status);
         }
-
+        [RoleFilter((int)Roles.Student)]
         [HttpPost]
         public IActionResult CreateBooking([FromBody] CreateBookingDTO createBookingDTO)
         {
@@ -68,7 +69,7 @@ namespace ServerSide.Controllers
         {
             return _bookingService.GetDetailBookingById(id);
         }
-
+        [RoleFilter((int)Roles.Staff)]
         [HttpPatch("{id}/checkin")]
         public IActionResult CheckinBooking(int id)
         {
@@ -84,7 +85,7 @@ namespace ServerSide.Controllers
                 checkinTime = booking.CheckInAt
             });
         }
-
+        [RoleFilter((int)Roles.Staff)]
         [HttpPatch("{id}/checkout")]
         public IActionResult CheckoutBooking(int id)
         {
@@ -111,7 +112,7 @@ namespace ServerSide.Controllers
 
             return Ok(new { total, data });
         }
-
+        [RoleFilter((int)Roles.Student)]
         [HttpPost("{bookingId}/rate")]
         public async Task<IActionResult> RateRoom(int bookingId, [FromBody] CreateRatingDTO dto)
         {
@@ -128,6 +129,7 @@ namespace ServerSide.Controllers
                 });
             }
         }
+        [RoleFilter((int)Roles.Student)]
         [HttpPatch("cancel/{id}")]
         public IActionResult CancelBooking(int id) {
             try {

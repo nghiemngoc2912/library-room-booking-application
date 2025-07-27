@@ -4,6 +4,7 @@ using ServerSide.Constants;
 using ServerSide.DTOs;
 using ServerSide.DTOs.Account;
 using ServerSide.DTOs.Auth;
+using ServerSide.Filters;
 using ServerSide.Services;
 using System.Security.Cryptography;
 using System.Text;
@@ -67,7 +68,7 @@ namespace ServerSide.Controllers
                 return BadRequest(new { message = "An error occurred during login.", error = ex.Message });
             }
         }
-
+        [RoleFilter((int)Roles.Student, (int)Roles.Staff,(int)Roles.Admin)]
         [HttpGet("current-user")]
         public IActionResult GetCurrentUser()
         {

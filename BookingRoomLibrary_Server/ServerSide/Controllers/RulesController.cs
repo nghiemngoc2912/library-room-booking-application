@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ServerSide.Constants;
 using ServerSide.DTOs;
 using ServerSide.DTOs.Rule;
+using ServerSide.Filters;
 using ServerSide.Services;
 
 namespace ServerSide.Controllers;
@@ -9,6 +11,7 @@ namespace ServerSide.Controllers;
 [ApiController]
 public class RulesController : ControllerBase
 {
+    [RoleFilter((int)Roles.Student, (int)Roles.Staff, (int)Roles.Admin)]
     private readonly IRuleService _ruleService;
 
     public RulesController(IRuleService ruleService)
@@ -36,7 +39,6 @@ public class RulesController : ControllerBase
             return NotFound($"Rule with ID {id} not found.");
         }
     }
-
     [HttpPost]
     public async Task<IActionResult> CreateRule([FromBody] RuleDTO ruleDto)
     {
@@ -55,7 +57,6 @@ public class RulesController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
-
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateRule(int id, [FromBody] RuleDTO ruleDto)
     {

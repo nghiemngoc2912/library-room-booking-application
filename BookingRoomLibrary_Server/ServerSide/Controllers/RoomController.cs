@@ -1,12 +1,15 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ServerSide.Constants;
 using ServerSide.DTOs.Room;
+using ServerSide.Filters;
 using ServerSide.Models;
 using ServerSide.Services;
 
 namespace ServerSide.Controllers
 {
+    [RoleFilter((int)Roles.Student, (int)Roles.Staff,(int)Roles.Admin)]
     [Route("api/[controller]")]
     [ApiController]
     public class RoomController : ControllerBase
@@ -17,7 +20,7 @@ namespace ServerSide.Controllers
         {
             this.roomService = roomService;
         }
-
+        [RoleFilter((int)Roles.Staff)]
         [HttpPut("room_librarian/maintenance/{roomId}")]
         public IActionResult ToggleMaintenance(int roomId)
         {
@@ -37,7 +40,7 @@ namespace ServerSide.Controllers
             }
         }
 
-
+        [RoleFilter((int)Roles.Staff)]
         [HttpPost("room_librarian/create")]
         public IActionResult CreateRoom([FromBody] CreateRoomDTO createRoomDTO)
         {
@@ -65,13 +68,13 @@ namespace ServerSide.Controllers
         {
             return roomService.GetAllRoomsForHome();
         }
-
+        [RoleFilter((int)Roles.Staff)]
         [HttpGet("room_librarian")]
         public IEnumerable<RoomLibrarian> GetAllForLibrarian()
         {
             return roomService.GetAllRoomsForStaffManagement();
         }
-
+        [RoleFilter((int)Roles.Staff)]
         [HttpGet("room_librarian/filter")]
         public IActionResult GetFilteredRoomsForLibrarian([FromQuery] string search = null, [FromQuery] int? status = null)
         {
@@ -91,13 +94,13 @@ namespace ServerSide.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
-
+        [RoleFilter((int)Roles.Student)]
         [HttpGet("{id}")]
         public CreateBookingRoomDTO GetById(int id)
         {
             return roomService.GetRoomByIdForBooking(id);
         }
-
+        [RoleFilter((int)Roles.Staff)]
         [HttpGet("room_librarian/update_room/{id}")]
         public IActionResult GetByIdForUpdate(int id)
         {
@@ -121,7 +124,7 @@ namespace ServerSide.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
-
+        [RoleFilter((int)Roles.Staff)]
         [HttpPut("room_librarian/update_room/{id}")]
         public IActionResult UpdateRoom(int id, [FromBody] UpdateRoomDTO updateRoomDTO)
         {

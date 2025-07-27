@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ServerSide.Constants;
 using ServerSide.DTOs.News;
+using ServerSide.Filters;
 using ServerSide.Services;
 
 namespace ServerSide.Controllers
 {
+    [RoleFilter((int)Roles.Student, (int)Roles.Staff)]
     [Route("api/[controller]")]
     [ApiController]
     public class NewsController : ControllerBase
@@ -39,7 +42,7 @@ namespace ServerSide.Controllers
             if (news == null) return NotFound();
             return Ok(news);
         }
-
+        [RoleFilter((int)Roles.Staff)]
         // POST: api/news
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateNewsDTO dto)
@@ -48,7 +51,7 @@ namespace ServerSide.Controllers
             var created = await _service.CreateAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
-
+        [RoleFilter((int)Roles.Staff)]
         // PUT: api/news
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] UpdateNewsDTO dto)
@@ -60,7 +63,7 @@ namespace ServerSide.Controllers
 
             return Ok(new { message = "Updated successfully" });
         }
-
+        [RoleFilter((int)Roles.Staff)]
         // DELETE: api/news/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)

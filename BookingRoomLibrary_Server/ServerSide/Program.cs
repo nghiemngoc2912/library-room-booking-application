@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Hangfire;
+using Microsoft.EntityFrameworkCore;
 using ServerSide.Constants;
 using ServerSide.DTOs;
-using ServerSide.Helpers;
+using ServerSide.Jobs;
+using ServerSide.Middlewares;
 using ServerSide.Models;
 using ServerSide.Repositories;
 using ServerSide.Services;
@@ -62,13 +64,24 @@ builder.Services.Configure<OtpRuleOptions>(
 );
 
 
+// DB context
+builder.Services.AddDbContext<LibraryRoomBookingContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("MyCnn")));
+//Hangfire
+builder.Services.AddHangfire(x =>
+    x.UseSqlServerStorage(builder.Configuration.GetConnectionString("MyCnn")));
+builder.Services.AddHangfireServer();
 
-// ==================== REPOSITORIES ====================
+
+// DI Repositories
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<ISlotRepository, SlotRepository>();
 builder.Services.AddScoped<INewsRepository, NewsRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+
+
 builder.Services.AddScoped<IOtpRepository, OtpRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IRuleRepository, RuleRepository>();
@@ -91,6 +104,7 @@ builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IRatingService, RatingService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 
 // ==================== VALIDATIONS ====================
 builder.Services.AddScoped<CreateBookingValidation>();
@@ -98,7 +112,17 @@ builder.Services.AddScoped<CreateBookingValidation>();
 // ==================== BACKGROUND JOBS ====================
 builder.Services.AddHostedService<BookingCleanupJob>();
 
-// ==================== BUILD APP ====================
+//DI Job
+builder.Services.AddScoped<ReputationJob>();
+
+var reputationConfig = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("Config/reputation-config.json", optional: false, reloadOnChange: true)
+    .Build();
+
+builder.Services.Configure<BookingRules>(bookingRulesConfig);
+builder.Services.Configure<ReputationConfig>(reputationConfig);
+
 var app = builder.Build();
 
 // ==================== MIDDLEWARE ====================
@@ -108,6 +132,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+using (var scope = app.Services.CreateScope())
+{
+    var recurringJobs = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
+    recurringJobs.AddOrUpdate<ReputationJob>(
+        "update-reputation",
+        job => job.UpdateReputation(),
+        "0 0 * * 1" // Cron: 00:00 Monday "* * * * *" - 1 minute for each scheduled job
+    );
+}
 app.UseHttpsRedirection();
 app.UseRouting();
 
@@ -118,5 +151,7 @@ app.UseAuthentication(); // nếu dùng JWT thì cần middleware xử lý trư�
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.Run();
