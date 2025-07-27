@@ -184,6 +184,35 @@ namespace ServerSide.Services
                 PageSize = pageSize
             };
         }
+
+        public PageResultDTO<AccountDTO> GetAllLibrarians(string? keyword, byte? status, int page, int pageSize)
+        {
+            var query = repository.GetLibrarians(keyword, status);
+            int totalItems = query.Count();
+
+            var accounts = query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var accountDtos = accounts.Select(a => new AccountDTO
+            {
+                Id = a.Id,
+                Username = a.Username,
+                FullName = a.Users.FirstOrDefault()?.FullName,
+                Dob = a.Users.FirstOrDefault()?.Dob,
+                Code = a.Users.FirstOrDefault()?.Code,
+                Status = a.Status == 1 ? "Active" : "Inactive"
+            }).ToList();
+
+            return new PageResultDTO<AccountDTO>
+            {
+                Items = accountDtos,
+                TotalItems = totalItems,
+                Page = page,
+                PageSize = pageSize
+            };
+        }
     }
 
     public interface IAccountService

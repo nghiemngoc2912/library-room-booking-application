@@ -69,7 +69,7 @@ export default function BookingTable({ date, status }) {
           {rooms.map((room) => (
             <TableRow key={room.id}>
               <TableCell component="th" scope="row">
-                {room.roomName}
+               {room.roomName}(Max: {room.capacity} - Min: {Math.ceil(room.capacity * 0.8)})
               </TableCell>
               {slots.map((slot) => {
                 const isRoomInactive = room.status === 2; // Trạng thái Maintenance của room
