@@ -16,23 +16,15 @@ public partial class LibraryRoomBookingContext : DbContext
     }
 
     public virtual DbSet<Account> Accounts { get; set; }
-
     public virtual DbSet<Booking> Bookings { get; set; }
-
     public virtual DbSet<News> News { get; set; }
 
     public virtual DbSet<OtpCode> OtpCodes { get; set; }
-
     public virtual DbSet<Rating> Ratings { get; set; }
-
     public virtual DbSet<Report> Reports { get; set; }
-
     public virtual DbSet<Room> Rooms { get; set; }
-
     public virtual DbSet<Rule> Rules { get; set; }
-
     public virtual DbSet<Slot> Slots { get; set; }
-
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -43,11 +35,8 @@ public partial class LibraryRoomBookingContext : DbContext
         modelBuilder.Entity<Account>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Account__3214EC272835AE0B");
-
             entity.ToTable("Account");
-
             entity.HasIndex(e => e.Username, "UQ__Account__536C85E48644BB6D").IsUnique();
-
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.PasswordHash).HasMaxLength(255);
             entity.Property(e => e.Role).HasDefaultValue((byte)1);
@@ -58,9 +47,7 @@ public partial class LibraryRoomBookingContext : DbContext
         modelBuilder.Entity<Booking>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Booking__3214EC2726B9EB3F");
-
             entity.ToTable("Booking");
-
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.CheckInAt).HasColumnType("datetime");
             entity.Property(e => e.CheckOutAt).HasColumnType("datetime");
@@ -108,7 +95,6 @@ public partial class LibraryRoomBookingContext : DbContext
         modelBuilder.Entity<News>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__News__3214EC27EDB9DB00");
-
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("(getdate())")
@@ -124,7 +110,6 @@ public partial class LibraryRoomBookingContext : DbContext
         modelBuilder.Entity<OtpCode>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__OtpCodes__3214EC07450C3372");
-
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             entity.Property(e => e.Code).HasMaxLength(100);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
@@ -134,9 +119,7 @@ public partial class LibraryRoomBookingContext : DbContext
         modelBuilder.Entity<Rating>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Rating__3214EC272AEBF224");
-
             entity.ToTable("Rating");
-
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.BookingId).HasColumnName("BookingID");
             entity.Property(e => e.CreatedDate)
@@ -158,9 +141,7 @@ public partial class LibraryRoomBookingContext : DbContext
         modelBuilder.Entity<Report>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Report__3214EC27C6421609");
-
             entity.ToTable("Report");
-
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.CreateAt)
                 .HasDefaultValueSql("(getdate())")
@@ -171,6 +152,8 @@ public partial class LibraryRoomBookingContext : DbContext
             entity.Property(e => e.RuleId).HasColumnName("RuleID");
             entity.Property(e => e.Status).HasDefaultValue((byte)0);
             entity.Property(e => e.UserId).HasColumnName("UserID");
+            entity.Property(e => e.StartSlotId).HasColumnName("StartSlotId"); // Thêm cột mới
+            entity.Property(e => e.EndSlotId).HasColumnName("EndSlotId");     // Thêm cột mới
 
             entity.HasOne(d => d.ResolvedByNavigation).WithMany(p => p.ReportResolvedByNavigations)
                 .HasForeignKey(d => d.ResolvedBy)
@@ -190,14 +173,22 @@ public partial class LibraryRoomBookingContext : DbContext
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Report__UserID__6477ECF3");
+
+            entity.HasOne(d => d.StartSlot).WithMany(p => p.ReportStartSlots) // Thêm khóa ngoại
+                .HasForeignKey(d => d.StartSlotId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Report_StartSlotId_Slot");
+
+            entity.HasOne(d => d.EndSlot).WithMany(p => p.ReportEndSlots)     // Thêm khóa ngoại
+                .HasForeignKey(d => d.EndSlotId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Report_EndSlotId_Slot");
         });
 
         modelBuilder.Entity<Room>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Room__3214EC2713161BB6");
-
             entity.ToTable("Room");
-
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.RoomName).HasMaxLength(100);
         });
@@ -205,9 +196,7 @@ public partial class LibraryRoomBookingContext : DbContext
         modelBuilder.Entity<Rule>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Rule__3214EC275DDD7544");
-
             entity.ToTable("Rule");
-
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.CreateAt)
                 .HasDefaultValueSql("(getdate())")
@@ -225,18 +214,23 @@ public partial class LibraryRoomBookingContext : DbContext
         modelBuilder.Entity<Slot>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Slot__3214EC27D47D5205");
-
             entity.ToTable("Slot");
-
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.Status)
                 .HasColumnName("status");
+
+            entity.HasMany(d => d.ReportStartSlots).WithOne(p => p.StartSlot) // Quan hệ với Report
+                .HasForeignKey(p => p.StartSlotId)
+                .HasConstraintName("FK_Report_StartSlotId_Slot");
+
+            entity.HasMany(d => d.ReportEndSlots).WithOne(p => p.EndSlot)     // Quan hệ với Report
+                .HasForeignKey(p => p.EndSlotId)
+                .HasConstraintName("FK_Report_EndSlotId_Slot");
         });
 
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__User__3214EC27EFEFD8F8");
-
             entity.ToTable("User");
 
             entity.Property(e => e.Id).HasColumnName("ID");

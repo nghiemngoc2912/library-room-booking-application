@@ -67,6 +67,11 @@ const ReportTable = ({ reports, onDetail, onStatusChange, loading = false }) => 
     return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text
   }
 
+  const getTimeSlot = (report) => {
+    if (!report.startSlot || !report.endSlot) return "N/A";
+    return `${report.startSlot.fromTime} - ${report.endSlot.toTime}`;
+  };
+
   if (loading) {
     return (
       <Paper elevation={3} sx={{ p: 2 }}>
@@ -82,6 +87,7 @@ const ReportTable = ({ reports, onDetail, onStatusChange, loading = false }) => 
                 <TableCell>Room</TableCell>
                 <TableCell>Type</TableCell>
                 <TableCell>Date</TableCell>
+                <TableCell>Time Slot</TableCell> {/* Thêm cột Time Slot */}
                 <TableCell>Status</TableCell>
                 <TableCell>Actions</TableCell>
               </TableRow>
@@ -103,6 +109,9 @@ const ReportTable = ({ reports, onDetail, onStatusChange, loading = false }) => 
                   </TableCell>
                   <TableCell>
                     <Skeleton variant="text" width={100} />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton variant="rectangular" width={100} height={24} /> {/* Skeleton cho Time Slot */}
                   </TableCell>
                   <TableCell>
                     <Skeleton variant="rectangular" width={80} height={24} />
@@ -159,6 +168,7 @@ const ReportTable = ({ reports, onDetail, onStatusChange, loading = false }) => 
               <TableCell sx={{ fontWeight: "bold", fontSize: "0.875rem" }}>Room</TableCell>
               <TableCell sx={{ fontWeight: "bold", fontSize: "0.875rem" }}>Type</TableCell>
               <TableCell sx={{ fontWeight: "bold", fontSize: "0.875rem" }}>Sending Date</TableCell>
+              <TableCell sx={{ fontWeight: "bold", fontSize: "0.875rem" }}>Time Slot</TableCell> {/* Thêm cột Time Slot */}
               <TableCell sx={{ fontWeight: "bold", fontSize: "0.875rem" }}>Status</TableCell>
               <TableCell sx={{ fontWeight: "bold", fontSize: "0.875rem" }} align="center">
                 Actions
@@ -207,6 +217,12 @@ const ReportTable = ({ reports, onDetail, onStatusChange, loading = false }) => 
                     <Typography variant="body2" color="text.secondary">
                       {formatDate(report.createAt)}
                     </Typography>
+                  </Box>
+                </TableCell>
+                <TableCell>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                    <AccessTimeIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+                    <Typography variant="body2">{getTimeSlot(report)}</Typography>
                   </Box>
                 </TableCell>
                 <TableCell>{getStatusChip(report.status)}</TableCell>

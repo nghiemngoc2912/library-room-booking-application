@@ -1,6 +1,6 @@
-import axios from 'axios';
+import axios from "axios";
 
-const REPORTS_API_BASE = 'https://localhost:7238/api/reports';
+const REPORTS_API_BASE = "https://localhost:7238/api/reports";
 
 export const getReportsList = async (params) => {
   const res = await axios.get(`${REPORTS_API_BASE}`, { params });
@@ -36,3 +36,15 @@ export const getReportTypesByUser = async (userId) => {
   const res = await axios.get(`${REPORTS_API_BASE}/user/${userId}/types`);
   return res.data;
 };
+
+export async function fetchSlots() {
+  const res = await fetch("https://localhost:7238/api/Slot");
+  if (!res.ok) throw new Error("Failed to fetch slots");
+  return res.json();
+}
+
+export async function fetchSlotById(slotId) {
+  const res = await fetch(`https://localhost:7238/api/Slot/${slotId}`);
+  if (!res.ok) throw new Error("Failed to fetch slot");
+  return res.json();
+}

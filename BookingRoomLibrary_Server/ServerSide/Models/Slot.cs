@@ -16,4 +16,6 @@ public partial class Slot
     public byte Status { get; set; }
 
     public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+    public virtual ICollection<Report> ReportStartSlots { get; set; } // Danh sách báo cáo bắt đầu
+    public virtual ICollection<Report> ReportEndSlots { get; set; }   // Danh sách báo cáo kết thúc
 }

@@ -18,6 +18,8 @@ namespace ServerSide.Repositories
                 .Include(r => r.User)
                 .Include(r => r.Rule)
                 .Include(r => r.Room)
+                .Include(r => r.StartSlot)
+                .Include(r => r.EndSlot)
                 .FirstOrDefaultAsync(r => r.Id == id)
                 ?? throw new KeyNotFoundException($"Report with ID {id} not found.");
         }
@@ -28,6 +30,8 @@ namespace ServerSide.Repositories
                 .Include(r => r.User)
                 .Include(r => r.Rule)
                 .Include(r => r.Room)
+                .Include(r => r.StartSlot)
+                .Include(r => r.EndSlot)
                 .ToListAsync();
         }
 
@@ -45,7 +49,7 @@ namespace ServerSide.Repositories
             var existingReport = await _context.Reports.FindAsync(report.Id);
             if (existingReport == null) throw new KeyNotFoundException($"Report with ID {report.Id} not found.");
 
-            // Chỉ cập nhật các trường có giá trị
+            // Cập nhật tất cả các trường, bao gồm StartSlotId và EndSlotId
             existingReport.RuleId = report.RuleId;
             existingReport.ReportType = report.ReportType;
             existingReport.Description = report.Description;
@@ -55,6 +59,8 @@ namespace ServerSide.Repositories
             existingReport.ResolvedAt = report.ResolvedAt;
             existingReport.ResolvedBy = report.ResolvedBy;
             existingReport.RoomId = report.RoomId;
+            existingReport.StartSlotId = report.StartSlotId;
+            existingReport.EndSlotId = report.EndSlotId;
 
             await _context.SaveChangesAsync();
         }
@@ -68,6 +74,7 @@ namespace ServerSide.Repositories
             await _context.SaveChangesAsync();
         }
     }
+
     public interface IReportRepository
     {
         Task<Report> GetReportByIdAsync(int id);

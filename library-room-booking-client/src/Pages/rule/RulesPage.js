@@ -67,11 +67,9 @@ const RulesPage = () => {
     fetchRules()
   }, [fetchRules])
 
-  // Filter rules based on search term and status
   useEffect(() => {
     let filtered = rules
 
-    // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter(
         (rule) =>
@@ -80,7 +78,6 @@ const RulesPage = () => {
       )
     }
 
-    // Apply status filter
     if (statusFilter !== "all") {
       filtered = filtered.filter((rule) => {
         if (statusFilter === "active") return rule.status === 1 || rule.status === true
@@ -141,10 +138,7 @@ const RulesPage = () => {
 
   if (loading) {
     return (
-      <Container
-        maxWidth="lg"
-        sx={{ py: 4, display: "flex", justifyContent: "center", alignItems: "center", minHeight: "50vh" }}
-      >
+      <Container maxWidth={false} sx={{ py: 4, display: "flex", justifyContent: "center", alignItems: "center", minHeight: "50vh", width: "100%" }}>
         <Box textAlign="center">
           <CircularProgress size={60} />
           <Typography variant="h6" sx={{ mt: 2 }}>
@@ -157,7 +151,7 @@ const RulesPage = () => {
 
   if (error && rules.length === 0) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Container maxWidth={false} sx={{ py: 4, width: "100%" }}>
         <Alert
           severity="error"
           action={
@@ -173,7 +167,7 @@ const RulesPage = () => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth={false} sx={{ py: 4, width: "100%" }}>
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" gutterBottom align="center" color="primary" sx={{ fontWeight: "bold" }}>
           Rules Management
@@ -184,9 +178,19 @@ const RulesPage = () => {
       </Box>
 
       {/* Action Bar */}
-      <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
+      <Paper
+        elevation={3}
+        sx={{
+          p: 2,
+          mb: 3,
+          width: "100%",
+          background: "linear-gradient(90deg, #e0f7fa 0%, #ffffff 100%)",
+          borderRadius: 2,
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+        }}
+      >
         <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={4}>
+          <Grid item sx={{ width: { xs: "100%", md: "25%" } }}>
             <TextField
               fullWidth
               placeholder="Search rules..."
@@ -195,21 +199,32 @@ const RulesPage = () => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchIcon />
+                    <SearchIcon sx={{ color: "#1976d2" }} />
                   </InputAdornment>
                 ),
               }}
               size="small"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#1976d2" },
+                  "&:hover fieldset": { borderColor: "#1565c0" },
+                  "&.Mui-focused fieldset": { borderColor: "#1565c0" },
+                },
+              }}
             />
           </Grid>
-          <Grid item xs={12} md={3}>
-            <FormControl fullWidth size="small">
-              <InputLabel>Filter by Status</InputLabel>
+          <Grid item sx={{ width: { xs: "100%", md: "16.66%" } }}>
+            <FormControl fullWidth size="small" variant="outlined">
+              <InputLabel sx={{ color: "#1976d2" }}>Filter by Status</InputLabel>
               <Select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
                 label="Filter by Status"
-                startAdornment={<FilterListIcon sx={{ mr: 1, color: "action.active" }} />}
+                sx={{
+                  "& .MuiOutlinedInput-notchedOutline": { borderColor: "#1976d2" },
+                  "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#1565c0" },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#1565c0" },
+                }}
               >
                 <MenuItem value="all">All Status</MenuItem>
                 <MenuItem value="active">Active</MenuItem>
@@ -217,32 +232,47 @@ const RulesPage = () => {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid item sx={{ width: { xs: "100%", md: "16.66%" } }}>
             <Box display="flex" alignItems="center" gap={1}>
               <Chip
                 label={`${filteredRules.length} of ${rules.length} rules`}
                 color="primary"
                 variant="outlined"
                 size="small"
+                sx={{ borderColor: "#1976d2", "&:hover": { backgroundColor: "#e3f2fd" } }}
               />
             </Box>
           </Grid>
-          <Grid item xs={12} md={2}>
-            <Box display="flex" gap={1}>
-              <Button variant="outlined" onClick={handleRefresh} disabled={loading} size="small">
-                <RefreshIcon />
-              </Button>
-              <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={handleAddRule} fullWidth>
-                Add Rule
-              </Button>
-            </Box>
+          <Grid item sx={{ width: { xs: "100%", md: "25%" }, display: "flex", gap: 1 }}>
+            <Button
+              variant="outlined"
+              onClick={handleRefresh}
+              disabled={loading}
+              size="small"
+              sx={{
+                color: "#1976d2",
+                borderColor: "#1976d2",
+                "&:hover": { backgroundColor: "#e3f2fd", borderColor: "#1565c0" },
+              }}
+            >
+              <RefreshIcon />
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<AddIcon />}
+              onClick={handleAddRule}
+              sx={{ "&:hover": { backgroundColor: "#1565c0" } }}
+            >
+              Add Rule
+            </Button>
           </Grid>
         </Grid>
       </Paper>
 
       {/* Rules Table */}
       <Grid container spacing={3}>
-        <Grid item xs={12}>
+        <Grid item sx={{ width: "100%" }}>
           <RuleTable rules={filteredRules} onEdit={handleEditRule} onDelete={handleDeleteClick} loading={loading} />
         </Grid>
       </Grid>

@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { createReport } from "../../api/Reports";
+import { createReport, fetchSlots } from "../../api/Reports";
 import ReportForm from "../../Components/form/ReportForm";
 import {
   Button,
@@ -21,6 +21,7 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import HomeIcon from "@mui/icons-material/Home";
 import AddIcon from "@mui/icons-material/Add";
+import { fetchRooms } from "../../api/RoomAPI";
 
 const AddReportPage = () => {
   const navigate = useNavigate();
@@ -29,14 +30,46 @@ const AddReportPage = () => {
     reportType: "",
     description: "",
     createAt: new Date().toISOString(),
-    userId: parseInt(localStorage.getItem("userId")),
+    userId: parseInt(localStorage.getItem("userId") || "1"),
     roomId: 1,
+    slotId: 1,
   });
-
+  const [slots, setSlots] = useState([]);
+  const [rooms, setRooms] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
   const [openConfirm, setOpenConfirm] = useState(false);
+  const [loadingRooms, setLoadingRooms] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        const [slotData, roomData] = await Promise.all([fetchSlots(), fetchRooms()]);
+        setSlots(slotData);
+        setRooms(roomData);
+        if (slotData.length > 0) {
+          setReport((prev) => ({
+            ...prev,
+            slotId: slotData[0].id,
+          }));
+        }
+        if (roomData.length > 0) {
+          setReport((prev) => ({
+            ...prev,
+            roomId: roomData[0].id,
+          }));
+        }
+      } catch (err) {
+        setError("Failed to load data: " + err.message);
+      } finally {
+        setLoading(false);
+        setLoadingRooms(false);
+      }
+    };
+    loadData();
+  }, []);
 
   const validateReport = () => {
     if (!report.reportType.trim()) {
@@ -51,6 +84,14 @@ const AddReportPage = () => {
       setError("Description must be less than 1000 characters");
       return false;
     }
+    if (!rooms.find((room) => room.id === report.roomId)) {
+      setError("A valid room is required");
+      return false;
+    }
+    if (!slots.find((slot) => slot.id === report.slotId)) {
+      setError("A valid slot is required");
+      return false;
+    }
     return true;
   };
 
@@ -63,16 +104,20 @@ const AddReportPage = () => {
   const handleConfirmSubmit = async () => {
     setLoading(true);
     try {
-      await createReport(report);
+      const selectedSlot = slots.find((slot) => slot.id === report.slotId);
+      const updatedReport = {
+        ...report,
+        startSlotId: selectedSlot.id,
+        endSlotId: selectedSlot.id,
+      };
+      await createReport(updatedReport);
       setSnackbar({
         open: true,
         message: `Report "${report.reportType}" created successfully`,
         severity: "success",
       });
       setOpenConfirm(false);
-      setTimeout(() => {
-        navigate("/history-report");
-      }, 1500);
+      navigate("/history-report");
     } catch (error) {
       setError(`Failed to create report. ${error.response?.data?.message || error.message}`);
       setLoading(false);
@@ -137,7 +182,15 @@ const AddReportPage = () => {
           </Alert>
         )}
 
-        <ReportForm report={report} onChange={handleChange} onSubmit={handleSubmit} loading={loading} />
+        <ReportForm
+          report={report}
+          onChange={handleChange}
+          onSubmit={handleSubmit}
+          loading={loading}
+          slots={slots}
+          rooms={rooms}
+          loadingRooms={loadingRooms}
+        />
       </Paper>
 
       <Dialog open={openConfirm} onClose={handleCloseConfirm} maxWidth="sm" fullWidth>

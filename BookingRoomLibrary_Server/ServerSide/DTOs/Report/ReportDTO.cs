@@ -13,6 +13,10 @@
         public int? ResolvedBy { get; set; }
         public int RoomId { get; set; }
         public string? UserName { get; set; }
+        public int StartSlotId { get; set; } // Thêm cột mới
+        public int EndSlotId { get; set; }   // Thêm cột mới
+        public SlotDTO? StartSlot { get; set; } // Thêm đối tượng Slot
+        public SlotDTO? EndSlot { get; set; }   // Thêm đối tượng Slot
     }
 
     public class ReportUpdateDTO

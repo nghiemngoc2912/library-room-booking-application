@@ -35,7 +35,6 @@ const EditRulePage = () => {
             userId: ruleData.userId || 1,
           })
         } catch (error) {
-          console.error("Error fetching rule:", error)
           setError("Failed to load rule data.")
           setSnackbar({
             open: true,
@@ -71,11 +70,7 @@ const EditRulePage = () => {
 
   const handleSubmit = async () => {
     setError(null)
-
-    if (!validateRule()) {
-      return
-    }
-
+    if (!validateRule()) return
     setLoading(true)
     try {
       await updateRule({
@@ -86,20 +81,17 @@ const EditRulePage = () => {
         createAt: rule.createAt,
         userId: rule.userId,
       })
-
       setSnackbar({
         open: true,
         message: `Rule "${rule.ruleName}" updated successfully`,
         severity: "success",
       })
-
-      // Navigate after a short delay to show the success message
       setTimeout(() => {
         navigate("/rules")
       }, 1500)
     } catch (error) {
-      console.error("Error updating rule:", error.response?.data || error.message)
-      setError(`Failed to update rule. ${error.response?.data?.message || error.message}`)
+      const errorMessage = error.response?.data?.message || "Failed to update rule."
+      setError(errorMessage)
       setLoading(false)
     }
   }
@@ -107,11 +99,7 @@ const EditRulePage = () => {
   const handleChange = (e) => {
     const { name, value } = e.target
     setRule({ ...rule, [name]: value })
-
-    // Clear error when user starts typing
-    if (error) {
-      setError(null)
-    }
+    if (error) setError(null)
   }
 
   const handleBack = () => {
@@ -159,7 +147,6 @@ const EditRulePage = () => {
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
-      {/* Breadcrumbs */}
       <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 3 }}>
         <Link
           underline="hover"

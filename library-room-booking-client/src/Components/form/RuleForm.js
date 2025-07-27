@@ -41,24 +41,26 @@ const RuleForm = ({ rule, onChange, onSubmit, loading = false, isEdit = false })
       <form onSubmit={handleSubmit}>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
           {/* Rule Name Field */}
-          <TextField
-            label="Rule Name"
-            name="ruleName"
-            value={rule.ruleName}
-            onChange={onChange}
-            fullWidth
-            required
-            error={rule.ruleName.length > 0 && rule.ruleName.length < 3}
-            helperText={
-              rule.ruleName.length > 0 && rule.ruleName.length < 3
-                ? "Rule name must be at least 3 characters"
-                : "Enter a descriptive name for your rule"
-            }
-            disabled={loading}
-            InputProps={{
-              endAdornment: rule.ruleName.length >= 3 && <Chip label="✓" color="success" size="small" />,
-            }}
-          />
+          <FormControl fullWidth required error={rule.ruleName.length > 0 && rule.ruleName.length < 3}>
+            <TextField
+              label="Rule Name"
+              name="ruleName"
+              value={rule.ruleName}
+              onChange={onChange}
+              fullWidth
+              required
+              error={rule.ruleName.length > 0 && rule.ruleName.length < 3}
+              helperText={
+                rule.ruleName.length > 0 && rule.ruleName.length < 3
+                  ? "Rule name must be at least 3 characters"
+                  : "Enter a descriptive name for your rule"
+              }
+              disabled={loading}
+              InputProps={{
+                endAdornment: rule.ruleName.length >= 3 && <Chip label="✓" color="success" size="small" />,
+              }}
+            />
+          </FormControl>
 
           {/* Description Field */}
           <Box>
@@ -103,7 +105,7 @@ const RuleForm = ({ rule, onChange, onSubmit, loading = false, isEdit = false })
                   </MenuItem>
                 </Select>
                 <FormHelperText>
-                  {rule.status === 1 || rule.status === true
+                  {rule.status === 1
                     ? "This rule is currently active and will be applied"
                     : "This rule is inactive and will not be applied"}
                 </FormHelperText>
@@ -122,11 +124,7 @@ const RuleForm = ({ rule, onChange, onSubmit, loading = false, isEdit = false })
               fullWidth
               disabled={loading || !isFormValid()}
               startIcon={loading ? null : isEdit ? <SaveIcon /> : <AddIcon />}
-              sx={{
-                py: 1.5,
-                fontSize: "1.1rem",
-                fontWeight: "bold",
-              }}
+              sx={{ py: 1.5, fontSize: "1.1rem", fontWeight: "bold" }}
             >
               {loading ? (
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
