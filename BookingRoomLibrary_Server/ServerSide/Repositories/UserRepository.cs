@@ -45,7 +45,7 @@ namespace ServerSide.Repositories
                 query = query.Where(u =>
                     u.FullName.Contains(keyword) ||
                     u.Code.Contains(keyword) ||
-                    u.Email.Contains(keyword));
+                    u.Account.Username.Contains(keyword));
             }
 
             return query;

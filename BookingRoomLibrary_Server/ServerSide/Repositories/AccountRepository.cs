@@ -59,8 +59,10 @@ namespace ServerSide.Repositories
         public async Task<User?> GetUserByEmailAsync(string email)
         {
             return await _context.Users
-                .FirstOrDefaultAsync(u => u.Email == email);
+                .Include(u => u.Account)
+                .FirstOrDefaultAsync(u => u.Account.Username == email);
         }
+
 
         public async Task UpdateAccountStatusAsync(int id, byte status)
         {
@@ -95,9 +97,11 @@ namespace ServerSide.Repositories
             if (!string.IsNullOrWhiteSpace(keyword))
             {
                 query = query.Where(a =>
-                    a.Users.Any(u => u.FullName.Contains(keyword) ||
-                                     u.Email.Contains(keyword) ||
-                                     u.Code.Contains(keyword)));
+                    a.Users.Any(u =>
+                        u.FullName.Contains(keyword) ||
+                        u.Code.Contains(keyword)) ||
+                    a.Username.Contains(keyword) 
+                );
             }
 
             if (status.HasValue)
@@ -108,17 +112,25 @@ namespace ServerSide.Repositories
             return query;
         }
 
+
         public async Task<User> GetUserByAccountIdAsync(int accountId)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.AccountId == accountId);
         }
 
-        public async Task<User?> GetLatestStudentAsync()
+        public async Task<User> GetLatestStudentAsync()
         {
             return await _context.Users
                 .Where(u => u.Code != null && u.Code.StartsWith("ST"))
                 .OrderByDescending(u => u.Code)
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<List<User>> GetStudentsWithSTCodeAsync()
+        {
+            return await _context.Users
+                .Where(u => u.Code != null && u.Code.StartsWith("ST"))
+                .ToListAsync();
         }
     }
 
@@ -134,5 +146,6 @@ namespace ServerSide.Repositories
         Task<Account> UpdateLibrarianAsync(Account account, User user);
         Task<User> GetUserByAccountIdAsync(int accountId);
         Task<User?> GetLatestStudentAsync();
+        Task<List<User>> GetStudentsWithSTCodeAsync();
     }
 }

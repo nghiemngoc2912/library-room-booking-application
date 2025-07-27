@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { register, verifyOtp } from '../../api/AuthAPI';
+import axios from 'axios';
 
 function Register() {
   const [step, setStep] = useState(1);
@@ -12,12 +13,15 @@ function Register() {
   });
   const [otp, setOtp] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isResendLoading, setIsResendLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
     setErrorMsg('');
+    setSuccessMsg('');
     setIsLoading(true);
 
     try {
@@ -38,6 +42,7 @@ function Register() {
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
     setErrorMsg('');
+    setSuccessMsg('');
 
     try {
       await verifyOtp(formData.email, otp);
@@ -45,6 +50,25 @@ function Register() {
     } catch (err) {
       setErrorMsg(err.response?.data?.message || 'Mã OTP không hợp lệ.');
     }
+  };
+
+  const handleResendOtp = async () => {
+    setErrorMsg('');
+    setSuccessMsg('');
+    setIsResendLoading(true);
+
+    try {
+      const response = await axios.post('/api/auth/resend-otp', { username: formData.email });
+      setSuccessMsg(response.data.message);
+    } catch (err) {
+      setErrorMsg(err.response?.data?.message || 'Gửi lại OTP thất bại. Vui lòng thử lại.');
+    } finally {
+      setIsResendLoading(false);
+    }
+  };
+
+  const handleBack = () => {
+    navigate('/login');
   };
 
   return (
@@ -133,43 +157,83 @@ function Register() {
               boxSizing: 'border-box',
             }}
           />
-          <button
-            type="submit"
-            disabled={isLoading}
-            style={{
-              backgroundColor: isLoading ? '#6c757d' : '#007BFF',
-              color: 'white',
-              padding: '0.75rem',
-              borderRadius: '6px',
-              border: 'none',
-              fontSize: '1rem',
-              cursor: isLoading ? 'not-allowed' : 'pointer',
-              width: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              position: 'relative',
-            }}
-          >
-            {isLoading ? (
-              <>
-                <span
-                  style={{
-                    border: '2px solid #fff',
-                    borderTop: '2px solid transparent',
-                    borderRadius: '50%',
-                    width: '16px',
-                    height: '16px',
-                    animation: 'spin 1s linear infinite',
-                    marginRight: '8px',
-                  }}
-                ></span>
-                Đang gửi OTP...
-              </>
-            ) : (
-              'Register'
-            )}
-          </button>
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <button
+              type="submit"
+              disabled={isLoading}
+              style={{
+                backgroundColor: isLoading ? '#6c757d' : '#007BFF',
+                color: 'white',
+                padding: '0.75rem',
+                borderRadius: '6px',
+                border: 'none',
+                fontSize: '1rem',
+                cursor: isLoading ? 'not-allowed' : 'pointer',
+                flex: 1,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                position: 'relative',
+              }}
+            >
+              {isLoading ? (
+                <>
+                  <span
+                    style={{
+                      border: '2px solid #fff',
+                      borderTop: '2px solid transparent',
+                      borderRadius: '50%',
+                      width: '16px',
+                      height: '16px',
+                      animation: 'spin 1s linear infinite',
+                      marginRight: '8px',
+                    }}
+                  ></span>
+                  Đang gửi OTP...
+                </>
+              ) : (
+                'Register'
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={handleBack}
+              disabled={isLoading}
+              style={{
+                backgroundColor: isLoading ? '#6c757d' : '#007BFF',
+                color: 'white',
+                padding: '0.75rem',
+                borderRadius: '6px',
+                border: 'none',
+                fontSize: '1rem',
+                cursor: isLoading ? 'not-allowed' : 'pointer',
+                flex: 1,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                position: 'relative',
+              }}
+            >
+              {isLoading ? (
+                <>
+                  <span
+                    style={{
+                      border: '2px solid #fff',
+                      borderTop: '2px solid transparent',
+                      borderRadius: '50%',
+                      width: '16px',
+                      height: '16px',
+                      animation: 'spin 1s linear infinite',
+                      marginRight: '8px',
+                    }}
+                  ></span>
+                  Đang tải...
+                </>
+              ) : (
+                'Back to Login'
+              )}
+            </button>
+          </div>
           <style>
             {`
               @keyframes spin {
@@ -184,6 +248,11 @@ function Register() {
           {errorMsg && (
             <p style={{ color: 'red', marginBottom: '0.5rem', fontWeight: 'bold' }}>
               {errorMsg}
+            </p>
+          )}
+          {successMsg && (
+            <p style={{ color: 'green', marginBottom: '0.5rem', fontWeight: 'bold' }}>
+              {successMsg}
             </p>
           )}
           <p style={{ color: '#555', marginBottom: '1rem' }}>
@@ -204,20 +273,84 @@ function Register() {
               boxSizing: 'border-box',
             }}
           />
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <button
+              type="submit"
+              style={{
+                backgroundColor: '#007BFF',
+                color: 'white',
+                padding: '0.75rem',
+                borderRadius: '6px',
+                border: 'none',
+                fontSize: '1rem',
+                cursor: 'pointer',
+                flex: 1,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                position: 'relative',
+              }}
+            >
+              Verify OTP
+            </button>
+            <button
+              type="button"
+              onClick={handleBack}
+              style={{
+                backgroundColor: '#007BFF',
+                color: 'white',
+                padding: '0.75rem',
+                borderRadius: '6px',
+                border: 'none',
+                fontSize: '1rem',
+                cursor: 'pointer',
+                flex: 1,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                position: 'relative',
+              }}
+            >
+              Back to Login
+            </button>
+          </div>
           <button
-            type="submit"
+            type="button"
+            onClick={handleResendOtp}
+            disabled={isResendLoading}
             style={{
-              backgroundColor: '#007BFF',
+              backgroundColor: isResendLoading ? '#6c757d' : '#007BFF',
               color: 'white',
               padding: '0.75rem',
               borderRadius: '6px',
               border: 'none',
               fontSize: '1rem',
-              cursor: 'pointer',
+              cursor: isResendLoading ? 'not-allowed' : 'pointer',
               width: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              position: 'relative',
             }}
           >
-            Verify OTP
+            {isResendLoading ? (
+              <>
+                <span
+                  style={{
+                    border: '2px solid #fff',
+                    borderTop: '2px solid transparent',
+                    borderRadius: '50%',
+                    width: '16px',
+                    height: '16px',
+                    animation: 'spin 1s linear infinite',
+                    marginRight: '8px',
+                  }}
+                ></span>
+                Đang gửi...
+              </>
+            ) : (
+              'Gửi lại OTP'
+            )}
           </button>
         </form>
       )}

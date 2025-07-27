@@ -42,13 +42,6 @@ namespace ServerSide.Services
                 throw new ArgumentException("Username đã tồn tại.");
             }
 
-            // Validate email doesn't exist
-            var existingUser = await repository.GetUserByEmailAsync(dto.Email);
-            if (existingUser != null)
-            {
-                throw new ArgumentException("Email đã tồn tại.");
-            }
-
             var account = new Account
             {
                 Username = dto.Username,
@@ -60,7 +53,6 @@ namespace ServerSide.Services
             var user = new User
             {
                 FullName = dto.FullName,
-                Email = dto.Email,
                 Dob = dto.Dob,
                 Code = dto.Code,
                 Reputation = 0
@@ -73,7 +65,6 @@ namespace ServerSide.Services
                 Id = createdAccount.Id,
                 Username = createdAccount.Username,
                 FullName = user.FullName,
-                Email = user.Email,
                 Dob = user.Dob,
                 Code = user.Code,
                 Status = createdAccount.Status == 1 ? "Active" : "Inactive"
@@ -106,12 +97,6 @@ namespace ServerSide.Services
                 throw new ArgumentException("Username already exists.");
             }
 
-            var userByEmail = await repository.GetUserByEmailAsync(dto.Email);
-            if (userByEmail != null && userByEmail.AccountId != id)
-            {
-                throw new ArgumentException("Email already exists.");
-            }
-
             existingAccount.Username = dto.Username;
             if (!string.IsNullOrEmpty(dto.Password))
             {
@@ -125,7 +110,6 @@ namespace ServerSide.Services
             }
 
             user.FullName = dto.FullName;
-            user.Email = dto.Email;
             user.Dob = dto.Dob;
             user.Code = dto.Code;
 
@@ -136,7 +120,6 @@ namespace ServerSide.Services
                 Id = existingAccount.Id,
                 Username = existingAccount.Username,
                 FullName = user.FullName,
-                Email = user.Email,
                 Dob = user.Dob,
                 Code = user.Code,
                 Status = existingAccount.Status == 1 ? "Active" : "Inactive"
@@ -154,7 +137,6 @@ namespace ServerSide.Services
                 Id = account.Id,
                 Username = account.Username,
                 FullName = user?.FullName,
-                Email = user?.Email,
                 Dob = user?.Dob,
                 Code = user?.Code,
                 Status = account.Status == 1 ? "Active" : "Inactive"
@@ -186,7 +168,6 @@ namespace ServerSide.Services
                 Id = a.Id,
                 Username = a.Username,
                 FullName = a.Users.FirstOrDefault()?.FullName,
-                Email = a.Users.FirstOrDefault()?.Email,
                 Dob = a.Users.FirstOrDefault()?.Dob,
                 Code = a.Users.FirstOrDefault()?.Code,
                 Status = a.Status == 1 ? "Active" : "Inactive"
