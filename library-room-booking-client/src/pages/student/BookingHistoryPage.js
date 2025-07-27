@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import {
   Box, Typography, Table, TableHead, TableRow, TableCell, TableBody,
-  TablePagination, TextField, Button, Paper, Chip
+  TablePagination, TextField, Button, Paper, Chip, Stack
 } from '@mui/material';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import RateRoomDialog from './RateRoomDialog';
 
-export default function BookingHistoryPage({ userId }) {
+export default function BookingHistoryPage({ userId, role }) {
   const [bookings, setBookings] = useState([]);
   const [total, setTotal] = useState(0);
   const [from, setFrom] = useState('');
@@ -35,6 +36,19 @@ export default function BookingHistoryPage({ userId }) {
   };
 
   useEffect(() => { fetchData(); }, [page]);
+
+  // Map status values to display text and colors
+  const getStatusChip = (status) => {
+    const statusMap = {
+      0: { label: 'Booked', color: 'primary' },
+      1: { label: 'Checked In', color: 'success' },
+      2: { label: 'Checked Out', color: 'default' },
+      3: { label: 'Canceled', color: 'error' },
+      4: { label: 'Auto Canceled', color: 'warning' }
+    };
+    const { label, color } = statusMap[status] || { label: 'Unknown', color: 'default' };
+    return <Chip label={label} color={color} size="small" />;
+  };
 
   return (
     <Box sx={{ p: 4 }}>
@@ -80,7 +94,6 @@ export default function BookingHistoryPage({ userId }) {
         </Button>
       </Box>
 
-      {/* ✅ Kéo dài bảng toàn chiều ngang */}
       <Box sx={{ width: '100%', overflowX: 'auto' }}>
         <Paper elevation={3} sx={{ width: '100%', minWidth: 1000 }}>
           <Table size="medium">
@@ -89,7 +102,8 @@ export default function BookingHistoryPage({ userId }) {
                 <TableCell><strong>Date</strong></TableCell>
                 <TableCell><strong>Room</strong></TableCell>
                 <TableCell><strong>Slot</strong></TableCell>
-                <TableCell><strong>Rating</strong></TableCell>
+                <TableCell><strong>Status</strong></TableCell>
+                {role === 1 && <TableCell><strong>Rating</strong></TableCell>}
                 <TableCell><strong>Action</strong></TableCell>
               </TableRow>
             </TableHead>
@@ -99,31 +113,44 @@ export default function BookingHistoryPage({ userId }) {
                   <TableCell>{b.bookingDate}</TableCell>
                   <TableCell>{b.roomName}</TableCell>
                   <TableCell>{b.slot}</TableCell>
+                  <TableCell>{getStatusChip(b.status)}</TableCell>
+                  {role === 1 && (
+                    <TableCell>
+                      {b.rating ? (
+                        <Box>
+                          <Chip label={`${b.rating.ratingValue} ★`} color="primary" size="small" />
+                          <Typography variant="body2" sx={{ mt: 0.5, whiteSpace: 'pre-line', maxWidth: 250 }}>
+                            {b.rating.comment}
+                          </Typography>
+                        </Box>
+                      ) : '—'}
+                    </TableCell>
+                  )}
                   <TableCell>
-                    {b.rating ? (
-                      <Box>
-                        <Chip label={`${b.rating.ratingValue} ★`} color="primary" size="small" />
-                        <Typography variant="body2" sx={{ mt: 0.5, whiteSpace: 'pre-line', maxWidth: 250 }}>
-                          {b.rating.comment}
-                        </Typography>
-                      </Box>
-                    ) : '—'}
-                  </TableCell>
-                  <TableCell>
-                    {!b.rating ? (
+                    <Stack direction="row" spacing={1}>
+                      {role === 1 && !b.rating && b.status === 2 ? (
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={() => {
+                            setSelectedBooking(b);
+                            setOpenDialog(true);
+                          }}
+                        >
+                          Rate
+                        </Button>
+                      ) : role === 1 && b.rating ? (
+                        <Chip label="Rated" size="small" variant="outlined" color="success" />
+                      ) : null}
                       <Button
                         variant="outlined"
                         size="small"
-                        onClick={() => {
-                          setSelectedBooking(b);
-                          setOpenDialog(true);
-                        }}
+                        component={Link}
+                        to={`/booking/detail/${b.id}`}
                       >
-                        Rate
+                        Detail
                       </Button>
-                    ) : (
-                      <Chip label="Rated" size="small" variant="outlined" color="success" />
-                    )}
+                    </Stack>
                   </TableCell>
                 </TableRow>
               ))}
@@ -141,13 +168,15 @@ export default function BookingHistoryPage({ userId }) {
         </Paper>
       </Box>
 
-      <RateRoomDialog
-        open={openDialog}
-        onClose={() => setOpenDialog(false)}
-        booking={selectedBooking}
-        userId={userId}
-        onRated={fetchData}
-      />
+      {role === 1 && (
+        <RateRoomDialog
+          open={openDialog}
+          onClose={() => setOpenDialog(false)}
+          booking={selectedBooking}
+          userId={userId}
+          onRated={fetchData}
+        />
+      )}
     </Box>
   );
 }

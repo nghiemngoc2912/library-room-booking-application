@@ -142,6 +142,7 @@ namespace ServerSide.Services
                     BookingDate = b.BookingDate.ToString("yyyy-MM-dd"),
                     RoomName = b.Room.RoomName,
                     Slot = $"{b.Slot.FromTime} - {b.Slot.ToTime}",
+                    Status = b.Status,
                     Rating = rating
                 });
             }

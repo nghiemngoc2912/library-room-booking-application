@@ -9,7 +9,8 @@ export default function BookingDetailForm({
   onChange,
   onCheckin,
   onCheckout,
-  onCancel
+  onCancel,
+  onBack, 
 }) {
   if (!booking) return <div>Loading...</div>;
 
@@ -19,7 +20,7 @@ export default function BookingDetailForm({
         <TextField
           type="date"
           label="Date"
-          value={booking.bookingDate+""}
+          value={booking.bookingDate + ""}
           fullWidth
           readOnly
         />
@@ -54,7 +55,6 @@ export default function BookingDetailForm({
             ))}
           </Select>
         </FormControl>
-
       </div>
 
       <TextField
@@ -68,21 +68,21 @@ export default function BookingDetailForm({
       <TextField
         label="Students"
         fullWidth
-        value={booking.students?.map(s => s.fullName+" - "+s.code).join(', ')} // chuyển thành chuỗi tên cách nhau bằng dấu phẩy
-        InputProps={{ readOnly: true }} // không cho sửa
+        value={booking.students?.map(s => s.fullName + " - " + s.code).join(', ')}
+        InputProps={{ readOnly: true }}
         style={{ marginBottom: 16 }}
-        />
+      />
 
       <div style={{ display: 'flex', gap: '16px', marginBottom: 16 }}>
         <TextField
           label="Created By"
           fullWidth
-          value={booking.createdBy.fullName+" - "+booking.createdBy.code}
+          value={booking.createdBy.fullName + " - " + booking.createdBy.code}
         />
         <TextField
           label="Created At"
           fullWidth
-          value={booking.createdDate+""}
+          value={booking.createdDate + ""}
         />
       </div>
 
@@ -91,18 +91,25 @@ export default function BookingDetailForm({
         <strong>Checkout:</strong> {booking.checkOutAt || 'None'}
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <div>
-          {role === 1 && booking.status === 0 && (
-            <Button variant="contained" color="warning" onClick={onCancel}>Cancel</Button>
-          )}
-          {role === 2 && booking.status === 0 && (
-            <Button variant="contained" color="success" onClick={onCheckin}>Check-in</Button>
-          )}
-          {role === 2 && booking.status === 1 && (
-            <Button variant="contained" color="info" onClick={onCheckout}>Check-out</Button>
-          )}
-        </div>
+      <div style={{ display: 'flex', gap: '8px' }}>
+        {role === 1 && booking.status === 0 && (
+          <Button variant="contained" color="warning" onClick={onCancel}>
+            Cancel
+          </Button>
+        )}
+        {role === 2 && booking.status === 0 && (
+          <Button variant="contained" color="success" onClick={onCheckin}>
+            Check-in
+          </Button>
+        )}
+        {role === 2 && booking.status === 1 && (
+          <Button variant="contained" color="info" onClick={onCheckout}>
+            Check-out
+          </Button>
+        )}
+        <Button variant="contained" color="primary" onClick={onBack}>
+          Back
+        </Button>
       </div>
     </form>
   );

@@ -36,7 +36,7 @@ export default function ProfilePage({ loggedInUserId, role }) {
       />
       <Box flex={1} display="flex" justifyContent="center" alignItems="flex-start" p={4}>
         {activeTab === 'profile' && <ReputationView userId={userId} />}
-        {activeTab === 'history' && <BookingHistoryPage userId={userId} />}
+        {activeTab === 'history' && <BookingHistoryPage userId={userId} role={role} />}
         {activeTab === 'change-password' && <ChangePasswordPage userId={userId} />}
       </Box>
     </Box>
