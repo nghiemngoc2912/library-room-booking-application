@@ -24,7 +24,7 @@ namespace ServerSide.Validations
             if (createBookingDTO.BookingDate > today.AddDays(_rules.MaxIntervalDayToBook))
                 throw new BookingPolicyViolationException($"Booking date cannot be more than {_rules.MaxIntervalDayToBook} days in advance.");
 
-            if (createBookingDTO.BookingDate == today && slot.FromTime < TimeOnly.FromDateTime(now).AddMinutes(-_rules.MaxTimeToCheckin))
+            if (createBookingDTO.BookingDate == today && slot.FromTime < TimeOnly.FromDateTime(now))
                 throw new BookingPolicyViolationException("Cannot book a slot in the past.");
         }
 
