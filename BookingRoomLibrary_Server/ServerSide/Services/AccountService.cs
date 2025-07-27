@@ -155,7 +155,8 @@ namespace ServerSide.Services
             await repository.DeleteAccountAsync(id);
         }
 
-        public PageResultDTO<AccountDTO> GetAllLibrarians(string? keyword, byte? status, int page, int pageSize)
+        public PageResultDTO<AccountDTO> 
+            Librarians(string? keyword, byte? status, int page, int pageSize)
         {
             var query = repository.GetLibrarians(keyword, status);
             int totalItems = query.Count();

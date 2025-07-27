@@ -12,7 +12,7 @@
             RoomName = room.RoomName;
             Id = room.Id;
             Capacity = room.Capacity;
-            Status = room.Status; 
+            Status = room.Status;
         }
     }
 }

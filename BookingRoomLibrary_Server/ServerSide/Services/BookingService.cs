@@ -11,6 +11,7 @@ using ServerSide.Models;
 using ServerSide.Repositories;
 using ServerSide.Validations;
 using System.Text.Json;
+using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
 
 namespace ServerSide.Services
@@ -60,9 +61,13 @@ namespace ServerSide.Services
         public void CreateBooking(CreateBookingDTO createBookingDTO, int userId)
         {
             var slot = slotService.GetById(createBookingDTO.SlotId);
+            if(slot.Status!=(byte)SlotStatus.Active)
+                throw new BookingPolicyViolationException($"Slot is not active.");
             validation.ValidateBookingDate(createBookingDTO, slot);
 
             var room = roomService.GetRoomByIdForBooking(createBookingDTO.RoomId);
+            if(room.Status!=(byte)RoomStatus.Active)
+                throw new BookingPolicyViolationException($"Slot is not active active.");
             validation.ValidateCapacity(createBookingDTO, room);
 
             var users = new List<User>();

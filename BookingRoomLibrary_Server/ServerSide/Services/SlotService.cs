@@ -20,7 +20,7 @@ namespace ServerSide.Services
 
         public IEnumerable<Slot> GetAll()
         {
-            return slotRepository.GetAll();
+            return slotRepository.GetAll().Where(s=>s.Status==(byte)SlotStatus.Active);
         }
 
         public Slot GetById(int id)
