@@ -92,7 +92,7 @@ export default function BookingDetailForm({
       </div>
 
       <div style={{ display: 'flex', gap: '8px' }}>
-        {role === 1 && booking.status === 0 && (
+        {(role === 1 || role === 2) && (booking.status === 0|| booking.status === 6) && (
           <Button variant="contained" color="warning" onClick={onCancel}>
             Cancel
           </Button>

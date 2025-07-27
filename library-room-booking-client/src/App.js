@@ -31,6 +31,7 @@ import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import LibrarianManagement from './pages/librarianManagement/LibrarianManagement'
 import MaintenanceBooking from './pages/roomManagement/MaintenanceBooking'; 
 import LibrarianProfilePage from './pages/librarian/LibrarianProfilePage';
+import AdminProfilePage from './pages/admin/AdminProfilePage';
 
 import { BrowserRouter as Router, Link, useNavigate } from 'react-router-dom';
 import RulesPage from './pages/rule/RulesPage';
@@ -257,6 +258,14 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/admin/profile"
+          element={
+            <ProtectedRoute allowedRoles={[3]}>
+              <AdminLayout><AdminProfilePage userId={userId} /></AdminLayout>
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/admin/request_room"
@@ -364,7 +373,7 @@ const App = () => {
         <Route
           path="/booking/detail/:id"
           element={
-            <ProtectedRoute allowedRoles={[1, 2, 3]}>
+            <ProtectedRoute allowedRoles={[1, 2]}>
               <DefaultLayout><BookingDetailPage role={role} /></DefaultLayout>
             </ProtectedRoute>
           }

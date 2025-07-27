@@ -129,7 +129,7 @@ namespace ServerSide.Controllers
                 });
             }
         }
-        [RoleFilter((int)Roles.Student)]
+        [RoleFilter((int)Roles.Student, (int)Roles.Staff)]
         [HttpPatch("cancel/{id}")]
         public IActionResult CancelBooking(int id) {
             try {
