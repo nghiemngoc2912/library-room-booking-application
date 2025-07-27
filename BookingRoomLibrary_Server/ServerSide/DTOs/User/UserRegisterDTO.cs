@@ -26,7 +26,6 @@ namespace ServerSide.DTOs.User
             {
                 FullName = FullName,
                 Dob = Dob,
-                Email = Email,
                 AccountId = accountId
             };
         }
