@@ -55,15 +55,15 @@ namespace ServerSide.Controllers
             }
             catch (UnauthorizedAccessException ex)
             {
-                return BadRequest(ex.Message); // "Current password is incorrect."
+                return BadRequest(ex.Message); 
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ex.Message); // "New password must be at least 8 characters long." hoặc "New password and confirm password do not match."
+                return BadRequest(ex.Message); 
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(ex.Message); // "Account with UserId {userId} not found."
+                return NotFound(ex.Message); 
             }
             catch (Exception ex)
             {
@@ -89,7 +89,7 @@ namespace ServerSide.Controllers
 
     public class ReputationAdjustmentRequest
     {
-        public int Change { get; set; }  // Ví dụ: -10 để trừ điểm
+        public int Change { get; set; }  
         public string Reason { get; set; } = string.Empty;
     }
 }

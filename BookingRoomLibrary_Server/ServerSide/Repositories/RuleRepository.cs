@@ -33,7 +33,7 @@ namespace ServerSide.Repositories
         public async Task CreateRuleAsync(Rule rule)
         {
             if (rule == null) throw new ArgumentNullException(nameof(rule));
-            rule.CreateAt = DateTime.UtcNow; // Đặt thời gian tạo mặc định
+            rule.CreateAt = DateTime.UtcNow; 
             _context.Rules.Add(rule);
             await _context.SaveChangesAsync();
         }

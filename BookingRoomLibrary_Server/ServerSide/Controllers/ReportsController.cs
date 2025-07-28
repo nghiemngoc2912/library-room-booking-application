@@ -88,7 +88,7 @@ namespace ServerSide.Controllers
 
             try
             {
-                reportDto.Id = id; // Đảm bảo ID khớp
+                reportDto.Id = id; 
                 await _reportService.UpdateReportAsync(reportDto);
                 return NoContent();
             }

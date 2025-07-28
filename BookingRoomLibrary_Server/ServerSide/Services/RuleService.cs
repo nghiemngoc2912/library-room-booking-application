@@ -31,7 +31,6 @@ namespace ServerSide.Services
             if (ruleDto == null) throw new ArgumentNullException(nameof(ruleDto));
             if (string.IsNullOrWhiteSpace(ruleDto.RuleName)) throw new ArgumentException("Rule name is required.");
 
-            // Kiểm tra trùng lặp tên rule
             var existingRule = await _ruleRepository.GetRuleByNameAsync(ruleDto.RuleName);
             if (existingRule != null)
             {
@@ -47,7 +46,6 @@ namespace ServerSide.Services
             if (ruleDto == null) throw new ArgumentNullException(nameof(ruleDto));
             if (string.IsNullOrWhiteSpace(ruleDto.RuleName)) throw new ArgumentException("Rule name is required.");
 
-            // Kiểm tra trùng lặp tên rule (ngoại trừ rule hiện tại)
             var existingRule = await _ruleRepository.GetRuleByNameAsync(ruleDto.RuleName);
             if (existingRule != null && existingRule.Id != ruleDto.Id)
             {

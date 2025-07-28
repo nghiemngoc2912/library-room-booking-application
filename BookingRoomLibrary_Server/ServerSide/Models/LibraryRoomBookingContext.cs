@@ -152,8 +152,8 @@ public partial class LibraryRoomBookingContext : DbContext
             entity.Property(e => e.RuleId).HasColumnName("RuleID");
             entity.Property(e => e.Status).HasDefaultValue((byte)0);
             entity.Property(e => e.UserId).HasColumnName("UserID");
-            entity.Property(e => e.StartSlotId).HasColumnName("StartSlotId"); // Thêm cột mới
-            entity.Property(e => e.EndSlotId).HasColumnName("EndSlotId");     // Thêm cột mới
+            entity.Property(e => e.StartSlotId).HasColumnName("StartSlotId"); 
+            entity.Property(e => e.EndSlotId).HasColumnName("EndSlotId");    
 
             entity.HasOne(d => d.ResolvedByNavigation).WithMany(p => p.ReportResolvedByNavigations)
                 .HasForeignKey(d => d.ResolvedBy)
@@ -174,12 +174,12 @@ public partial class LibraryRoomBookingContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Report__UserID__6477ECF3");
 
-            entity.HasOne(d => d.StartSlot).WithMany(p => p.ReportStartSlots) // Thêm khóa ngoại
+            entity.HasOne(d => d.StartSlot).WithMany(p => p.ReportStartSlots) 
                 .HasForeignKey(d => d.StartSlotId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Report_StartSlotId_Slot");
 
-            entity.HasOne(d => d.EndSlot).WithMany(p => p.ReportEndSlots)     // Thêm khóa ngoại
+            entity.HasOne(d => d.EndSlot).WithMany(p => p.ReportEndSlots)     
                 .HasForeignKey(d => d.EndSlotId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Report_EndSlotId_Slot");
@@ -219,11 +219,11 @@ public partial class LibraryRoomBookingContext : DbContext
             entity.Property(e => e.Status)
                 .HasColumnName("status");
 
-            entity.HasMany(d => d.ReportStartSlots).WithOne(p => p.StartSlot) // Quan hệ với Report
+            entity.HasMany(d => d.ReportStartSlots).WithOne(p => p.StartSlot) 
                 .HasForeignKey(p => p.StartSlotId)
                 .HasConstraintName("FK_Report_StartSlotId_Slot");
 
-            entity.HasMany(d => d.ReportEndSlots).WithOne(p => p.EndSlot)     // Quan hệ với Report
+            entity.HasMany(d => d.ReportEndSlots).WithOne(p => p.EndSlot)     
                 .HasForeignKey(p => p.EndSlotId)
                 .HasConstraintName("FK_Report_EndSlotId_Slot");
         });

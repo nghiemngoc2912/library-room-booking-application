@@ -38,7 +38,7 @@ namespace ServerSide.Repositories
         public async Task CreateReportAsync(Report report)
         {
             if (report == null) throw new ArgumentNullException(nameof(report));
-            report.CreateAt = DateTime.UtcNow; // Đặt thời gian tạo mặc định
+            report.CreateAt = DateTime.UtcNow; 
             _context.Reports.Add(report);
             await _context.SaveChangesAsync();
         }
@@ -49,7 +49,6 @@ namespace ServerSide.Repositories
             var existingReport = await _context.Reports.FindAsync(report.Id);
             if (existingReport == null) throw new KeyNotFoundException($"Report with ID {report.Id} not found.");
 
-            // Cập nhật tất cả các trường, bao gồm StartSlotId và EndSlotId
             existingReport.RuleId = report.RuleId;
             existingReport.ReportType = report.ReportType;
             existingReport.Description = report.Description;

@@ -16,7 +16,6 @@ namespace ServerSide.Repositories
 
         public async Task<IEnumerable<User>> GetRelatedStudentsAsync(int userId)
         {
-            // Lấy report gần nhất của sinh viên
             var report = await _context.Reports
                 .Where(r => r.UserId == userId)
                 .OrderByDescending(r => r.CreateAt)
@@ -25,7 +24,6 @@ namespace ServerSide.Repositories
             if (report == null || report.CreateAt == null)
                 throw new Exception("No report found for the given user.");
 
-            // Lấy danh sách studentId có mặt tại phòng đó vào thời điểm report
             var relatedStudentIds = await _context.Bookings
                 .Where(b => b.RoomId == report.RoomId &&
                             b.CheckInAt <= report.CreateAt &&
@@ -35,7 +33,6 @@ namespace ServerSide.Repositories
                 .Distinct()
                 .ToListAsync();
 
-            // Truy vấn người dùng từ bảng Users bằng Id
             var users = await _context.Users
                 .Where(u => relatedStudentIds.Contains(u.Id))
                 .ToListAsync();
