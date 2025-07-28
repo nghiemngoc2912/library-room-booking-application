@@ -27,6 +27,7 @@ namespace ServerSide.Services
         private readonly IRatingService _ratingService;
         private readonly BookingRules _rules;
         private readonly CreateBookingValidation validation;
+        private readonly IEmailService _emailService;
 
 
         public BookingService(
@@ -38,7 +39,8 @@ namespace ServerSide.Services
             IStudentService studentService,
             IRatingService ratingService,
             IOptions<BookingRules> options,
-            CreateBookingValidation validation
+            CreateBookingValidation validation,
+            IEmailService emailService
             )
         {
             this.repository = repository;
@@ -50,6 +52,7 @@ namespace ServerSide.Services
             this._ratingService = ratingService;
             _rules = options.Value;
             this.validation = validation;
+            _emailService = emailService;
         }
 
         public IEnumerable<HomeBookingDTO> GetBookingByDateAndStatus(DateOnly date, byte status)
@@ -265,18 +268,42 @@ namespace ServerSide.Services
         public void CreateMaintenanceBooking(MaintenanceBookingDTO maintenanceBookingDTO, int userId)
         {
             var slot = slotService.GetById(maintenanceBookingDTO.SlotId);
-            if (slot.Status != (byte)SlotStatus.Active && slot.Status != (byte)SlotStatus.OnlyForMaintain)
+            if (slot == null || (slot.Status != (byte)SlotStatus.Active && slot.Status != (byte)SlotStatus.OnlyForMaintain))
+            {
+                Console.WriteLine($"Invalid slot for maintenance. SlotId: {maintenanceBookingDTO.SlotId}");
                 throw new BookingPolicyViolationException("Invalid slot for maintenance.");
+            }
 
             var room = roomService.GetRoomByIdForBooking(maintenanceBookingDTO.RoomId);
-            if (room.Status != (byte)RoomStatus.Active)
+            if (room == null || room.Status != (byte)RoomStatus.Active)
+            {
+                Console.WriteLine($"Invalid room for maintenance. RoomId: {maintenanceBookingDTO.RoomId}");
                 throw new BookingPolicyViolationException("Room is not available for maintenance.");
+            }
+
+            var staff = userService.GetUserById(userId);
+            if (staff == null)
+            {
+                Console.WriteLine($"Staff user not found for userId: {userId}");
+                throw new Exception("Staff user not found.");
+            }
+            var staffAccount = staff.Account;
+            if (staffAccount == null)
+            {
+                Console.WriteLine($"Staff account not found for userId: {userId}");
+                throw new Exception("Staff account not found.");
+            }
+            var staffEmail = staffAccount.Username;
 
             if (maintenanceBookingDTO.DateRange == null)
             {
                 // Single date booking
                 var bookingDate = DateOnly.Parse(maintenanceBookingDTO.BookingDate);
                 validation.ValidateBookingDate(new CreateBookingDTO { BookingDate = bookingDate, SlotId = maintenanceBookingDTO.SlotId }, slot);
+
+                // Check for conflicting bookings
+                var conflictingBookings = repository.GetBookingByDateAndStatus(bookingDate, (byte)BookingRoomStatus.Booked)
+                    .Where(b => b.RoomId == maintenanceBookingDTO.RoomId && b.SlotId == maintenanceBookingDTO.SlotId).ToList();
 
                 var booking = new Booking
                 {
@@ -290,7 +317,43 @@ namespace ServerSide.Services
                 };
 
                 if (!CheckBookingAvailable(booking))
+                {
                     throw new BookingPolicyViolationException($"Room {room.RoomName} is unavailable at slot {slot.Order} on {bookingDate}");
+                }
+
+                // Handle conflicts
+                foreach (var conflictingBooking in conflictingBookings)
+                {
+                    if (conflictingBooking == null)
+                    {
+                        Console.WriteLine($"Null conflicting booking found for date: {bookingDate}, RoomId: {maintenanceBookingDTO.RoomId}, SlotId: {maintenanceBookingDTO.SlotId}");
+                        continue;
+                    }
+                    conflictingBooking.Status = (byte)BookingRoomStatus.CanceledForMaintainance;
+                    repository.UpdateBooking(conflictingBooking);
+
+                    var creator = userService.GetUserById(conflictingBooking.CreatedBy);
+                    if (creator == null)
+                    {
+                        Console.WriteLine($"Creator not found for booking CreatedBy: {conflictingBooking.CreatedBy}");
+                        continue;
+                    }
+                    var creatorAccount = creator.Account;
+                    if (creatorAccount == null)
+                    {
+                        Console.WriteLine($"Creator account not found for userId: {conflictingBooking.CreatedBy}");
+                        continue;
+                    }
+                    var creatorEmail = creatorAccount.Username;
+
+                    // Send email to booking creator
+                    var cancellationMessage = $"Your booking for room {room.RoomName} on {bookingDate:yyyy-MM-dd} at slot {slot.FromTime} - {slot.ToTime} has been canceled due to a maintenance schedule with reason: {maintenanceBookingDTO.Reason}";
+                    _emailService.SendEmailAsync(creatorEmail, "Booking Canceled Due to Maintenance", cancellationMessage).Wait();
+
+                    // Send notification to staff
+                    var staffNotification = $"Maintenance booking conflict detected. Booking by {creator.FullName} on {bookingDate:yyyy-MM-dd} at slot {slot.FromTime} - {slot.ToTime} has been canceled for maintenance with reason: {maintenanceBookingDTO.Reason}";
+                    _emailService.SendEmailAsync(staffEmail, "Maintenance Booking Conflict", staffNotification).Wait();
+                }
 
                 repository.Add(booking);
             }
@@ -316,8 +379,48 @@ namespace ServerSide.Services
                         CreatedDate = DateTime.Now
                     };
 
+                    // Check for conflicting bookings
+                    var conflictingBookings = repository.GetBookingByDateAndStatus(date, (byte)BookingRoomStatus.Booked)
+                        .Where(b => b.RoomId == maintenanceBookingDTO.RoomId && b.SlotId == maintenanceBookingDTO.SlotId).ToList();
+
                     if (!CheckBookingAvailable(booking))
+                    {
                         throw new BookingPolicyViolationException($"Room {room.RoomName} is unavailable at slot {slot.Order} on {date}");
+                    }
+
+                    // Handle conflicts
+                    foreach (var conflictingBooking in conflictingBookings)
+                    {
+                        if (conflictingBooking == null)
+                        {
+                            Console.WriteLine($"Null conflicting booking found for date: {date}, RoomId: {maintenanceBookingDTO.RoomId}, SlotId: {maintenanceBookingDTO.SlotId}");
+                            continue;
+                        }
+                        conflictingBooking.Status = (byte)BookingRoomStatus.CanceledForMaintainance;
+                        repository.UpdateBooking(conflictingBooking);
+
+                        var creator = userService.GetUserById(conflictingBooking.CreatedBy);
+                        if (creator == null)
+                        {
+                            Console.WriteLine($"Creator not found for booking CreatedBy: {conflictingBooking.CreatedBy}");
+                            continue;
+                        }
+                        var creatorAccount = creator.Account;
+                        if (creatorAccount == null)
+                        {
+                            Console.WriteLine($"Creator account not found for userId: {conflictingBooking.CreatedBy}");
+                            continue;
+                        }
+                        var creatorEmail = creatorAccount.Username;
+
+                        // Send email to booking creator
+                        var cancellationMessage = $"Your booking for room {room.RoomName} on {date:yyyy-MM-dd} at slot {slot.FromTime} - {slot.ToTime} has been canceled due to a maintenance schedule with reason: {maintenanceBookingDTO.Reason}";
+                        _emailService.SendEmailAsync(creatorEmail, "Booking Canceled Due to Maintenance", cancellationMessage).Wait();
+
+                        // Send notification to staff
+                        var staffNotification = $"Maintenance booking conflict detected. Booking by {creator.FullName} on {date:yyyy-MM-dd} at slot {slot.FromTime} - {slot.ToTime} has been canceled for maintenance with reason: {maintenanceBookingDTO.Reason}";
+                        _emailService.SendEmailAsync(staffEmail, "Maintenance Booking Conflict", staffNotification).Wait();
+                    }
 
                     repository.Add(booking);
                 }

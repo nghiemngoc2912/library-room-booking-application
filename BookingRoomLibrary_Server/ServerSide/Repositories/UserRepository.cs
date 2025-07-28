@@ -35,7 +35,10 @@ namespace ServerSide.Repositories
 
         User IUserRepository.GetUserById(int id)
         {
-            return context.Users.Find(id);
+            return context.Users
+              .Include(x => x.Account)
+              .FirstOrDefault(x => x.Id == id);
+
         }
         public IQueryable<User> GetUsersByRole(int role, string? keyword)
         {

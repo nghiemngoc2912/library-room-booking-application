@@ -67,6 +67,7 @@ const App = () => {
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
+  const [userName, setUserName] = useState(null);
 
   // useEffect để fetch thông tin người dùng hiện tại
   useEffect(() => {
@@ -79,20 +80,24 @@ const App = () => {
         if (response.ok) {
           const data = await response.json();
           console.log('API response:', data); // Debug
-          const newUserId = data.id; // Lấy id từ API
-          const newRole = data.role; // Lấy role từ API
+          const newUserId = data.id; // Get id from API
+          const newRole = data.role; // Get role from API
+          const newUserName = data.username; // Get username from API
           setRole(newRole);
           setUserId(newUserId);
-          console.log('Updated userId:', newUserId, 'role:', newRole); // Debug sau khi set
+          setUserName(newUserName);
+          console.log('Updated userId:', newUserId, 'role:', newRole, 'userName:', newUserName); // Debug after set
         } else {
           console.log('API error:', response.status, response.statusText);
           setUserId(null);
           setRole(null);
+          setUserName(null);
         }
       } catch (err) {
         console.error('Network error:', err);
         setUserId(null);
         setRole(null);
+        setUserName(null);
       } finally {
         setLoading(false);
       }
@@ -166,7 +171,7 @@ const App = () => {
 
   return (
     // AuthContext.Provider bao bọc toàn bộ Routes để cung cấp role và loading state
-    <AuthContext.Provider value={{ role, loading, setRole, userId }}>
+    <AuthContext.Provider value={{ role, loading, setRole, userId, userName, setUserId, setRole, setUserName }}>
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={

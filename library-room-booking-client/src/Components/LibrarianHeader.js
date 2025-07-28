@@ -7,13 +7,11 @@ import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
-import Badge from '@mui/material/Badge';
 import { useAuth } from '../App';
 import { useNavigate } from 'react-router-dom';
 
@@ -34,7 +32,7 @@ function LibrarianHeader() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const navigate = useNavigate();
-  const { role, setRole } = useAuth();
+  const { role, setRole, userName } = useAuth();
 
   console.log('LibrarianHeader - Role:', role);
 
@@ -163,9 +161,9 @@ function LibrarianHeader() {
           </Box>
 
           <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Badge badgeContent={3} color="error" overlap="circular">
-              <NotificationsIcon />
-            </Badge>
+            <Typography variant="body1" sx={{ color: 'white', marginRight: '10px' }}>
+              Librarian: {userName || 'Guest'}
+            </Typography>
             <Tooltip title="Account settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <AccountCircle fontSize="large" />
