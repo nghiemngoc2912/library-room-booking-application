@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-
-import { fetchSlotById } from '../../api/SlotAPI';
-import { fetchRoomById } from '../../api/RoomAPI';
+import { getRulesList } from '../../api/Rules'; 
 import bookingReasons from '../../constants/BookingReasons';
+import { fetchRoomById } from '../../api/RoomAPI';
+import { fetchSlotById } from '../../api/SlotAPI';
 
 const RoomBooking = () => {
   const [searchParams] = useSearchParams();
@@ -23,23 +23,29 @@ const RoomBooking = () => {
 
   const [agree, setAgree] = useState(false);
   const [message, setMessage] = useState('');
+  const [rules, setRules] = useState([]); // State để lưu danh sách quy tắc từ API
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
+        // Fetch room và slot data
         const roomData = await fetchRoomById(roomId);
-        const slotInfo = await fetchSlotById(slotId);
+        const slotInfoData = await fetchSlotById(slotId);
 
-        setRoomName(roomData?.roomName || 'Không rõ phòng');
+        setRoomName(roomData?.roomName || 'Unknown room');
         setSlotInfo(
-          slotInfo
-            ? `${slotInfo.order} (${slotInfo.fromTime} - ${slotInfo.toTime})`
-            : 'Không rõ slot'
+          slotInfoData
+            ? `${slotInfoData.order} (${slotInfoData.fromTime} - ${slotInfoData.toTime})`
+            : 'Unknown slot'
         );
+
+        // Fetch rules từ API
+        const rulesData = await getRulesList(); 
+        setRules(rulesData);
       } catch (err) {
         console.error(err);
-        setError('Không thể tải dữ liệu phòng hoặc ca.');
+        setError('Unable to load room, slot, or rules data.');
       } finally {
         setLoading(false);
       }
@@ -55,7 +61,9 @@ const RoomBooking = () => {
     setStudentInput(value);
 
     if (value.length >= 2) {
-      fetch(`https://localhost:7238/api/User/Search?code=${value}`)
+      fetch(`https://localhost:7238/api/User/Search?code=${value}`, {
+        credentials: 'include'
+      })
         .then((res) => res.json())
         .then((data) => setSuggestedStudents(data))
         .catch((err) => console.error(err));
@@ -95,7 +103,6 @@ const RoomBooking = () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
-      withCredentials: true,
       body: JSON.stringify(payload),
     })
       .then(async (res) => {
@@ -114,27 +121,65 @@ const RoomBooking = () => {
   };
 
   return (
-    <div style={{ maxWidth: 700, margin: '2rem auto', padding: '2rem', border: '1px solid #eee', borderRadius: '10px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-      <h1 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>📅 Room Booking</h1>
+    <div style={{
+      maxWidth: 750,
+      margin: '2rem auto',
+      padding: '2rem',
+      border: '1px solid #eee',
+      borderRadius: '12px',
+      boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
+      backgroundColor: '#fff'
+    }}>
+      <h1 style={{
+        textAlign: 'center',
+        fontSize: '2rem',
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: '2.5rem'
+      }}>
+        Room Booking
+      </h1>
+
       {loading ? (
         <p>Loading...</p>
       ) : error ? (
         <p style={{ color: 'red' }}>{error}</p>
       ) : (
-        <form onSubmit={handleSubmit}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem', marginBottom: '1.5rem' }}>
-            <div><strong>📌 Date:</strong> {date}</div>
-            <div><strong>🏠 Room:</strong> {roomName}</div>
-            <div><strong>🕒 Slot:</strong> {slotInfo}</div>
+        <div>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            marginBottom: '2rem',
+            gap: '1rem'
+          }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ fontWeight: 'bold' }}>Day:</label>
+              <div>{date}</div>
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={{ fontWeight: 'bold' }}>Slot:</label>
+              <div>{slotInfo}</div>
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={{ fontWeight: 'bold' }}>Room:</label>
+              <div>{roomName}</div>
+            </div>
           </div>
 
-          <div style={{ marginBottom: '1rem' }}>
-            <label><strong>📖 Reason:</strong></label><br />
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{ fontWeight: 'bold' }}>Purpose:</label>
             <select
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               required
-              style={{ padding: '0.5rem', width: '100%', borderRadius: '6px' }}
+              style={{
+                padding: '0.5rem',
+                width: '100%',
+                borderRadius: '6px',
+                border: '1px solid #ccc',
+                marginTop: '0.5rem'
+              }}
             >
               <option value="" disabled>-- Choose Reason --</option>
               {bookingReasons.map((r, index) => (
@@ -143,14 +188,20 @@ const RoomBooking = () => {
             </select>
           </div>
 
-          <div style={{ marginBottom: '1rem' }}>
-            <label><strong>👥 Add Student:</strong></label><br />
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{ fontWeight: 'bold' }}>Students:</label>
             <input
               type="text"
               value={studentInput}
               onChange={handleStudentInputChange}
-              placeholder="Enter student code or name"
-              style={{ width: '100%', padding: '0.5rem', borderRadius: '6px' }}
+              placeholder="Search for a student"
+              style={{
+                width: '100%',
+                padding: '0.5rem',
+                borderRadius: '6px',
+                border: '1px solid #ccc',
+                marginTop: '0.5rem'
+              }}
             />
             {suggestedStudents.length > 0 && (
               <ul style={{
@@ -161,6 +212,7 @@ const RoomBooking = () => {
                 listStyle: 'none',
                 maxHeight: '150px',
                 overflowY: 'auto',
+                backgroundColor: 'white'
               }}>
                 {suggestedStudents.map((s, index) => (
                   <li key={index} style={{ cursor: 'pointer', padding: '0.25rem 0' }} onClick={() => handleSelectStudent(s)}>
@@ -172,11 +224,10 @@ const RoomBooking = () => {
           </div>
 
           {selectedStudents.length > 0 && (
-            <div style={{ marginBottom: '1rem' }}>
-              <strong>📋 Selected Students:</strong>
+            <div style={{ marginBottom: '1.5rem' }}>
               <ul style={{ paddingLeft: '1rem' }}>
                 {selectedStudents.map((s) => (
-                  <li key={s.code} style={{ marginBottom: '0.25rem' }}>
+                  <li key={s.code} style={{ marginBottom: '0.5rem' }}>
                     {s.fullName} ({s.code})
                     <button
                       type="button"
@@ -199,14 +250,37 @@ const RoomBooking = () => {
             </div>
           )}
 
-          <div style={{ marginBottom: '1rem' }}>
-            <label>
-              <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} /> I agree to the booking rules.
+          <div style={{
+            backgroundColor: '#e6f4ea',
+            border: '1px solid #bde0c0',
+            padding: '1rem',
+            borderRadius: '8px',
+            marginBottom: '1.5rem',
+            fontSize: '0.95rem',
+            lineHeight: '1.6'
+          }}>
+            <ul style={{ paddingLeft: '1.25rem', margin: 0 }}>
+              {rules.map((rule, index) => (
+                <li key={index}>{rule.ruleName}: {rule.description}</li> 
+              ))}
+            </ul>
+          </div>
+
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{ display: 'flex', alignItems: 'center' }}>
+              <input
+                type="checkbox"
+                checked={agree}
+                onChange={(e) => setAgree(e.target.checked)}
+                style={{ marginRight: '0.5rem' }}
+              />
+              I agree to comply with the room booking rules.
             </label>
           </div>
 
           <button
             type="submit"
+            onClick={handleSubmit}
             style={{
               backgroundColor: '#007BFF',
               color: 'white',
@@ -218,10 +292,11 @@ const RoomBooking = () => {
               width: '100%',
             }}
           >
-            ✅ Book Room
+            Save changes
           </button>
-        </form>
+        </div>
       )}
+
       {message && (
         <p style={{
           marginTop: '1.5rem',

@@ -1,4 +1,4 @@
-using ServerSide.Constants;
+﻿using ServerSide.Constants;
 using ServerSide.DTOs;
 using ServerSide.DTOs.Booking;
 using ServerSide.DTOs.User;
@@ -12,10 +12,12 @@ namespace ServerSide.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository repository;
+        private readonly IAccountRepository accountRepository;
 
-        public UserService(IUserRepository repository)
+        public UserService(IUserRepository repository, IAccountRepository accountRepository)
         {
-            this.repository = repository;
+            this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            this.accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
         }
 
         public IEnumerable<UserBookingDTO> SearchUserByCode(string code)
@@ -46,7 +48,7 @@ namespace ServerSide.Services
                 Id = u.Id,
                 FullName = u.FullName,
                 Code = u.Code,
-                Email = u.Email,
+                Email = u.Account.Username,
                 Status = u.Account.Status == 1 ? "Active" : "Inactive"
             }).ToList();
             return new PageResultDTO<StudentListDTO>
@@ -84,6 +86,59 @@ namespace ServerSide.Services
                 Violations = violations
             };
         }
+
+        PageResultDTO<User> IUserService.GetAllStaffs(string? keyword, int page, int defaultPageSize)
+        {
+            var query = repository.GetUsersByRole((int)Roles.Staff, keyword);
+            int totalItems = query.Count();
+            var staffs = query
+                .Skip((page - 1) * defaultPageSize)
+                .Take(defaultPageSize)
+                .Include(u => u.Account)
+                .ToList();
+            return new PageResultDTO<User>
+            {
+                Items = staffs,
+                TotalItems = totalItems,
+                Page = page,
+                PageSize = defaultPageSize
+            };
+        }
+
+        User IUserService.UpdateStatus(int id, byte status)
+        {
+            var user = repository.GetUserById(id);
+            if (user == null)
+                return null;
+
+            user.Account.Status = status;
+            repository.UpdateAccount(user.Account);
+            return user;
+        }
+
+        public async Task<UserDetailsDto> GetUserDetailsAsync(int userId)
+        {
+            var user = repository.GetUserById(userId);
+            if (user == null) return null;
+
+            if (user.AccountId == null) return null;
+
+            if (accountRepository == null)
+                throw new InvalidOperationException("accountRepository is not initialized.");
+
+            var account = await accountRepository.GetAccountByIdAsync(user.AccountId);
+            if (account == null) return null;
+
+            return new UserDetailsDto
+            {
+                Id = user.Id,
+                FullName = user.FullName,
+                Dob = user.Dob,
+                Email = account.Username,
+                CreatedDate = DateTime.UtcNow
+            };
+        }
+
     }
 
     public interface IUserService
@@ -93,5 +148,8 @@ namespace ServerSide.Services
         IEnumerable<UserBookingDTO> SearchUserByCode(string code);
         User GetUserById(int id);
         PageResultDTO<StudentListDTO> GetAllStudents(string? keyword, int page, int pageSize);
+        PageResultDTO<User> GetAllStaffs(string? keyword, int page, int defaultPageSize);
+        User UpdateStatus(int id, byte status);
+        Task<UserDetailsDto> GetUserDetailsAsync(int userId);
     }
 }

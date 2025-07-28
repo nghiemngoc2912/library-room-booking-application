@@ -1,7 +1,7 @@
 import React from 'react';
 
 const StudentTable = ({ students }) => (
-  <table border="1" style={{ width: '100%', textAlign: 'center' }}>
+  <table className="table table-bordered text-center">
     <thead>
       <tr>
         <th>Student Name</th>
@@ -24,7 +24,7 @@ const StudentTable = ({ students }) => (
             <td>{student.email || '-'}</td>
             <td>{student.status}</td>
             <td>
-              <button onClick={() => alert(`Viewing history for ${student.fullName}`)}>
+              <button className="btn btn-info btn-sm" onClick={() => alert(`Viewing history for ${student.fullName}`)}>
                 View History
               </button>
             </td>

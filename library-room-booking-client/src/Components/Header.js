@@ -17,30 +17,29 @@ import Badge from '@mui/material/Badge';
 import { useAuth } from '../App';
 import { useNavigate } from 'react-router-dom';
 
-const pages = ['Home', 'Booking Room', 'News', 'Rules', 'Reports'];
+const pages = [
+  { label: 'Booking Room', path: '/home', roles: [1, 2, 3] },
+  { label: 'News', path: '/student/news', roles: [1, 2] },
+  { label: 'Rules', path: '/rules', roles: [2] },
+  { label: 'Reports', path: '/reports', roles: [2] }, 
+  { label: 'Report History', path: '/history-report', roles: [1] },
+  { label: 'Add Report', path: '/add-report', roles: [1] },
+];
+
 const settings = ['Profile', 'Logout'];
 
 function Header() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const navigate = useNavigate();
-  const { setRole } = useAuth();
+  const { role, setRole, userName } = useAuth();
 
-  const handleOpenNavMenu = (event) => {
-    setAnchorElNav(event.currentTarget);
-  };
+  console.log('Header - Role:', role);
 
-  const handleOpenUserMenu = (event) => {
-    setAnchorElUser(event.currentTarget);
-  };
-
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
-  };
-
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
-  };
+  const handleOpenNavMenu = (event) => setAnchorElNav(event.currentTarget);
+  const handleOpenUserMenu = (event) => setAnchorElUser(event.currentTarget);
+  const handleCloseNavMenu = () => setAnchorElNav(null);
+  const handleCloseUserMenu = () => setAnchorElUser(null);
 
   const handleLogout = async () => {
     try {
@@ -48,12 +47,12 @@ function Header() {
         method: 'POST',
         credentials: 'include',
       });
-      console.log("Đăng xuất thành công");
     } catch (err) {
       console.error('Logout failed', err);
     }
 
     localStorage.removeItem('authToken');
+    localStorage.removeItem('role');
     sessionStorage.clear();
     setRole(null);
 
@@ -76,7 +75,21 @@ function Header() {
     if (page === 'Home') {
       navigate('/home');
     }
+    if (page === 'News') {
+      navigate('/student/news');
+    }
     handleCloseNavMenu();
+  };
+
+  const handleSettingClick = (setting) => {
+    if (setting === 'Logout') {
+      handleLogout();
+    } else if (setting === 'Profile') {
+      if (role === 1) navigate('/student/profile');
+      else if (role === 2) navigate('/librarian/profile');
+      else if (role === 3) navigate('/admin.profile');
+      handleCloseUserMenu();
+    }
   };
 
   return (
@@ -88,7 +101,7 @@ function Header() {
             variant="h6"
             noWrap
             component="a"
-            href="#app-bar-with-responsive-menu"
+            href="#"
             sx={{
               mr: 2,
               display: { xs: 'none', md: 'flex' },
@@ -99,15 +112,12 @@ function Header() {
               textDecoration: 'none',
             }}
           >
-            Logo
+            LOGO
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
               size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
               onClick={handleOpenNavMenu}
               color="inherit"
             >
@@ -116,32 +126,34 @@ function Header() {
             <Menu
               id="menu-appbar"
               anchorEl={anchorElNav}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
-              }}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
               keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
               open={Boolean(anchorElNav)}
               onClose={handleCloseNavMenu}
               sx={{ display: { xs: 'block', md: 'none' } }}
             >
-              {pages.map((page) => (
-                <MenuItem key={page} onClick={() => handleNavMenuClick(page)}>
-                  <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
+              {pages.filter(p => p.roles.includes(role)).map((page) => (
+                <MenuItem
+                  key={page.label}
+                  onClick={() => {
+                    console.log('Navigating to:', page.path);
+                    navigate(page.path);
+                    handleCloseNavMenu();
+                  }}
+                >
+                  <Typography textAlign="center">{page.label}</Typography>
                 </MenuItem>
               ))}
             </Menu>
           </Box>
+
           <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
           <Typography
             variant="h5"
             noWrap
             component="a"
-            href="#app-bar-with-responsive-menu"
+            href="#"
             sx={{
               mr: 2,
               display: { xs: 'flex', md: 'none' },
@@ -155,22 +167,27 @@ function Header() {
           >
             LOGO
           </Typography>
+
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {pages.map((page) => (
+            {pages.filter(p => p.roles.includes(role)).map((page) => (
               <Button
-                key={page}
-                onClick={() => handleNavMenuClick(page)}
+                key={page.label}
+                onClick={() => {
+                  console.log('Navigating to:', page.path);
+                  navigate(page.path);
+                }}
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
-                {page}
+                {page.label}
               </Button>
             ))}
           </Box>
+
           <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Badge badgeContent={3} color="error" overlap="circular">
-              <NotificationsIcon />
-            </Badge>
-            <Tooltip title="Account setting">
+            <Typography variant="body1" sx={{ color: 'white', marginRight: '10px' }}>
+              {userName || 'Guest'}
+            </Typography>
+            <Tooltip title="Account settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <AccountCircle fontSize="large" />
               </IconButton>
@@ -179,21 +196,15 @@ function Header() {
               sx={{ mt: '45px' }}
               id="menu-appbar"
               anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
+              anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
               keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
+              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={() => handleMenuItemClick(setting)}>
-                  <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
+                <MenuItem key={setting} onClick={() => handleSettingClick(setting)}>
+                  <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>
               ))}
             </Menu>

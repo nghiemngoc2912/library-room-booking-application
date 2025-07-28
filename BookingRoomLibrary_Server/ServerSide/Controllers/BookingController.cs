@@ -1,13 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ServerSide.Constants;
 using ServerSide.DTOs.Booking;
+using ServerSide.DTOs.Rating;
 using ServerSide.Exceptions;
+using ServerSide.Filters;
 using ServerSide.Models;
 using ServerSide.Services;
+using System.Text.Json;
 using ServerSide.DTOs.Rating;
 
 
 namespace ServerSide.Controllers
 {
+    //[RoleFilter((int)Roles.Student, (int)Roles.Staff)]
     [Route("api/[controller]")]
     [ApiController]
     public class BookingController : ControllerBase
@@ -26,7 +31,7 @@ namespace ServerSide.Controllers
         {
             return _bookingService.GetBookingByDateAndStatus(date, status);
         }
-
+        [RoleFilter((int)Roles.Student)]
         [HttpPost]
         public IActionResult CreateBooking([FromBody] CreateBookingDTO createBookingDTO)
         {
@@ -64,7 +69,7 @@ namespace ServerSide.Controllers
         {
             return _bookingService.GetDetailBookingById(id);
         }
-
+        [RoleFilter((int)Roles.Staff)]
         [HttpPatch("{id}/checkin")]
         public IActionResult CheckinBooking(int id)
         {
@@ -80,7 +85,7 @@ namespace ServerSide.Controllers
                 checkinTime = booking.CheckInAt
             });
         }
-
+        [RoleFilter((int)Roles.Staff)]
         [HttpPatch("{id}/checkout")]
         public IActionResult CheckoutBooking(int id)
         {
@@ -102,10 +107,12 @@ namespace ServerSide.Controllers
             int userId, DateTime? from = null, DateTime? to = null,
             int page = 1, int pageSize = 5)
         {
+            Console.WriteLine($"đã gọi vào api history với userId = {userId}");
             var (total, data) = await _bookingService.GetBookingHistoryAsync(userId, from, to, page, pageSize);
+
             return Ok(new { total, data });
         }
-
+        [RoleFilter((int)Roles.Student)]
         [HttpPost("{bookingId}/rate")]
         public async Task<IActionResult> RateRoom(int bookingId, [FromBody] CreateRatingDTO dto)
         {
@@ -122,6 +129,7 @@ namespace ServerSide.Controllers
                 });
             }
         }
+        [RoleFilter((int)Roles.Student, (int)Roles.Staff)]
         [HttpPatch("cancel/{id}")]
         public IActionResult CancelBooking(int id) {
             try {
@@ -136,6 +144,37 @@ namespace ServerSide.Controllers
                 return StatusCode(500, "Something when wrong: "+ex.Message);
             }
             
+        }
+
+        [RoleFilter((int)Roles.Staff)]
+        [HttpPost("maintenance")]
+        public IActionResult CreateMaintenanceBooking([FromBody] MaintenanceBookingDTO maintenanceBookingDTO)
+        {
+            try
+            {
+                var userIdRaw = HttpContext.Session.GetString("UserId");
+                if (string.IsNullOrEmpty(userIdRaw))
+                {
+                    return Unauthorized(new { message = "Not logged in" });
+                }
+                if (!int.TryParse(userIdRaw, out int userId))
+                {
+                    return BadRequest(new { message = "Invalid user ID format" });
+                }
+                Console.WriteLine($"Received payload: {Newtonsoft.Json.JsonConvert.SerializeObject(maintenanceBookingDTO)}");
+                _bookingService.CreateMaintenanceBooking(maintenanceBookingDTO, userId);
+                return Ok(new { message = "Maintenance booking created successfully" });
+            }
+            catch (BookingPolicyViolationException ex)
+            {
+                Console.WriteLine($"Policy violation: {ex.Message}");
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return StatusCode(500, new { message = "Internal server error: " + ex.Message });
+            }
         }
     }
 }

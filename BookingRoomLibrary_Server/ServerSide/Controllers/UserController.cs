@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ServerSide.Constants;
 using ServerSide.DTOs.Booking;
 using ServerSide.DTOs.User;
+using ServerSide.Filters;
 using ServerSide.Models;
 using ServerSide.Services;
 using System.Collections.Generic;
@@ -10,15 +11,18 @@ using System.Threading.Tasks;
 
 namespace ServerSide.Controllers
 {
+    [RoleFilter((int)Roles.Student, (int)Roles.Staff, (int)Roles.Admin)]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
     {
         private readonly IUserService userService;
+        private readonly IAccountService _accountService;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, IAccountService accountService)
         {
             this.userService = userService;
+            _accountService = accountService;
         }
 
         // GET: api/user/search?code=SE123
@@ -42,5 +46,22 @@ namespace ServerSide.Controllers
             var result = userService.GetAllStudents(keyword, page, Pagination.DefaultPageSize);
             return Ok(result);
         }
+
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetUserDetails(int userId)
+        {
+            try
+            {
+                var user = await userService.GetUserDetailsAsync(userId);
+                if (user == null) return NotFound("User not found.");
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi hoặc return để debug
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+
     }
 }

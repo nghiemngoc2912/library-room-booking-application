@@ -8,8 +8,8 @@ import AdminLayout from './layouts/AdminLayout';
 
 // Import các Page Components
 import RoomBooking from './pages/roomBooking/RoomBooking';
-import Home from './pages/roomBooking/Home'; 
-import ListRoom from './pages/roomManagement/ListRoom'; 
+import Home from './pages/roomBooking/Home';
+import ListRoom from './pages/roomManagement/ListRoom';
 import UpdateRoom from './pages/roomManagement/UpdateRoom';
 import CreateRoom from './pages/roomManagement/CreateRoom';
 import ListSlot from './pages/slotManagement/ListSlot';
@@ -20,12 +20,18 @@ import DetailRequestRoom from './pages/admin/DetailRequestRoom';
 import SlotRequest from './pages/admin/SlotRequest';
 import DetailSlotRequest from './pages/admin/DetailSlotRequest';
 import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
 import Unauthorized from './pages/auth/Unauthorized'
 import NewsPage from './pages/roomBooking/NewsPage';
 import ProfilePage from './pages/student/ProfilePage';
 import BookingDetailPage from './pages/roomBooking/BookingDetail';
-import StudentList from './pages/user/StudentList';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import ResetPasswordPage from './pages/auth/ResetPasswordPage';
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
+import LibrarianManagement from './pages/librarianManagement/LibrarianManagement'
+import MaintenanceBooking from './pages/roomManagement/MaintenanceBooking'; 
+import LibrarianProfilePage from './pages/librarian/LibrarianProfilePage';
+import AdminProfilePage from './pages/admin/AdminProfilePage';
 
 import { BrowserRouter as Router, Link, useNavigate } from 'react-router-dom';
 import RulesPage from './pages/rule/RulesPage';
@@ -37,7 +43,11 @@ import ReportDetailPage from './pages/report/ReportDetailPage';
 import StudentInfoPage from './pages/report/StudentInfoPage';
 import HistoryReportPage from './pages/report/HistoryReportPage';
 import ReportTypeDetailsPage from './pages/report/ReportTypeDetailsPage';
+import StudentListPage from './pages/student/StudentListPage';
+import StudentNewsPage from './pages/student/StudentNewsPage';
+
 import './App.css';
+import { Dashboard } from '@mui/icons-material';
 
 // Không cần import HomeLayoutWrapper nữa
 
@@ -57,35 +67,42 @@ const App = () => {
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
+  const [userName, setUserName] = useState(null);
 
   // useEffect để fetch thông tin người dùng hiện tại
   useEffect(() => {
     const checkAuth = async () => {
-      // Không gọi lại nếu role đã được thiết lập
-      if (role !== null) {
-        setLoading(false);
-        return;
-      }
       setLoading(true);
       try {
-        const response = await fetch('https://localhost:7238/api/auth/current-user', { 
-          credentials: 'include' 
+        const response = await fetch('https://localhost:7238/api/auth/current-user', {
+          credentials: 'include',
         });
         if (response.ok) {
           const data = await response.json();
-          setRole(data.role);
-          setUserId(data.userId);
+          console.log('API response:', data); // Debug
+          const newUserId = data.id; // Get id from API
+          const newRole = data.role; // Get role from API
+          const newUserName = data.username; // Get username from API
+          setRole(newRole);
+          setUserId(newUserId);
+          setUserName(newUserName);
+          console.log('Updated userId:', newUserId, 'role:', newRole, 'userName:', newUserName); // Debug after set
         } else {
+          console.log('API error:', response.status, response.statusText);
           setUserId(null);
           setRole(null);
+          setUserName(null);
         }
       } catch (err) {
-        console.error("Error fetching current user:", err);
+        console.error('Network error:', err);
+        setUserId(null);
         setRole(null);
+        setUserName(null);
       } finally {
         setLoading(false);
       }
     };
+
     checkAuth();
   }, [location.pathname]);
 
@@ -129,19 +146,43 @@ const App = () => {
     } else if (role === 2) {
       return <LibrarianLayout><Home /></LibrarianLayout>;
     } else if (role === 3) {
-      return <AdminLayout><Home /></AdminLayout>;
+      return <AdminLayout><AdminDashboard /></AdminLayout>;
     }
     return <DefaultLayout><Home /></DefaultLayout>; // Mặc định về DefaultLayout
   };
 
+  const getNewsLayout = () => {
+    if (role === 1) {
+      return <DefaultLayout><NewsPage /></DefaultLayout>;
+    } else if (role === 2) {
+      return <LibrarianLayout><NewsPage /></LibrarianLayout>;
+    } 
+    return <DefaultLayout><NewsPage /></DefaultLayout>; 
+  };
+
+  const getProfileLayout = () => {
+    if (role === 1) {
+      return <DefaultLayout><ProfilePage loggedInUserId={userId} role={role} /></DefaultLayout>;
+    } else if (role === 2) {
+      return <LibrarianLayout><ProfilePage loggedInUserId={userId} role={role} /></LibrarianLayout>;
+    }
+    return <DefaultLayout><ProfilePage loggedInUserId={userId} role={role} /></DefaultLayout>;
+  };
+
   return (
     // AuthContext.Provider bao bọc toàn bộ Routes để cung cấp role và loading state
-    <AuthContext.Provider value={{ role, loading, setRole }}>
+    <AuthContext.Provider value={{ role, loading, setRole, userId, userName, setUserId, setRole, setUserName }}>
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={
           <PublicRoute>
             <Login />
+          </PublicRoute>
+        } />
+
+        <Route path="/register" element={
+          <PublicRoute>
+            <Register />
           </PublicRoute>
         } />
 
@@ -161,7 +202,7 @@ const App = () => {
           path="/room_management"
           element={
             <ProtectedRoute allowedRoles={[2]}>
-              <LibrarianLayout><ListRoom/></LibrarianLayout>
+              <LibrarianLayout><ListRoom /></LibrarianLayout>
             </ProtectedRoute>
           }
         />
@@ -173,7 +214,14 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-
+        <Route
+          path="/room_management/maintenance"
+          element={
+            <ProtectedRoute allowedRoles={[2]}>
+              <LibrarianLayout><MaintenanceBooking /></LibrarianLayout>
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/room_management/create"
           element={
@@ -204,6 +252,22 @@ const App = () => {
           element={
             <ProtectedRoute allowedRoles={[2]}>
               <LibrarianLayout><UpdateSlot /></LibrarianLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/librarian/profile"
+          element={
+            <ProtectedRoute allowedRoles={[2]}>
+              <LibrarianLayout><LibrarianProfilePage userId={userId} /></LibrarianLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/profile"
+          element={
+            <ProtectedRoute allowedRoles={[3]}>
+              <AdminLayout><AdminProfilePage userId={userId} /></AdminLayout>
             </ProtectedRoute>
           }
         />
@@ -254,18 +318,38 @@ const App = () => {
           path="/news"
           element={
             <ProtectedRoute allowedRoles={[1, 2]}>
-              <DefaultLayout><NewsPage /></DefaultLayout>
+              {getNewsLayout()} {/* Gọi hàm để render layout phù hợp */}
             </ProtectedRoute>
           }
         />
         <Route
-          path="/student/profile"
+        path="/student/profile"
+        element={
+          <ProtectedRoute allowedRoles={[1, 2]}>
+            {getProfileLayout()}
+          </ProtectedRoute>
+        }
+      />
+        <Route
+          path="/profile/change-password"
           element={
-            <ProtectedRoute allowedRoles={[1, 2]}>
-              <DefaultLayout><ProfilePage userId={userId} /></DefaultLayout>
+            <ProtectedRoute allowedRoles={[1, 2, 3]}>
+              <DefaultLayout>
+                <ProfilePage userId={userId} /> {/* Truyền userId vào ProfilePage */}
+              </DefaultLayout>
             </ProtectedRoute>
           }
         />
+        <Route path="/forgot-password" element={
+        <PublicRoute>
+          <ForgotPasswordPage />
+        </PublicRoute>
+        } />
+        <Route path="/reset-password" element={
+          <PublicRoute>
+            <ResetPasswordPage />
+          </PublicRoute>
+        } />
         <Route
           path="/admin"
           element={
@@ -274,20 +358,114 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/students"
+          element={
+            <ProtectedRoute allowedRoles={[2]}>
+              <LibrarianLayout><StudentListPage /></LibrarianLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/news"
+          element={
+            <ProtectedRoute allowedRoles={[1]}>
+              <DefaultLayout><StudentNewsPage /></DefaultLayout>
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/booking/detail/:id" element={<DefaultLayout><BookingDetailPage role={role} /></DefaultLayout>} />
-        <Route path="/user/students" element={<DefaultLayout><StudentList /></DefaultLayout>} />
+        <Route
+          path="/booking/detail/:id"
+          element={
+            <ProtectedRoute allowedRoles={[1, 2]}>
+              <DefaultLayout><BookingDetailPage role={role} /></DefaultLayout>
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/rules" element={<RulesPage />} />
-        <Route path="/reports" element={<ReportsPage />} />
-        <Route path="/add-rule" element={<AddRulePage />} />
-        <Route path="/edit-rule" element={<EditRulePage />} />
-        <Route path="/add-report" element={<AddReportPage />} />
-        <Route path="/report-detail" element={<ReportDetailPage />} />
-        <Route path="/student-info" element={<StudentInfoPage />} />
-        <Route path="/history-report" element={<HistoryReportPage />} />
-        <Route path="/report-type-details" element={<ReportTypeDetailsPage />} />
-        <Route path="/" element={<Navigate to="/reports" />} />
+        <Route
+          path="/rules"
+          element={
+            <ProtectedRoute allowedRoles={[2]}>
+              <LibrarianLayout><RulesPage /></LibrarianLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reports"
+          element={
+            <ProtectedRoute allowedRoles={[2]}>
+              <LibrarianLayout><ReportsPage /></LibrarianLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/add-rule"
+          element={
+            <ProtectedRoute allowedRoles={[2]}>
+              <LibrarianLayout><AddRulePage /></LibrarianLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/edit-rule"
+          element={
+            <ProtectedRoute allowedRoles={[2]}>
+              <LibrarianLayout><EditRulePage /></LibrarianLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/add-report"
+          element={
+            <ProtectedRoute allowedRoles={[1]}>
+              <DefaultLayout><AddReportPage /></DefaultLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/report-detail"
+          element={
+            <ProtectedRoute allowedRoles={[2]}>
+              <LibrarianLayout><ReportDetailPage /></LibrarianLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student-info"
+          element={
+            <ProtectedRoute allowedRoles={[2]}>
+              <LibrarianLayout><StudentInfoPage /></LibrarianLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/history-report"
+          element={
+            <ProtectedRoute allowedRoles={[1]}>
+              <DefaultLayout><HistoryReportPage /></DefaultLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/report-type-details"
+          element={
+            <ProtectedRoute allowedRoles={[1]}>
+              <DefaultLayout><ReportTypeDetailsPage /></DefaultLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/manage_librarians"
+          element={
+            <ProtectedRoute allowedRoles={[3]}> 
+              <AdminLayout>
+                <LibrarianManagement />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
 
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>

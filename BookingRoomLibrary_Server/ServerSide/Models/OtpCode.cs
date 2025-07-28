@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ServerSide.Constants;
+using System;
 using System.Collections.Generic;
 
 namespace ServerSide.Models;
@@ -7,9 +8,9 @@ public partial class OtpCode
 {
     public Guid Id { get; set; }
 
-    public string Username { get; set; } = null!;
+    public string Username { get; set; } = null!; 
 
-    public string Code { get; set; } = null!;
+    public string Code { get; set; } = null!; 
 
     public int OtpType { get; set; }
 

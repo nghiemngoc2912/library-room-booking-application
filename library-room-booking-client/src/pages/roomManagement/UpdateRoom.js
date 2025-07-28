@@ -64,13 +64,12 @@ const UpdateRoom = () => {
       return;
     }
 
-    // Validate status only for non-pending rooms
-    if (!isPending) {
-      const status = parseInt(room.status);
-      if (![0, 1, 2].includes(status)) {
-        setError('Trạng thái không hợp lệ. Vui lòng chọn một giá trị hợp lệ.');
-        return;
-      }
+    // Validate status
+    const status = parseInt(room.status);
+    const validStatuses = [0, 1, 2, 3]; // Match all enum values
+    if (!validStatuses.includes(status)) {
+      setError('Trạng thái không hợp lệ. Vui lòng chọn một giá trị hợp lệ.');
+      return;
     }
 
     try {
@@ -82,7 +81,7 @@ const UpdateRoom = () => {
           id: room.id,
           roomName: room.roomName,
           capacity: capacity,
-          status: isPending ? 0 : parseInt(room.status), // Keep status as 0 if pending
+          status: status, // Use the validated status
         }),
       });
 
@@ -192,7 +191,8 @@ const UpdateRoom = () => {
             >
               {/* <option value="0">Pending</option> */}
               <option value="1">Active</option>
-              <option value="2">Maintenance</option>
+              {/* <option value="2">Maintenance</option> */}
+              <option value="3">Inactive</option>
             </select>
             {isPending && (
               <p style={{ color: '#6c757d', fontSize: '0.9rem', marginTop: '0.5rem' }}>

@@ -24,6 +24,7 @@ public partial class Booking
     public byte Status { get; set; }
 
     public string? Reason { get; set; }
+    public bool? ReminderSent { get; set; }
 
     public virtual User CreatedByNavigation { get; set; } = null!;
 

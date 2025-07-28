@@ -32,130 +32,130 @@ import SearchIcon from "@mui/icons-material/Search"
 import FilterListIcon from "@mui/icons-material/FilterList"
 import RefreshIcon from "@mui/icons-material/Refresh"
 import EditIcon from "@mui/icons-material/Edit"
+import { useAuth } from '../../App';
 
 const ReportsPage = () => {
-  const navigate = useNavigate()
-  const [reports, setReports] = useState([])
-  const [filteredReports, setFilteredReports] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
-  const [typeFilter, setTypeFilter] = useState("all")
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" })
-  const [error, setError] = useState(null)
-  const [openDialog, setOpenDialog] = useState(false)
-  const [selectedReport, setSelectedReport] = useState(null)
-  const [newStatus, setNewStatus] = useState(0)
+  const { role } = useAuth();
+  const navigate = useNavigate();
+  const [reports, setReports] = useState([]);
+  const [filteredReports, setFilteredReports] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const [error, setError] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [newStatus, setNewStatus] = useState(0);
+
+  console.log('ReportsPage rendered, role:', role); // Log để kiểm tra render
 
   const fetchReports = useCallback(async () => {
     try {
-      setLoading(true)
-      setError(null)
-      const response = await getReportsList()
-      setReports(response)
-      setFilteredReports(response)
+      setLoading(true);
+      setError(null);
+      const response = await getReportsList();
+      console.log('Reports fetched:', response); // Log dữ liệu reports
+      setReports(response);
+      setFilteredReports(response);
     } catch (error) {
-      console.error("Error fetching reports:", error)
-      setError("Failed to load reports. Please try again.")
+      console.error('Error fetching reports:', error);
+      setError('Failed to load reports. Please try again.');
       setSnackbar({
         open: true,
-        message: "Failed to load reports",
-        severity: "error",
-      })
+        message: 'Failed to load reports',
+        severity: 'error',
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-    fetchReports()
-  }, [fetchReports])
+    fetchReports();
+  }, [fetchReports]);
 
-  // Filter reports based on search term, status, and type
   useEffect(() => {
-    let filtered = reports
+    let filtered = reports;
 
-    // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter(
         (report) =>
           report.reportType?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           report.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           (report.description && report.description.toLowerCase().includes(searchTerm.toLowerCase())),
-      )
+      );
     }
 
-    // Apply status filter
     if (statusFilter !== "all") {
       filtered = filtered.filter((report) => {
-        if (statusFilter === "pending") return report.status === 0
-        if (statusFilter === "replied") return report.status === 1
-        return true
-      })
+        if (statusFilter === "pending") return report.status === 0;
+        if (statusFilter === "replied") return report.status === 1;
+        return true;
+      });
     }
 
-    // Apply type filter
     if (typeFilter !== "all") {
-      filtered = filtered.filter((report) => report.reportType === typeFilter)
+      filtered = filtered.filter((report) => report.reportType === typeFilter);
     }
 
-    setFilteredReports(filtered)
-  }, [reports, searchTerm, statusFilter, typeFilter])
+    setFilteredReports(filtered);
+  }, [reports, searchTerm, statusFilter, typeFilter]);
 
   const handleAddReport = () => {
-    navigate("/add-report")
-  }
+    navigate("/add-report");
+  };
 
   const handleDetailReport = (report) => {
-    navigate("/report-detail", { state: { report } })
-  }
+    navigate("/report-detail", { state: { report } });
+  };
 
   const handleStatusChange = (report) => {
-    setSelectedReport(report)
-    setNewStatus(report.status || 0)
-    setOpenDialog(true)
-  }
+    setSelectedReport(report);
+    setNewStatus(report.status || 0);
+    setOpenDialog(true);
+  };
 
   const handleConfirmStatusChange = async () => {
     if (selectedReport) {
       try {
-        await updateReportStatus(selectedReport.id, newStatus)
-        setReports(reports.map(r => r.id === selectedReport.id ? { ...r, status: newStatus } : r))
-        setFilteredReports(filteredReports.map(r => r.id === selectedReport.id ? { ...r, status: newStatus } : r))
+        await updateReportStatus(selectedReport.id, newStatus);
+        setReports(reports.map(r => r.id === selectedReport.id ? { ...r, status: newStatus } : r));
+        setFilteredReports(filteredReports.map(r => r.id === selectedReport.id ? { ...r, status: newStatus } : r));
         setSnackbar({
           open: true,
           message: `Status for report "${selectedReport.reportType}" updated successfully`,
           severity: "success",
-        })
-        setOpenDialog(false)
+        });
+        setOpenDialog(false);
       } catch (error) {
-        console.error("Error updating status:", error)
-        setError("Failed to update report status.")
+        console.error("Error updating status:", error);
+        setError("Failed to update report status.");
         setSnackbar({
           open: true,
           message: "Failed to update status",
           severity: "error",
-        })
+        });
       }
     }
-  }
+  };
 
   const handleCloseDialog = () => {
-    setOpenDialog(false)
-    setSelectedReport(null)
-    setNewStatus(0)
-  }
+    setOpenDialog(false);
+    setSelectedReport(null);
+    setNewStatus(0);
+  };
 
   const handleSnackbarClose = () => {
-    setSnackbar({ ...snackbar, open: false })
-  }
+    setSnackbar({ ...snackbar, open: false });
+  };
 
   const handleRefresh = () => {
-    fetchReports()
-  }
+    fetchReports();
+  };
 
-  // Get unique report types for filter
-  const reportTypes = [...new Set(reports.map((report) => report.reportType).filter(Boolean))]
+  const reportTypes = [...new Set(reports.map((report) => report.reportType).filter(Boolean))];
 
   if (loading) {
     return (
@@ -170,7 +170,7 @@ const ReportsPage = () => {
           </Typography>
         </Box>
       </Container>
-    )
+    );
   }
 
   if (error && reports.length === 0) {
@@ -187,7 +187,7 @@ const ReportsPage = () => {
           {error}
         </Alert>
       </Container>
-    )
+    );
   }
 
   return (
@@ -201,10 +201,9 @@ const ReportsPage = () => {
         </Typography>
       </Box>
 
-      {/* Action Bar */}
       <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
         <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={3}>
+          <Grid sx={{ width: { xs: '100%', md: '25%' } }}>
             <TextField
               fullWidth
               placeholder="Search reports..."
@@ -220,7 +219,7 @@ const ReportsPage = () => {
               size="small"
             />
           </Grid>
-          <Grid item xs={12} md={2}>
+          <Grid sx={{ width: { xs: '100%', md: '16.66%' } }}>
             <FormControl fullWidth size="small">
               <InputLabel>Status</InputLabel>
               <Select
@@ -235,7 +234,7 @@ const ReportsPage = () => {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} md={2}>
+          <Grid sx={{ width: { xs: '100%', md: '16.66%' } }}>
             <FormControl fullWidth size="small">
               <InputLabel>Type</InputLabel>
               <Select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} label="Type">
@@ -248,7 +247,7 @@ const ReportsPage = () => {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid sx={{ width: { xs: '100%', md: '25%' } }}>
             <Box display="flex" alignItems="center" gap={1}>
               <Chip
                 label={`${filteredReports.length} of ${reports.length} reports`}
@@ -258,20 +257,18 @@ const ReportsPage = () => {
               />
             </Box>
           </Grid>
-          <Grid item xs={12} md={2}>
+          <Grid sx={{ width: { xs: '100%', md: '16.66%' } }}>
             <Box display="flex" gap={1}>
               <Button variant="outlined" onClick={handleRefresh} disabled={loading} size="small">
                 <RefreshIcon />
               </Button>
-              {/* Tạm thời loại bỏ nút Add Report */}
             </Box>
           </Grid>
         </Grid>
       </Paper>
 
-      {/* Reports Table */}
       <Grid container spacing={3}>
-        <Grid item xs={12}>
+        <Grid sx={{ width: '100%' }}>
           <ReportTable 
             reports={filteredReports} 
             onDetail={handleDetailReport} 
@@ -281,7 +278,6 @@ const ReportsPage = () => {
         </Grid>
       </Grid>
 
-      {/* Modal Xác nhận thay đổi trạng thái */}
       <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ backgroundColor: "primary.light", color: "white", p: 3 }}>
           Change Report Status
@@ -313,7 +309,6 @@ const ReportsPage = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Snackbar for notifications */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
@@ -325,7 +320,7 @@ const ReportsPage = () => {
         </Alert>
       </Snackbar>
     </Container>
-  )
+  );
 }
 
-export default ReportsPage
+export default ReportsPage;

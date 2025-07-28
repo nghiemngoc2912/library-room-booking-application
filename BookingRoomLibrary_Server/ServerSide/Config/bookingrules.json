@@ -10,5 +10,7 @@
   "TimeStart": 9,
   "TimeEnd": 18,
   "TimeJobInterval": 5,
-  "CancelTimeInterval": 2
+  "CancelTimeInterval": 2,
+  "SendMailRemind": 6,
+  "SendMailRemindInterval": 5
 }

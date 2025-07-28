@@ -40,11 +40,7 @@ const AddRulePage = () => {
 
   const handleSubmit = async () => {
     setError(null)
-
-    if (!validateRule()) {
-      return
-    }
-
+    if (!validateRule()) return
     setLoading(true)
     try {
       await createRule(rule)
@@ -53,14 +49,12 @@ const AddRulePage = () => {
         message: `Rule "${rule.ruleName}" created successfully`,
         severity: "success",
       })
-
-      // Navigate after a short delay to show the success message
       setTimeout(() => {
         navigate("/rules")
       }, 1500)
     } catch (error) {
-      console.error("Error creating rule:", error.response?.data || error.message)
-      setError(`Failed to create rule. ${error.response?.data?.message || error.message}`)
+      const errorMessage = error.response?.data?.message || "Failed to create rule."
+      setError(errorMessage)
       setLoading(false)
     }
   }
@@ -68,11 +62,7 @@ const AddRulePage = () => {
   const handleChange = (e) => {
     const { name, value } = e.target
     setRule({ ...rule, [name]: value })
-
-    // Clear error when user starts typing
-    if (error) {
-      setError(null)
-    }
+    if (error) setError(null)
   }
 
   const handleBack = () => {
@@ -85,7 +75,6 @@ const AddRulePage = () => {
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
-      {/* Breadcrumbs */}
       <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 3 }}>
         <Link
           underline="hover"

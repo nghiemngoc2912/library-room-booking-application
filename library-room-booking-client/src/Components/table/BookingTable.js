@@ -7,40 +7,52 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { Link } from 'react-router-dom';
-
 import { fetchSlots } from '../../api/SlotAPI';
 import { fetchRooms } from '../../api/RoomAPI';
 import { fetchBookingsByDateAndStatus } from '../../api/BookingAPI';
+import { useAuth } from '../../App';
 
-export default function BookingTable({ date, status}) {
+export default function BookingTable({ date, status }) {
   const [slots, setSlots] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [bookings, setBookings] = useState([]);
+  const { role } = useAuth();
+
   const today = new Date().toISOString().split('T')[0];
   const isPastDate = date < today;
 
   useEffect(() => {
-    // Luôn fetch slots và rooms
     Promise.all([fetchSlots(), fetchRooms()])
       .then(([slotsData, roomsData]) => {
         setSlots(slotsData);
         setRooms(roomsData);
       })
       .catch(err => console.error('Lỗi khi tải slots hoặc rooms:', err));
-  if (!isPastDate) {
-      fetchBookingsByDateAndStatus(date, status)
-        .then(setBookings)
-        .catch(err => console.error('Lỗi khi tải bookings:', err));
+
+    if (!isPastDate) {
+      if (Array.isArray(status)) {
+        Promise.all(status.map(s => fetchBookingsByDateAndStatus(date, s)))
+          .then(results => {
+            const allBookings = results.flat();
+            console.log('Bookings:', allBookings); // Debug
+            setBookings(allBookings);
+          })
+          .catch(err => console.error('Lỗi khi tải bookings (multi-status):', err));
+      } else {
+        fetchBookingsByDateAndStatus(date, status)
+          .then(setBookings)
+          .catch(err => console.error('Lỗi khi tải bookings:', err));
+      }
     } else {
-      // Nếu ngày đã qua thì không fetch booking, reset bookings
       setBookings([]);
     }
   }, [date, status, isPastDate]);
 
   const getBooking = (roomId, slotId) => {
-  return bookings.find(b => b.roomId === roomId && b.slotId === slotId);
-};
-return (
+    return bookings.find(b => b.roomId === roomId && b.slotId === slotId);
+  };
+
+  return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="booking table">
         <TableHead>
@@ -57,39 +69,37 @@ return (
           {rooms.map((room) => (
             <TableRow key={room.id}>
               <TableCell component="th" scope="row">
-                {room.roomName}
+               {room.roomName}(Max: {room.capacity} - Min: {Math.ceil(room.capacity * 0.8)})
               </TableCell>
-
               {slots.map((slot) => {
-                const isRoomInactive = room.status === 0;
-                              
+                const isRoomInactive = room.status === 2; // Trạng thái Maintenance của room
                 const booking = getBooking(room.id, slot.id);
-                const cellText = isRoomInactive
+                const isMaintenanceBooking = booking && booking.status === 6; // Booking cho bảo trì
+                const cellText = isRoomInactive || isMaintenanceBooking
                   ? '-'
                   : booking
-                  ? (
+                  ? (role === 2 ? (
                       <Link
                         to={`/booking/detail/${booking.id}`}
                         style={{ fontWeight: 'bold', textDecoration: 'underline', color: 'red' }}
                       >
                         Đã đặt
                       </Link>
-                    )
-                  : (
+                    ) : 'Đã đặt')
+                  : (role === 1 ? (
                       <Link
                         to={`/booking?roomId=${room.id}&slotId=${slot.id}&date=${date}`}
                         style={{ fontWeight: 'bold', textDecoration: 'underline' }}
                       >
                         +
                       </Link>
-                    );
-                const bgColor = isRoomInactive
-                  ? '#e0e0e0' // xám
+                    ) : null);
+                const bgColor = isRoomInactive || isMaintenanceBooking
+                  ? '#e0e0e0'
                   : booking
-                  ? '#f8d7da' // đỏ nhạt
-                  : '#d4edda'; // xanh nhạt
-
-                const textColor = isRoomInactive
+                  ? '#f8d7da'
+                  : '#d4edda';
+                const textColor = isRoomInactive || isMaintenanceBooking
                   ? '#6c757d'
                   : booking
                   ? '#721c24'

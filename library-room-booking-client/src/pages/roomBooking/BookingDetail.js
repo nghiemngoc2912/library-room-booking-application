@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import BookingDetailForm from '../../Components/BookingDetailForm';
 import { fetchBookingDetail, updateBooking, deleteBooking } from '../../api/BookingAPI';
 import { cancelBooking, checkinBooking, checkoutBooking } from '../../api/BookingAPI';
-
 import { fetchSlots } from '../../api/SlotAPI';
 import { fetchRooms } from '../../api/RoomAPI';
 
@@ -11,6 +10,8 @@ export default function BookingDetailPage({ role }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const [booking, setBooking] = useState(null);
+  const [slots, setSlots] = useState([]);
+  const [rooms, setRooms] = useState([]);
 
   const reloadBooking = () => {
     fetchBookingDetail(id).then(data => {
@@ -20,14 +21,6 @@ export default function BookingDetailPage({ role }) {
 
   useEffect(() => {
     reloadBooking();
-  }, [id]);
-
-  
-  const [slots, setSlots] = useState([]);
-  const [rooms, setRooms] = useState([]);
-
-  useEffect(() => {
-    fetchBookingDetail(id).then(setBooking);
     fetchSlots().then(setSlots);
     fetchRooms().then(setRooms);
   }, [id]);
@@ -35,37 +28,38 @@ export default function BookingDetailPage({ role }) {
   const handleChange = (field, value) => {
     setBooking(prev => ({ ...prev, [field]: value }));
   };
+
   const handleCancel = async () => {
-  if (window.confirm('Do you want to cancel booking?')) {
-    await cancelBooking(id);
-    alert('Booking is canceled');
-    reloadBooking(); // reload lại detail
-  }
-};
+    if (window.confirm('Do you want to cancel booking?')) {
+      await cancelBooking(id);
+      alert('Booking is canceled');
+      reloadBooking();
+    }
+  };
 
-const handleCheckin = async () => {
-  try {
-    const result = await checkinBooking(id);
-    alert('✅ Check-in successfully: ' + result.checkInAt);
-    // gọi lại API hoặc reload chi tiết booking nếu cần
-  } catch (error) {
-    alert('❌ Error check-in: ' + error.message);
-  }
-  reloadBooking();
-};
+  const handleCheckin = async () => {
+    try {
+      const result = await checkinBooking(id);
+      alert('✅ Check-in successfully: ' + result.checkInAt);
+      reloadBooking();
+    } catch (error) {
+      alert('❌ Error check-in: ' + error.message);
+    }
+  };
 
+  const handleCheckout = async () => {
+    try {
+      const result = await checkoutBooking(id);
+      alert('✅ Check-out successfully: ' + result.checkOutAt);
+      reloadBooking();
+    } catch (error) {
+      alert('❌ Error check-out: ' + error.message);
+    }
+  };
 
-const handleCheckout = async () => {
-  try {
-    const result = await checkinBooking(id);
-    alert('✅ Check-out successfully: ' + result.checkOutAt);
-    // gọi lại API hoặc reload chi tiết booking nếu cần
-  } catch (error) {
-    alert('❌ Error check-out: ' + error.message);
-  }
-  reloadBooking();
-};
-
+  const handleBack = () => {
+    navigate(-1); // Navigate to the previous page
+  };
 
   return (
     <BookingDetailForm
@@ -77,7 +71,7 @@ const handleCheckout = async () => {
       onCancel={handleCancel}
       onCheckin={handleCheckin}
       onCheckout={handleCheckout}
-      onBack={() => navigate('/booking/history')}
+      onBack={handleBack}
     />
   );
 }

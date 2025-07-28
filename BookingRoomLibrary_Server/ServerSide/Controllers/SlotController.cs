@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ServerSide.Constants;
 using ServerSide.DTOs;
+using ServerSide.Filters;
 using ServerSide.Models;
 using ServerSide.Services;
 
 namespace ServerSide.Controllers
 {
+    [RoleFilter((int)Roles.Student, (int)Roles.Staff, (int)Roles.Admin)]
     [Route("api/[controller]")]
     [ApiController]
     public class SlotController : ControllerBase
@@ -49,7 +52,7 @@ namespace ServerSide.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
-
+        [RoleFilter((int)Roles.Staff,(int)Roles.Admin)]
         [HttpGet("update/{id}")]
         public IActionResult GetSlotByIdForUpdate(int id)
         {
@@ -74,7 +77,6 @@ namespace ServerSide.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
-
         [HttpPost]
         public IActionResult CreateSlot([FromBody] SlotDTO slotDTO)
         {
@@ -96,7 +98,6 @@ namespace ServerSide.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
-
         [HttpPut("update/{id}")]
         public IActionResult UpdateSlot(int id, [FromBody] SlotDTO slotDTO)
         {
@@ -123,7 +124,6 @@ namespace ServerSide.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
-
         [HttpPut("deactivate/{id}")]
         public IActionResult DeactivateSlot(int id)
         {
@@ -141,7 +141,6 @@ namespace ServerSide.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
-
         [HttpPut("activate/{id}")]
         public IActionResult ActivateSlot(int id)
         {
@@ -153,6 +152,20 @@ namespace ServerSide.Controllers
                     return BadRequest("Slot not found or not in Inactive status.");
                 }
                 return Ok("Slot activated successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
+        [HttpGet("slots_for_maintenance")]
+        public IActionResult GetSlotsForMaintenance()
+        {
+            try
+            {
+                var slots = slotService.GetSlotsForMaintenance();
+                return Ok(slots);
             }
             catch (Exception ex)
             {

@@ -32,9 +32,6 @@ export default function ReputationView({ userId }) {
 
         {/* Violation History Section */}
         <Box>
-          <Box display="flex" justifyContent="flex-end" mb={1}>
-            <Button size="small" variant="outlined">CHANGE PASSWORD</Button>
-          </Box>
           <Paper elevation={3} sx={{ p: 3, minWidth: 320 }}>
             <Typography variant="h6" gutterBottom>Violation History</Typography>
             <hr />

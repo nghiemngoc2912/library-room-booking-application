@@ -45,7 +45,9 @@ namespace ServerSide.Repositories
                 .Where(b =>
                     b.BookingDate >= fromDate &&
                     b.BookingDate <= toDate &&
-                    b.Students.Any(s => s.Id == user.Id))
+                    b.Students.Any(s => s.Id == user.Id) &&
+                    b.Status!=(byte)BookingRoomStatus.CanceledForMaintainance
+                    )
                 .Count();
         }
         public Booking GetBookingById(int id)
@@ -61,21 +63,16 @@ namespace ServerSide.Repositories
             context.Bookings.Update(booking);
             context.SaveChanges();
         }
-    
+
 
         public async Task<List<Booking>> GetBookingsByUser(int userId, DateOnly? from, DateOnly? to, int page, int pageSize)
         {
-            var bookingIds = await context.Bookings
-                .Where(b => b.Students.Any(s => s.Id == userId))
-                .Select(b => b.Id)
-                .ToListAsync();
-
             var query = context.Bookings
                 .Include(b => b.Room)
                 .Include(b => b.Slot)
                 .Include(b => b.Ratings)
                 .Include(b => b.Students)
-                .Where(b => bookingIds.Contains(b.Id));
+                .Where(b => b.CreatedBy == userId); 
 
             if (from.HasValue)
                 query = query.Where(b => b.BookingDate >= from.Value);
@@ -89,10 +86,11 @@ namespace ServerSide.Repositories
                 .ToListAsync();
         }
 
+
         public async Task<int> CountBookingsByUser(int userId, DateOnly? from, DateOnly? to)
         {
             var query = context.Bookings
-                .Where(b => b.Students.Any(s => s.Id == userId));
+                .Where(b => b.CreatedBy == userId); // Lọc theo CreatedBy
 
             if (from.HasValue)
                 query = query.Where(b => b.BookingDate >= from.Value);
@@ -101,6 +99,7 @@ namespace ServerSide.Repositories
 
             return await query.CountAsync();
         }
+
         public async Task<List<object>> GetBookingStatistics(DateTime? startDate, DateTime? endDate)
         {
             try
@@ -247,7 +246,21 @@ namespace ServerSide.Repositories
                 throw;
             }
         }
+        public async Task<List<Booking>> GetBookingsToRemindAsync()
+        {
+            return await context.Bookings
+                .Include(b => b.Slot)
+                .Include(b => b.CreatedByNavigation).ThenInclude(u => u.Account)
+                .Where(b => (b.ReminderSent == null || b.ReminderSent == false)
+                            && b.Status == (byte)BookingRoomStatus.Booked)
+                .ToListAsync();
 
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await context.SaveChangesAsync();
+        }
 
     }
 
@@ -264,5 +277,7 @@ namespace ServerSide.Repositories
         Task<List<object>> GetUsageStatistics(string period, DateTime? startDate, DateTime? endDate);
         Task<List<ServerSide.DTOs.Admin.RatingGroupResult>> GetRatingStatistics(DateTime? startDate, DateTime? endDate);
         Task<IEnumerable<Booking>> GetExpiredBooking();
+        Task SaveChangesAsync();
+        Task<List<Booking>> GetBookingsToRemindAsync();
     }
 }

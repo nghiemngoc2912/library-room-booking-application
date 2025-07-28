@@ -7,39 +7,38 @@ import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
-import Badge from '@mui/material/Badge';
-import { useAuth } from '../App'
+import { useAuth } from '../App';
 import { useNavigate } from 'react-router-dom';
 
-const pages = ['Home', 'Room', 'Slot', 'Students', 'Report', 'Setting', 'News', 'Rules'];
-const settings = ['Profile','Logout'];
+const pages = [
+  { label: 'Home', path: '/home', roles: [2] },
+  { label: 'Room', path: '/room_management', roles: [2] },
+  { label: 'Slot', path: '/slot_management', roles: [2] },
+  { label: 'Students', path: '/students', roles: [2] },
+  { label: 'Reports', path: '/reports', roles: [2] },
+  { label: 'News', path: '/news', roles: [2] },
+  { label: 'Rules', path: '/rules', roles: [2] },
+];
+
+const settings = ['Profile', 'Logout'];
 
 function LibrarianHeader() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const navigate = useNavigate();
+  const { role, setRole, userName } = useAuth();
 
-  const handleOpenNavMenu = (event) => {
-    setAnchorElNav(event.currentTarget);
-  };
-  const handleOpenUserMenu = (event) => {
-    setAnchorElUser(event.currentTarget);
-  };
+  console.log('LibrarianHeader - Role:', role);
 
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
-  };
-
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
-  };
-  const { setRole } = useAuth();
+  const handleOpenNavMenu = (event) => setAnchorElNav(event.currentTarget);
+  const handleOpenUserMenu = (event) => setAnchorElUser(event.currentTarget);
+  const handleCloseNavMenu = () => setAnchorElNav(null);
+  const handleCloseUserMenu = () => setAnchorElUser(null);
 
   const handleLogout = async () => {
     try {
@@ -52,6 +51,7 @@ function LibrarianHeader() {
     }
 
     localStorage.removeItem('authToken');
+    localStorage.removeItem('role');
     sessionStorage.clear();
     setRole(null);
 
@@ -59,16 +59,12 @@ function LibrarianHeader() {
     navigate('/login', { replace: true });
   };
 
-  const handlePageNavigation = (page) => {
-    handleCloseNavMenu();
-    if (page === 'Home') {
-      navigate('/home');
-    } else if (page === 'Room') {
-      navigate('/room_management');
-    } else if (page === 'Slot') {
-      navigate('/slot_management');
-    } else {
-      navigate(`/${page.toLowerCase()}`);
+  const handleSettingClick = (setting) => {
+    if (setting === 'Logout') {
+      handleLogout();
+    } else if (setting === 'Profile') {
+      if (role === 2) navigate('/librarian/profile'); // Chỉ điều hướng khi role là 2
+      handleCloseUserMenu();
     }
   };
 
@@ -81,7 +77,7 @@ function LibrarianHeader() {
             variant="h6"
             noWrap
             component="a"
-            href="#app-bar-with-responsive-menu"
+            href="#"
             sx={{
               mr: 2,
               display: { xs: 'none', md: 'flex' },
@@ -92,15 +88,12 @@ function LibrarianHeader() {
               textDecoration: 'none',
             }}
           >
-            Logo
+            LOGO
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
               size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
               onClick={handleOpenNavMenu}
               color="inherit"
             >
@@ -109,32 +102,34 @@ function LibrarianHeader() {
             <Menu
               id="menu-appbar"
               anchorEl={anchorElNav}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
-              }}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
               keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
               open={Boolean(anchorElNav)}
               onClose={handleCloseNavMenu}
               sx={{ display: { xs: 'block', md: 'none' } }}
             >
-              {pages.map((page) => (
-                <MenuItem key={page} onClick={() => handlePageNavigation(page)}>
-                  <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
+              {pages.filter(p => p.roles.includes(role)).map((page) => (
+                <MenuItem
+                  key={page.label}
+                  onClick={() => {
+                    console.log('Navigating to:', page.path);
+                    navigate(page.path);
+                    handleCloseNavMenu();
+                  }}
+                >
+                  <Typography textAlign="center">{page.label}</Typography>
                 </MenuItem>
               ))}
             </Menu>
           </Box>
+
           <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
           <Typography
             variant="h5"
             noWrap
             component="a"
-            href="#app-bar-with-responsive-menu"
+            href="#"
             sx={{
               mr: 2,
               display: { xs: 'flex', md: 'none' },
@@ -148,22 +143,27 @@ function LibrarianHeader() {
           >
             LOGO
           </Typography>
+
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {pages.map((page) => (
+            {pages.filter(p => p.roles.includes(role)).map((page) => (
               <Button
-                key={page}
-                onClick={() => handlePageNavigation(page)}
+                key={page.label}
+                onClick={() => {
+                  console.log('Navigating to:', page.path);
+                  navigate(page.path);
+                }}
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
-                {page}
+                {page.label}
               </Button>
             ))}
           </Box>
+
           <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Badge badgeContent={3} color="error" overlap="circular">
-              <NotificationsIcon />
-            </Badge>
-            <Tooltip title="Account setting">
+            <Typography variant="body1" sx={{ color: 'white', marginRight: '10px' }}>
+              Librarian: {userName || 'Guest'}
+            </Typography>
+            <Tooltip title="Account settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <AccountCircle fontSize="large" />
               </IconButton>
@@ -172,21 +172,15 @@ function LibrarianHeader() {
               sx={{ mt: '45px' }}
               id="menu-appbar"
               anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
+              anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
               keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
+              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={setting === 'Logout' ? handleLogout : handleCloseUserMenu}>
-                  <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
+                <MenuItem key={setting} onClick={() => handleSettingClick(setting)}>
+                  <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>
               ))}
             </Menu>

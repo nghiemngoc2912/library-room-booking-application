@@ -8,6 +8,7 @@ namespace ServerSide.DTOs.Booking
         public string BookingDate { get; set; } = null!;
         public string RoomName { get; set; } = null!;
         public string Slot { get; set; } = null!;
+        public byte Status { get; set; }
         public RatingDTO? Rating { get; set; } 
     }
 }

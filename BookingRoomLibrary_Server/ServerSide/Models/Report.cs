@@ -24,6 +24,8 @@ public partial class Report
     public int? ResolvedBy { get; set; }
 
     public int RoomId { get; set; }
+    public int StartSlotId { get; set; } // Thêm cột mới
+    public int EndSlotId { get; set; }   // Thêm cột mới
 
     public virtual User? ResolvedByNavigation { get; set; }
 
@@ -32,4 +34,6 @@ public partial class Report
     public virtual Rule Rule { get; set; } = null!;
 
     public virtual User User { get; set; } = null!;
+    public virtual Slot StartSlot { get; set; } // Thêm navigation property
+    public virtual Slot EndSlot { get; set; }   // Thêm navigation property
 }

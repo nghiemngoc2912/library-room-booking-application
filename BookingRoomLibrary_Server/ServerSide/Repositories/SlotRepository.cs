@@ -71,5 +71,6 @@ namespace ServerSide.Repositories
         Slot GetById(int id);
         bool Update(Slot slot);
         bool Delete(int id);
+
     }
 }

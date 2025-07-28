@@ -7,34 +7,36 @@ import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
-import Badge from '@mui/material/Badge';
-import { useAuth } from '../App'
+import { useAuth } from '../App';
 import { useNavigate } from 'react-router-dom';
 
-
 const pages = [
-  { name: 'Manage rules', path: '/admin/manage_rules' },
-  { name: 'Manage librarians', path: '/admin/manage_librarians' },
-  { name: 'Dashboard', path: '/admin' },
-  { name: 'Request Room', path: '/admin/request_room' },
-  { name: 'Request Slot', path: '/admin/request_slot' }
+  { label: 'Manage rules', path: '/admin/manage_rules', roles: [3] },
+  { label: 'Manage librarians', path: '/admin/manage_librarians', roles: [3] },
+  { label: 'Dashboard', path: '/admin', roles: [3] },
+  { label: 'Request Room', path: '/admin/request_room', roles: [3] },
+  { label: 'Request Slot', path: '/admin/request_slot', roles: [3] },
 ];
-const settings = ['Profile','Logout'];
+
+const settings = ['Profile', 'Logout'];
 
 function AdminHeader() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const navigate = useNavigate();
+  const { role, setRole, userName } = useAuth();
+
+  console.log('AdminHeader - Role:', role);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
+
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
@@ -47,8 +49,6 @@ function AdminHeader() {
     setAnchorElUser(null);
   };
 
-  const { setRole } = useAuth();
-
   const handleLogout = async () => {
     try {
       await fetch('https://localhost:7238/api/auth/logout', {
@@ -60,6 +60,7 @@ function AdminHeader() {
     }
 
     localStorage.removeItem('authToken');
+    localStorage.removeItem('role');
     sessionStorage.clear();
     setRole(null);
 
@@ -67,9 +68,13 @@ function AdminHeader() {
     navigate('/login', { replace: true });
   };
 
-  const handlePageNavigation = (path) => {
-    navigate(path);
-    handleCloseNavMenu();
+  const handleSettingClick = (setting) => {
+    if (setting === 'Logout') {
+      handleLogout();
+    } else if (setting === 'Profile') {
+      navigate('/admin/profile');
+      handleCloseUserMenu();
+    }
   };
 
   return (
@@ -81,7 +86,7 @@ function AdminHeader() {
             variant="h6"
             noWrap
             component="a"
-            href="#app-bar-with-responsive-menu"
+            href="#"
             sx={{
               mr: 2,
               display: { xs: 'none', md: 'flex' },
@@ -92,7 +97,7 @@ function AdminHeader() {
               textDecoration: 'none',
             }}
           >
-            Logo
+            LOGO
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -122,19 +127,27 @@ function AdminHeader() {
               onClose={handleCloseNavMenu}
               sx={{ display: { xs: 'block', md: 'none' } }}
             >
-              {pages.map((page) => (
-                <MenuItem key={page.name} onClick={() => handlePageNavigation(page.path)}>
-                  <Typography sx={{ textAlign: 'center' }}>{page.name}</Typography>
+              {pages.filter(p => p.roles.includes(role)).map((page) => (
+                <MenuItem
+                  key={page.label}
+                  onClick={() => {
+                    console.log('Navigating to:', page.path);
+                    navigate(page.path);
+                    handleCloseNavMenu();
+                  }}
+                >
+                  <Typography textAlign="center">{page.label}</Typography>
                 </MenuItem>
               ))}
             </Menu>
           </Box>
+
           <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
           <Typography
             variant="h5"
             noWrap
             component="a"
-            href="#app-bar-with-responsive-menu"
+            href="#"
             sx={{
               mr: 2,
               display: { xs: 'flex', md: 'none' },
@@ -148,22 +161,28 @@ function AdminHeader() {
           >
             LOGO
           </Typography>
+
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {pages.map((page) => (
+            {pages.filter(p => p.roles.includes(role)).map((page) => (
               <Button
-                key={page.name}
-                onClick={() => handlePageNavigation(page.path)}
+                key={page.label}
+                onClick={() => {
+                  console.log('Navigating to:', page.path);
+                  navigate(page.path);
+                  handleCloseNavMenu();
+                }}
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
-                {page.name}
+                {page.label}
               </Button>
             ))}
           </Box>
+
           <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Badge badgeContent={3} color="error" overlap="circular">
-              <NotificationsIcon />
-            </Badge>
-            <Tooltip title="Account setting">
+            <Typography variant="body1" sx={{ color: 'white', marginRight: '10px' }}>
+              {userName || 'Guest'}
+            </Typography>
+            <Tooltip title="Account settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <AccountCircle fontSize="large" />
               </IconButton>
@@ -185,8 +204,8 @@ function AdminHeader() {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={setting === 'Logout' ? handleLogout : handleCloseUserMenu}>
-                  <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
+                <MenuItem key={setting} onClick={() => handleSettingClick(setting)}>
+                  <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>
               ))}
             </Menu>
@@ -196,4 +215,5 @@ function AdminHeader() {
     </AppBar>
   );
 }
+
 export default AdminHeader;
