@@ -246,7 +246,21 @@ namespace ServerSide.Repositories
                 throw;
             }
         }
+        public async Task<List<Booking>> GetBookingsToRemindAsync()
+        {
+            return await context.Bookings
+                .Include(b => b.Slot)
+                .Include(b => b.CreatedByNavigation).ThenInclude(u => u.Account)
+                .Where(b => (b.ReminderSent == null || b.ReminderSent == false)
+                            && b.Status == (byte)BookingRoomStatus.Booked)
+                .ToListAsync();
 
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await context.SaveChangesAsync();
+        }
 
     }
 
@@ -263,5 +277,7 @@ namespace ServerSide.Repositories
         Task<List<object>> GetUsageStatistics(string period, DateTime? startDate, DateTime? endDate);
         Task<List<ServerSide.DTOs.Admin.RatingGroupResult>> GetRatingStatistics(DateTime? startDate, DateTime? endDate);
         Task<IEnumerable<Booking>> GetExpiredBooking();
+        Task SaveChangesAsync();
+        Task<List<Booking>> GetBookingsToRemindAsync();
     }
 }

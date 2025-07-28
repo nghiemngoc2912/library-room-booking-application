@@ -64,12 +64,12 @@ namespace ServerSide.Services
         public void CreateBooking(CreateBookingDTO createBookingDTO, int userId)
         {
             var slot = slotService.GetById(createBookingDTO.SlotId);
-            if(slot.Status!=(byte)SlotStatus.Active)
+            if (slot.Status != (byte)SlotStatus.Active)
                 throw new BookingPolicyViolationException($"Slot is not active.");
             validation.ValidateBookingDate(createBookingDTO, slot);
 
             var room = roomService.GetRoomByIdForBooking(createBookingDTO.RoomId);
-            if(room.Status!=(byte)RoomStatus.Active)
+            if (room.Status != (byte)RoomStatus.Active)
                 throw new BookingPolicyViolationException($"Slot is not active active.");
             validation.ValidateCapacity(createBookingDTO, room);
 
@@ -197,7 +197,8 @@ namespace ServerSide.Services
             var early = slotStart.AddMinutes(-_rules.MaxTimeToCheckin);
             var late = slotStart.AddMinutes(_rules.MaxTimeToCheckin);
 
-            if (now < early || now > late){
+            if (now < early || now > late)
+            {
                 return (false, $"You can check in within {_rules.MaxTimeToCheckin} minutes before and after: {slotStart:HH:mm}", booking);
             }
             booking.Status = (byte)BookingRoomStatus.Checkined;
@@ -229,7 +230,7 @@ namespace ServerSide.Services
             {
                 studentService.SubtractReputationAsync(booking.CreatedBy, _rules.SubstractReputation, "");
             }
-            booking.Status =(byte) BookingRoomStatus.Checkouted;
+            booking.Status = (byte)BookingRoomStatus.Checkouted;
             booking.CheckOutAt = now;
             repository.UpdateBooking(booking);
 
@@ -241,7 +242,7 @@ namespace ServerSide.Services
             var expiredBookings = await repository.GetExpiredBooking();
             foreach (var booking in expiredBookings)
             {
-                booking.Status =(byte) BookingRoomStatus.AutoCanceled;
+                booking.Status = (byte)BookingRoomStatus.AutoCanceled;
                 //tru diem reputation
                 await studentService.SubtractReputationAsync(booking.CreatedBy, _rules.SubstractReputation, "");
                 repository.UpdateBooking(booking);
@@ -426,7 +427,39 @@ namespace ServerSide.Services
                 }
             }
         }
+
+        public async Task CheckAndSendRemindersAsync()
+        {
+            var now = DateTime.Now;
+            var targetTime = now.AddHours(_rules.SendMailRemind); // ví dụ 6h
+            var fromTime = now;
+
+            var bookings = await repository.GetBookingsToRemindAsync();
+
+            foreach (var booking in bookings)
+            {
+                var slotTime = booking.Slot.FromTime; // TimeSpan
+                var bookingStart = booking.BookingDate.ToDateTime(slotTime);
+
+                if (bookingStart >= fromTime && bookingStart <= targetTime)
+                {
+                    var email = booking.CreatedByNavigation.Account.Username;
+                    if (!string.IsNullOrEmpty(email))
+                    {
+                        await _emailService.SendEmailAsync(
+                            email,
+                            "Remind room booking in FPTU library",
+                            "Remember to come and check in the room you booked in FPTU library"
+                        );
+                        booking.ReminderSent = true;
+                    }
+                }
+            }
+
+            await repository.SaveChangesAsync();
+        }
     }
+
 
     public interface IBookingService
     {
@@ -441,5 +474,6 @@ namespace ServerSide.Services
         Task CancelExpiredBookingsAsync();
         void CancelBooking(int id);
         void CreateMaintenanceBooking(MaintenanceBookingDTO maintenanceBookingDTO, int userId);
+        Task CheckAndSendRemindersAsync();
     }
 }
