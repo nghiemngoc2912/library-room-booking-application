@@ -157,10 +157,13 @@ namespace ServerSide.Controllers
                 {
                     return Unauthorized(new { message = "Not logged in" });
                 }
-                int userId = int.Parse(userIdRaw);
+                if (!int.TryParse(userIdRaw, out int userId))
+                {
+                    return BadRequest(new { message = "Invalid user ID format" });
+                }
                 Console.WriteLine($"Received payload: {Newtonsoft.Json.JsonConvert.SerializeObject(maintenanceBookingDTO)}");
                 _bookingService.CreateMaintenanceBooking(maintenanceBookingDTO, userId);
-                return Ok("Maintenance booking created successfully");
+                return Ok(new { message = "Maintenance booking created successfully" });
             }
             catch (BookingPolicyViolationException ex)
             {
@@ -170,7 +173,7 @@ namespace ServerSide.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine($"Error: {ex.Message}");
-                return StatusCode(500, "Internal server error: " + ex.Message);
+                return StatusCode(500, new { message = "Internal server error: " + ex.Message });
             }
         }
     }

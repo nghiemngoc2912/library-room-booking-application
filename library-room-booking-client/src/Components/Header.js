@@ -32,7 +32,7 @@ function Header() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const navigate = useNavigate();
-  const { role, setRole } = useAuth();
+  const { role, setRole, userName } = useAuth();
 
   console.log('Header - Role:', role);
 
@@ -184,7 +184,9 @@ function Header() {
           </Box>
 
           <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center', gap: 2 }}>
-            
+            <Typography variant="body1" sx={{ color: 'white', marginRight: '10px' }}>
+              {userName || 'Guest'}
+            </Typography>
             <Tooltip title="Account settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <AccountCircle fontSize="large" />

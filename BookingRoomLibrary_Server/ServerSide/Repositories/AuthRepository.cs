@@ -21,6 +21,13 @@ namespace ServerSide.Repositories
                 .FirstOrDefault(a => a.Username == username);
         }
 
+        public async Task<Account> GetAccountByUsernameSyn(string username)
+        {
+            Console.WriteLine("GetAccountByUsername: " + username);
+            return await _context.Accounts.FirstOrDefaultAsync(a => a.Username == username);
+        }
+
+
         public async Task<Account> GetAccountByUserIdAsync(int userId)
         {
             return await _context.Accounts
@@ -48,6 +55,7 @@ namespace ServerSide.Repositories
     public interface IAuthRepository
     {
         Account GetAccountByUsername(string username);
+        Task<Account> GetAccountByUsernameSyn(string username);
         Task<Account> GetAccountByUserIdAsync(int userId); 
         Task UpdateAccountAsync(Account account);
         int GetUserIdByAccountId(int accountId);

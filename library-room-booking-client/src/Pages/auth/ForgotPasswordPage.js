@@ -23,14 +23,17 @@ function ForgotPasswordPage() {
 
     try {
       const response = await forgotPassword(email);
-      if (response.ok) {
-        setSuccessMsg('Một liên kết đặt lại mật khẩu đã được gửi đến email của bạn. Vui lòng kiểm tra.');
-        setTimeout(() => navigate('/login'), 3000); // Quay lại login sau 3 giây
-      } else {
-        setErrorMsg('Email không tồn tại hoặc xảy ra lỗi. Vui lòng thử lại.');
-      }
+
+      // Nếu đến đây là đã thành công rồi
+      setSuccessMsg('Một liên kết đặt lại mật khẩu đã được gửi đến email của bạn. Vui lòng kiểm tra.');
+      setTimeout(() => navigate('/login'), 3000);
     } catch (err) {
-      setErrorMsg('Lỗi mạng. Vui lòng thử lại sau.');
+      if (err.response && err.response.status === 400) {
+        // Lỗi cụ thể từ server trả về
+        setErrorMsg(err.response.data.message || 'Email không tồn tại hoặc đã gửi OTP rồi.');
+      } else {
+        setErrorMsg('Lỗi mạng. Vui lòng thử lại sau.');
+      }
       console.error('Forgot password error:', err);
     }
   };

@@ -43,6 +43,7 @@ namespace ServerSide.Repositories
         public async Task<User> GetUserByIdAsync(int id)
         {
             return await _context.Users
+                .Include(u=>u.Account)
                 .FirstOrDefaultAsync(u => u.Id == id)
                 ?? throw new KeyNotFoundException($"User with ID {id} not found.");
         }

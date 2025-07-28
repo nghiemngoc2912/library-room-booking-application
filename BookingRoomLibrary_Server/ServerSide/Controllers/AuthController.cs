@@ -191,8 +191,19 @@ namespace ServerSide.Controllers
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDTO dto)
         {
-            Console.WriteLine("[DEBUG] DTO nhận được:");
-            Console.WriteLine($"Email: {dto.Email}");
+            if (dto == null)
+            {
+                Console.WriteLine("[DEBUG] DTO is null!");
+                return BadRequest("Invalid payload");
+            }
+
+            if (string.IsNullOrEmpty(dto.Email))
+            {
+                Console.WriteLine("[DEBUG] Email is empty!");
+                return BadRequest("Email is required");
+            }
+
+            Console.WriteLine($"[DEBUG] Email nhận được: {dto.Email}");
 
             try
             {
@@ -204,6 +215,7 @@ namespace ServerSide.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
 
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO dto)

@@ -8,6 +8,7 @@ function Register() {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
+    confirmPassword: '',
     fullName: '',
     dob: '',
   });
@@ -16,13 +17,41 @@ function Register() {
   const [successMsg, setSuccessMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isResendLoading, setIsResendLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
+
+  const validateForm = () => {
+    if (!formData.email) return 'Email is required.';
+    if (!formData.password) return 'Password is required.';
+    if (formData.password.length < 8) return 'Password must be at least 8 characters long.';
+    if (!formData.confirmPassword) return 'Confirm Password is required.';
+    if (formData.password !== formData.confirmPassword) return 'Passwords do not match.';
+    if (!formData.fullName) return 'Full Name is required.';
+    if (!formData.dob) return 'Date of Birth is required.';
+    
+    const today = new Date();
+    const dob = new Date(formData.dob);
+    const maxValidDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+    
+    if (dob > today) return 'Date of Birth cannot be in the future.';
+    if (dob > maxValidDate) return 'You must be at least 18 years old.';
+    
+    return '';
+  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
     setErrorMsg('');
     setSuccessMsg('');
     setIsLoading(true);
+
+    const validationError = validateForm();
+    if (validationError) {
+      setErrorMsg(validationError);
+      setIsLoading(false);
+      return;
+    }
 
     try {
       await register({
@@ -33,7 +62,7 @@ function Register() {
       });
       setStep(2);
     } catch (err) {
-      setErrorMsg(err.response?.data?.message || 'Đăng ký thất bại. Vui lòng thử lại.');
+      setErrorMsg(err.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -46,9 +75,12 @@ function Register() {
 
     try {
       await verifyOtp(formData.email, otp);
-      navigate('/login', { state: { successMsg: 'Đăng ký thành công! Vui lòng đăng nhập.' } });
+      setSuccessMsg('You have successfully registered! Redirecting to login in 2 seconds...');
+      setTimeout(() => {
+        navigate('/login', { state: { successMsg: 'Registration successful! Please log in.' } });
+      }, 2000);
     } catch (err) {
-      setErrorMsg(err.response?.data?.message || 'Mã OTP không hợp lệ.');
+      setErrorMsg(err.response?.data?.message || 'Invalid OTP code.');
     }
   };
 
@@ -61,7 +93,7 @@ function Register() {
       const response = await axios.post('/api/auth/resend-otp', { username: formData.email });
       setSuccessMsg(response.data.message);
     } catch (err) {
-      setErrorMsg(err.response?.data?.message || 'Gửi lại OTP thất bại. Vui lòng thử lại.');
+      setErrorMsg(err.response?.data?.message || 'Failed to resend OTP. Please try again.');
     } finally {
       setIsResendLoading(false);
     }
@@ -111,22 +143,76 @@ function Register() {
               boxSizing: 'border-box',
             }}
           />
-          <input
-            type="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            required
-            disabled={isLoading}
-            style={{
-              padding: '0.75rem',
-              borderRadius: '6px',
-              border: '1px solid #ccc',
-              fontSize: '1rem',
-              width: '100%',
-              boxSizing: 'border-box',
-            }}
-          />
+          <div style={{ position: 'relative' }}>
+            <input
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Password"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              required
+              disabled={isLoading}
+              style={{
+                padding: '0.75rem',
+                borderRadius: '6px',
+                border: '1px solid #ccc',
+                fontSize: '1rem',
+                width: '100%',
+                boxSizing: 'border-box',
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                position: 'absolute',
+                right: '10px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '0.9rem',
+                color: '#007BFF',
+              }}
+            >
+              {showPassword ? 'Hide' : 'Show'}
+            </button>
+          </div>
+          <div style={{ position: 'relative' }}>
+            <input
+              type={showConfirmPassword ? 'text' : 'password'}
+              placeholder="Confirm Password"
+              value={formData.confirmPassword}
+              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+              required
+              disabled={isLoading}
+              style={{
+                padding: '0.75rem',
+                borderRadius: '6px',
+                border: '1px solid #ccc',
+                fontSize: '1rem',
+                width: '100%',
+                boxSizing: 'border-box',
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              style={{
+                position: 'absolute',
+                right: '10px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '0.9rem',
+                color: '#007BFF',
+              }}
+            >
+              {showConfirmPassword ? 'Hide' : 'Show'}
+            </button>
+          </div>
           <input
             type="text"
             placeholder="Full Name"
@@ -147,6 +233,7 @@ function Register() {
             type="date"
             value={formData.dob}
             onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
+            required
             disabled={isLoading}
             style={{
               padding: '0.75rem',
@@ -189,7 +276,7 @@ function Register() {
                       marginRight: '8px',
                     }}
                   ></span>
-                  Đang gửi OTP...
+                  Sending OTP...
                 </>
               ) : (
                 'Register'
@@ -214,24 +301,7 @@ function Register() {
                 position: 'relative',
               }}
             >
-              {isLoading ? (
-                <>
-                  <span
-                    style={{
-                      border: '2px solid #fff',
-                      borderTop: '2px solid transparent',
-                      borderRadius: '50%',
-                      width: '16px',
-                      height: '16px',
-                      animation: 'spin 1s linear infinite',
-                      marginRight: '8px',
-                    }}
-                  ></span>
-                  Đang tải...
-                </>
-              ) : (
-                'Back to Login'
-              )}
+              Back to Login
             </button>
           </div>
           <style>
@@ -256,7 +326,7 @@ function Register() {
             </p>
           )}
           <p style={{ color: '#555', marginBottom: '1rem' }}>
-            Vui lòng nhập mã OTP đã được gửi đến {formData.email}
+            Please enter the OTP sent to {formData.email}
           </p>
           <input
             type="text"
@@ -346,10 +416,10 @@ function Register() {
                     marginRight: '8px',
                   }}
                 ></span>
-                Đang gửi...
+                Sending...
               </>
             ) : (
-              'Gửi lại OTP'
+              'Resend OTP'
             )}
           </button>
         </form>

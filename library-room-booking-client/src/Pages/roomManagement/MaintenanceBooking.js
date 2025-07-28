@@ -13,6 +13,7 @@ const MaintenanceBooking = () => {
   const [reason, setReason] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     const fetchSlots = async () => {
@@ -57,11 +58,15 @@ const MaintenanceBooking = () => {
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) throw new Error('Không thể tạo lịch bảo trì.');
-      alert('Đặt lịch bảo trì thành công!');
-      navigate('/room_management');
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Không thể tạo lịch bảo trì.');
+      }
+      const data = await response.json();
+      setMessage(data.message || 'Đặt lịch bảo trì thành công!');
+      setTimeout(() => navigate('/room_management'), 2000);
     } catch (err) {
-      setError('Đặt lịch bảo trì thất bại.');
+      setError(err.message || 'Đặt lịch bảo trì thất bại.');
     } finally {
       setLoading(false);
     }
@@ -71,6 +76,7 @@ const MaintenanceBooking = () => {
     <div style={{ maxWidth: 600, margin: '2rem auto', padding: '2rem', border: '1px solid #eee', borderRadius: '10px' }}>
       <h2>Đặt lịch bảo trì cho phòng {roomId}</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
+      {message && <p style={{ color: 'green' }}>{message}</p>}
       <div style={{ marginBottom: '1rem' }}>
         <label>
           <input

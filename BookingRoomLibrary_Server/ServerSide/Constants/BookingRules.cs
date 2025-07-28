@@ -14,5 +14,7 @@
         public int TimeEnd { get; set; }
         public int TimeJobInterval { get; set; }
         public int CancelTimeInterval { get; set;}
+        public int SendMailRemind { get; set; }
+        public int SendMailRemindInterval { get;set; }
     }
 }
