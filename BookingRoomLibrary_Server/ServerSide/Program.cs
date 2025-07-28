@@ -111,6 +111,7 @@ builder.Services.AddScoped<CreateBookingValidation>();
 
 // ==================== BACKGROUND JOBS ====================
 builder.Services.AddHostedService<BookingCleanupJob>();
+builder.Services.AddHostedService<ReminderJob>();
 
 //DI Job
 builder.Services.AddScoped<ReputationJob>();

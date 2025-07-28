@@ -184,6 +184,11 @@ namespace ServerSide.Services
                 PageSize = pageSize
             };
         }
+
+        PageResultDTO<AccountDTO> IAccountService.GetAllLibrarians(string? keyword, byte? status, int page, int pageSize)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public interface IAccountService
