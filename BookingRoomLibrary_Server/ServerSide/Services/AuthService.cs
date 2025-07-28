@@ -80,7 +80,7 @@ namespace ServerSide.Services
 
         public async Task ForgotPasswordAsync(string email)
         {
-            var account = _authRepository.GetAccountByUsername(email);
+            Account account = await _authRepository.GetAccountByUsernameSyn(email);
             if (account == null)
                 throw new Exception("Email không tồn tại trong hệ thống.");
 

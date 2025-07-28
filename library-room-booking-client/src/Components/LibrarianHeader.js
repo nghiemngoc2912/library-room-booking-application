@@ -21,7 +21,6 @@ const pages = [
   { label: 'Slot', path: '/slot_management', roles: [2] },
   { label: 'Students', path: '/students', roles: [2] },
   { label: 'Reports', path: '/reports', roles: [2] },
-  { label: 'Setting', path: '/setting', roles: [2] },
   { label: 'News', path: '/news', roles: [2] },
   { label: 'Rules', path: '/rules', roles: [2] },
 ];
